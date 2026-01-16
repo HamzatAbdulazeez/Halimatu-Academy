@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  color: #0a0a0a;
+  background: #fff;
+  font-family: "Manrope", sans-serif !important;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden !important;
+}
+
+@layer components {
+  .Resizer {
+    @apply w-full px-3.75 mx-auto;
+  }
+
+  @media (min-width: 576px) {
+    .Resizer {
+      max-width: 540px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .Resizer {
+      max-width: 720px;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .Resizer {
+      max-width: 960px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .Resizer {
+      max-width: 1140px;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .Resizer {
+      max-width: 1320px;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .Resizer {
+      max-width: 1440px;
+    }
+  }
+
+  .section {
+    padding: 80px 0px;
+  }
+  .just{
+    padding: 0px 0px 100px 0px;
+  }
+
+  .only-bottom {
+    padding: 0px 0px 80px 0px;
+  }
+
+  .only-top {
+    padding: 80px 0px 0px 0px;
+  }
+
+  @media (max-width: 1000px) {
+    .section {
+      padding: 60px 0px;
+    }
+  }
+  .bg-gradient {
+    background: linear-gradient(92.49deg, #E61F65 -14.1%, #3B4CB3 111.07%);
+  }
+  .bg-faqs {
+    background: linear-gradient(92.49deg, #0EE5FF -14.1%, #1357EC 111.07%);
+  }
+  .bg-bread {
+    background: linear-gradient(92.49deg, #004AAD -14.1%, #02449B 111.07%);
+  }
+}
