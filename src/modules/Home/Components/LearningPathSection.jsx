@@ -63,7 +63,6 @@ const LearningPathSection = () => {
                         <div className="sticky top-1/2 h-full border-l-4 border-dotted border-[#004aad]"></div>
                     </div>
 
-
                     {/* Steps */}
                     <div className="space-y-12">
                         {steps.map((step, index) => (

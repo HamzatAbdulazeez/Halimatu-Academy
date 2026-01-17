@@ -100,7 +100,7 @@ const AcademyBanner = () => {
                                         <button className="px-8 py-3 bg-white text-gray-900 rounded-md hover:bg-gray-100 transition-colors">
                                             Enroll Now
                                         </button>
-                                        <button className="hidden md:block **:px-8 py-3  border border-white text-white rounded-md hover:bg-white/30 transition-colors">
+                                        <button className="hidden md:block px-8 py-3  border border-white text-white rounded-md hover:bg-white/30 transition-colors">
                                             Learn More
                                         </button>
                                     </div>

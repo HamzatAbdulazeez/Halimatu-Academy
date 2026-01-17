@@ -5,41 +5,41 @@ const ProgramSection = () => {
     const [hoveredCard, setHoveredCard] = useState(null);
 
     const subjects = [
-        {
-            title: "Aqeedah",
-            description: "Study the fundamental beliefs and pillars of Islamic faith, understanding the concept of Tawheed and the articles of faith.",
-            gradient: "from-blue-500 to-blue-700",
-            icon: "📿",
-            delay: "0"
-        },
-        {
-            title: "Seerah",
-            description: "Learn the comprehensive biography of Prophet Muhammad ﷺ, his life, teachings, and exemplary character.",
-            gradient: "from-amber-500 to-orange-600",
-            icon: "🕌",
-            delay: "100"
-        },
-        {
-            title: "Fiqh",
-            description: "Become acquainted with all types of worship, from purification to Hajj, covering financial transactions, medical issues, family matters, oaths, and vows.",
-            gradient: "from-emerald-500 to-teal-600",
-            icon: "⚖️",
-            delay: "200"
-        },
-        {
-            title: "Tafsir",
-            description: "Explore the interpretation and explanation of the Quran, understanding its meanings, context, and application in daily life.",
-            gradient: "from-teal-500 to-cyan-600",
-            icon: "📖",
-            delay: "300"
-        },
-        {
-            title: "Hadith",
-            description: "Study the sayings and actions of Prophet Muhammad ﷺ, learning their authenticity, meanings, and practical applications.",
-            gradient: "from-green-500 to-emerald-600",
-            icon: "📜",
-            delay: "400"
-        },
+        // {
+        //     title: "Aqeedah",
+        //     description: "Study the fundamental beliefs and pillars of Islamic faith, understanding the concept of Tawheed and the articles of faith.",
+        //     gradient: "from-blue-500 to-blue-700",
+        //     icon: "📿",
+        //     delay: "0"
+        // },
+        // {
+        //     title: "Seerah",
+        //     description: "Learn the comprehensive biography of Prophet Muhammad ﷺ, his life, teachings, and exemplary character.",
+        //     gradient: "from-amber-500 to-orange-600",
+        //     icon: "🕌",
+        //     delay: "100"
+        // },
+        // {
+        //     title: "Fiqh",
+        //     description: "Become acquainted with all types of worship, from purification to Hajj, covering financial transactions, medical issues, family matters, oaths, and vows.",
+        //     gradient: "from-emerald-500 to-teal-600",
+        //     icon: "⚖️",
+        //     delay: "200"
+        // },
+        // {
+        //     title: "Tafsir",
+        //     description: "Explore the interpretation and explanation of the Quran, understanding its meanings, context, and application in daily life.",
+        //     gradient: "from-teal-500 to-cyan-600",
+        //     icon: "📖",
+        //     delay: "300"
+        // },
+        // {
+        //     title: "Hadith",
+        //     description: "Study the sayings and actions of Prophet Muhammad ﷺ, learning their authenticity, meanings, and practical applications.",
+        //     gradient: "from-green-500 to-emerald-600",
+        //     icon: "📜",
+        //     delay: "400"
+        // },
         {
             title: "Arabic Language",
             description: "Master the fundamentals of Arabic grammar and vocabulary to better understand the Quran and Islamic texts.",
@@ -48,7 +48,7 @@ const ProgramSection = () => {
             delay: "500"
         },
         {
-            title: "Islamic Manners",
+            title: "Quranic",
             description: "Learn the etiquettes and moral character taught in Islam, developing excellence in behavior and interpersonal relations.",
             gradient: "from-pink-500 to-rose-600",
             icon: "🤲",
