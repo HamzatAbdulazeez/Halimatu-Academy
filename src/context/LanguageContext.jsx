@@ -1,23 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import translations from "../i18n/translations";
-
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(
-    localStorage.getItem("lang") || "en"
-  );
+  const [language, setLanguage] = useState("en");
 
-  const t = translations[language];
+  const current = translations[language];
 
   useEffect(() => {
     document.documentElement.lang = language;
-    document.documentElement.dir = t.dir;
-    localStorage.setItem("lang", language);
-  }, [language, t.dir]);
+    document.documentElement.dir = current.dir;
+  }, [language, current.dir]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider
+      value={{
+        language,
+        setLanguage,
+        t: current,
+      }}
+    >
       {children}
     </LanguageContext.Provider>
   );

@@ -60,7 +60,7 @@ body {
   }
 
   .section {
-    padding: 80px 0px;
+    padding: 60px 0px;
   }
   .just{
     padding: 0px 0px 100px 0px;
@@ -80,12 +80,6 @@ body {
     }
   }
   .bg-gradient {
-    background: linear-gradient(92.49deg, #E61F65 -14.1%, #3B4CB3 111.07%);
-  }
-  .bg-faqs {
-    background: linear-gradient(92.49deg, #0EE5FF -14.1%, #1357EC 111.07%);
-  }
-  .bg-bread {
-    background: linear-gradient(92.49deg, #004AAD -14.1%, #02449B 111.07%);
+    background: #004aad;
   }
 }
