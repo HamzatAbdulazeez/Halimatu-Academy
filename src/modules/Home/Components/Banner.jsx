@@ -111,7 +111,7 @@ const AcademyBanner = () => {
                                     <img
                                         src={slide.image}
                                         alt={slide.title}
-                                        className="absolute inset-0 w-full h-full object-cover"
+                                        className="absolute inset-01 w-full h-full object-cover"
                                     />
                                     <div className="absolute inset-0 bg-linear-to-l from-transparent to-black/20"></div>
                                 </div>

@@ -79,7 +79,7 @@ export default function Header() {
               </NavLink>
 
               {/* LANGUAGE */}
-              <div className="relative shrink-0 min-w-[90px]">
+              <div className="relative shrink-0 min-w-20.5">
                 <button
                   onClick={() => setIsLangOpen(!isLangOpen)}
                   className="w-full flex justify-center items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
