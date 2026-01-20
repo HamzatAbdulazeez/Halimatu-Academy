@@ -22,7 +22,7 @@ const BannerSection = ({
         >
             {/* Overlay for better text readability when using background image */}
             {backgroundImage && (
-                <div className={`absolute inset-0 bg-black/60 ${overlayOpacity}`}></div>
+                <div className={`absolute inset-0 bg-black/70 ${overlayOpacity}`}></div>
             )}
             
             {/* Content */}

@@ -6,7 +6,7 @@
   box-sizing: border-box;
 }
 
-body {
+html , body {
   color: #0a0a0a;
   background: #fff;
   font-family: "Manrope", sans-serif !important;
