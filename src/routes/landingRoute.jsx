@@ -5,6 +5,7 @@ import NotFoundPage from "../components/ui/NotFoundPage";
 import Knowledge from "../modules/Home/Knowledge";
 import Curriculum from "../modules/Home/Curriculum";
 import ContactUsPage from "../modules/Home/Contact";
+import SchedulePage from "../modules/Home/Schedule";
 
 export const landingRooutes = [
   {
@@ -30,6 +31,10 @@ export const landingRooutes = [
       {
         path: 'contact',
         element: <ContactUsPage />,
+      },
+      {
+        path: 'schedule',
+        element: <SchedulePage />,
       },
       {
         path: "*",
