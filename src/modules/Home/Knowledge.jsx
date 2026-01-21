@@ -1,5 +1,4 @@
 
-import { Link } from "react-router-dom";
 import BannerSection from './Components/Breadcrumb';
 import React, { useState } from 'react';
 import { BookOpen, CheckCircle, Users, Award, Globe, Sparkles, Play, ChevronRight } from 'lucide-react';
@@ -100,7 +99,7 @@ const KnowledgeSeriesSection = () => {
                                         <div
                                             key={index}
                                             onClick={() => setActiveFeature(index)}
-                                            className={`group cursor-pointer bg-white rounded-md transition-all duration-500 overflow-hidden ${isActive ? 'ring-1 ring-[#004aad]' : ''
+                                            className={`group cursor-pointer bg-white rounded-md transition-all duration-500 overflow-hidden ${isActive ? '' : ''
                                                 }`}
                                         >
                                             <div className="p-6 space-y-4">
