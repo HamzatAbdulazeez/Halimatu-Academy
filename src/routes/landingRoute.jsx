@@ -4,6 +4,7 @@ import AboutUs from "../modules/Home/About";
 import NotFoundPage from "../components/ui/NotFoundPage";
 import Knowledge from "../modules/Home/Knowledge";
 import Curriculum from "../modules/Home/Curriculum";
+import ContactUsPage from "../modules/Home/Contact";
 
 export const landingRooutes = [
   {
@@ -25,6 +26,10 @@ export const landingRooutes = [
       {
         path: 'curriculum',
         element: <Curriculum />,
+      },
+      {
+        path: 'contact',
+        element: <ContactUsPage />,
       },
       {
         path: "*",
