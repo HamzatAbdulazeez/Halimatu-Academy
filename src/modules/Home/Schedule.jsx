@@ -272,7 +272,7 @@ const SchedulePage = () => {
                                         key={level.value}
                                         onClick={() => setSelectedLevel(level.value)}
                                         className={`px-6 py-2 rounded-md text-base transition-all duration-300 ${selectedLevel === level.value
-                                                ? `bg-gradient ${level.color} text-white text-base scale-105`
+                                                ? `bg-linear ${level.color} text-white text-base scale-105`
                                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
@@ -324,7 +324,7 @@ const SchedulePage = () => {
                                     return (
                                         <div key={dayIndex} className="bg-white rounded-2xl overflow-hidden">
                                             {/* Day Header */}
-                                            <div className="bg-gradient px-6 py-4">
+                                            <div className="bg-linear px-6 py-4">
                                                 <div className="flex items-center justify-between">
                                                     <div>
                                                         <h3 className="text-lg font-bold text-white">{dayInfo.day}</h3>
