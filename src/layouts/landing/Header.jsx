@@ -4,85 +4,116 @@ import { NavLink } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function Header() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage } = useLanguage();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isStudyOpen, setIsStudyOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleStudy = () => setIsStudyOpen(!isStudyOpen);
+  const closeAll = () => {
+    setIsMenuOpen(false);
+    setIsStudyOpen(false);
+    setIsLangOpen(false);
+  };
 
   const linkClasses = ({ isActive }) =>
-    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-      isActive
-        ? "text-[#004AAD]"
-        : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive
+      ? "text-[#004AAD]"
+      : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
     }`;
 
-  /* MOBILE LINKS – full width */
   const mobileLink =
     "block w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50";
 
   return (
-    <div className="sticky top-0 z-50 bg-white">
-      <header className="bg-white">
+    <div className="fixed top-0 z-50 w-full bg-white">
+      <header>
         <div className="Resizer px-4 sm:px-6">
-          <div className="flex justify-between items-center h-14">
+          <div className="flex items-center justify-between h-20">
 
             {/* LOGO */}
-            <NavLink to="/" className="shrink-0">
-              <div className="w-32 h-8 bg-gray-300 rounded flex items-center justify-center">
-                <span className="text-black text-sm">LOGO</span>
+            <div className="flex items-center">
+              <div className="flex items-center space-x-2">
+                <NavLink to="/" onClick={closeAll}>
+                  <img
+                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+                    alt=""
+                    draggable="false"
+                    className="w-24 h-auto"
+                  />
+                </NavLink>
               </div>
-            </NavLink>
+            </div>
 
             {/* DESKTOP NAV */}
             <nav className="hidden lg:flex items-center gap-2 xl:gap-4">
 
-              <NavLink to="/" className={linkClasses}>
-                {t.menu.home}
-              </NavLink>
-
               <NavLink to="/about" className={linkClasses}>
-                {t.menu.about}
+                About Us
               </NavLink>
 
               {/* STUDY PLAN */}
               <div className="relative shrink-0">
                 <button
-                  onClick={toggleStudy}
-                  className="w-full flex justify-center items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
+                  onClick={() => {
+                    setIsStudyOpen(!isStudyOpen);
+                    setIsLangOpen(false);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition
+      ${isStudyOpen ? "bg-gray-200" : "bg-gray-100 hover:bg-gray-200"}
+    `}
                 >
-                  {t.menu.studyPlan}
-                  <ChevronDown className="h-4 w-4" />
+                  Study Plan
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform duration-200 ${isStudyOpen ? "rotate-180" : ""
+                      }`}
+                  />
                 </button>
 
                 {isStudyOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-full bg-white z-50">
-                    <NavLink to="/curriculum" className={linkClasses}>
-                      {t.menu.curriculum}
+                  <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-xl border border-gray-100 shadow-lg z-50 overflow-hidden">
+                    <NavLink
+                      to="/curriculum"
+                      onClick={() => setIsStudyOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium">Curriculum</div>
+                      <p className="text-xs text-gray-500">
+                        View course structure & modules
+                      </p>
                     </NavLink>
-                    <NavLink to="/schedule" className={linkClasses}>
-                      {t.menu.schedule}
+
+                    <NavLink
+                      to="/schedule"
+                      onClick={() => setIsStudyOpen(false)}
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium">Schedule</div>
+                      <p className="text-xs text-gray-500">
+                        Class timetable & timelines
+                      </p>
                     </NavLink>
                   </div>
                 )}
               </div>
 
-              <NavLink to="/faculty" className={linkClasses}>
-                {t.menu.faculty}
+
+              <NavLink to="/knowledge-series" className={linkClasses}>
+                Knowledge Series
               </NavLink>
 
-              <NavLink to="/registration" className={linkClasses}>
-                {t.menu.registration}
+              <NavLink to="/contact" className={linkClasses}>
+                Contact Us
               </NavLink>
 
               {/* LANGUAGE */}
               <div className="relative shrink-0 min-w-20.5">
                 <button
-                  onClick={() => setIsLangOpen(!isLangOpen)}
-                  className="w-full flex justify-center items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
+                  onClick={() => {
+                    setIsLangOpen(!isLangOpen);
+                    setIsStudyOpen(false);
+                  }}
+                  className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
                 >
                   <Globe className="h-4 w-4" />
                   {language.toUpperCase()}
@@ -90,7 +121,7 @@ export default function Header() {
 
                 {isLangOpen && (
                   <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-md shadow z-50">
-                    {["en", "es", "ar"].map((lng) => (
+                    {["en", "ar"].map((lng) => (
                       <button
                         key={lng}
                         onClick={() => {
@@ -110,21 +141,21 @@ export default function Header() {
             {/* DESKTOP AUTH */}
             <div className="hidden lg:flex items-center gap-3 shrink-0">
               <NavLink to="/login">
-                <button className="min-w-25 px-6 py-2 text-sm border border-[#101E55] rounded-md">
-                  {t.menu.login}
+                <button className="min-w-24 px-5 py-2 text-sm border border-[#101E55] rounded-md">
+                  Login
                 </button>
               </NavLink>
 
               <NavLink to="/register">
-                <button className="min-w-30 px-6 py-2 text-sm bg-gradient text-white rounded-md">
-                  {t.menu.register}
+                <button className="min-w-28 px-5 py-2 text-sm bg-gradient text-white rounded-md">
+                  Register
                 </button>
               </NavLink>
             </div>
 
             {/* MOBILE TOGGLE */}
             <button
-              onClick={toggleMenu}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-md hover:bg-gray-100"
             >
               {isMenuOpen ? <X /> : <Menu />}
@@ -137,50 +168,105 @@ export default function Header() {
           <div className="fixed inset-0 z-50 bg-black/30 lg:hidden">
             <div className="fixed top-0 right-0 h-full w-80 bg-white p-4 shadow-xl">
 
-              <div className="flex justify-between items-center border-b pb-3">
-                <span className="font-bold">LOGO</span>
-                <button onClick={toggleMenu}><X /></button>
+              <div className="flex justify-between items-center  border-b border-gray-400 pb-3">
+              <NavLink to="/" onClick={closeAll}>
+                  <img
+                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+                    alt=""
+                    draggable="false"
+                    className="w-20 h-auto"
+                  />
+                </NavLink>
+                <button onClick={closeAll}>
+                  <X />
+                </button>
               </div>
 
               <nav className="mt-4 space-y-2">
-                <NavLink to="/" className={mobileLink}>{t.menu.home}</NavLink>
-                <NavLink to="/about" className={mobileLink}>{t.menu.about}</NavLink>
+                <NavLink to="/about" className={mobileLink} onClick={closeAll}>
+                  About Us
+                </NavLink>
 
+                {/* STUDY PLAN MOBILE */}
                 <button
-                  onClick={toggleStudy}
+                  onClick={() => setIsStudyOpen(!isStudyOpen)}
                   className="w-full flex justify-between items-center px-3 py-2 bg-gray-100 rounded-md"
                 >
-                  {t.menu.studyPlan}
-                  <ChevronDown className="h-4 w-4" />
+                  Study Plan
+                  <ChevronDown
+                    className={`h-4 w-4 transition ${isStudyOpen ? "rotate-180" : ""
+                      }`}
+                  />
                 </button>
 
                 {isStudyOpen && (
                   <div className="ml-4 space-y-1">
-                    <NavLink to="/curriculum" className={mobileLink}>
-                      {t.menu.curriculum}
+                    <NavLink
+                      to="/curriculum"
+                      className={mobileLink}
+                      onClick={closeAll}
+                    >
+                      Curriculum
                     </NavLink>
-                    <NavLink to="/schedule" className={mobileLink}>
-                      {t.menu.schedule}
+                    <NavLink
+                      to="/schedule"
+                      className={mobileLink}
+                      onClick={closeAll}
+                    >
+                      Schedule
                     </NavLink>
                   </div>
                 )}
 
-                <NavLink to="/faculty" className={mobileLink}>{t.menu.faculty}</NavLink>
-                <NavLink to="/registration" className={mobileLink}>{t.menu.registration}</NavLink>
+                <NavLink
+                  to="/knowledge-series"
+                  className={mobileLink}
+                  onClick={closeAll}
+                >
+                  Knowledge Series
+                </NavLink>
 
-                <div className="pt-4 border-t space-y-1">
-                  {["en", "es", "ar"].map((lng) => (
-                    <button
-                      key={lng}
-                      onClick={() => {
-                        setLanguage(lng);
-                        setIsMenuOpen(false);
-                      }}
-                      className="block w-full px-3 py-2 text-left hover:bg-gray-50"
-                    >
-                      {lng.toUpperCase()}
+                <NavLink to="/contact" className={mobileLink} onClick={closeAll}>
+                  Contact Us
+                </NavLink>
+
+                {/* AUTH MOBILE */}
+                <div className="pt-3 space-y-4">
+                  <NavLink to="/login" onClick={closeAll}>
+                    <button className="w-full px-4 py-3 border border-gray-400 rounded-md text-sm mb-4">
+                      Login
                     </button>
-                  ))}
+                  </NavLink>
+
+                  <NavLink to="/register" onClick={closeAll}>
+                    <button className="w-full px-4 py-3 bg-gradient text-white rounded-md text-sm">
+                      Register
+                    </button>
+                  </NavLink>
+                </div>
+
+                {/* LANGUAGE MOBILE */}
+                <div className="pt-3">
+                  <p className="px-4 mb-2 text-xs text-gray-500 uppercase">
+                    Language
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 px-4">
+                    {["en", "ar"].map((lng) => (
+                      <button
+                        key={lng}
+                        onClick={() => {
+                          setLanguage(lng);
+                          closeAll();
+                        }}
+                        className={`py-2 rounded-md text-sm font-medium ${language === lng
+                          ? "bg-gray-200"
+                          : "bg-gray-100 hover:bg-gray-200"
+                          }`}
+                      >
+                        {lng.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </nav>
             </div>
