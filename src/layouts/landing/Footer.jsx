@@ -1,41 +1,24 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin, Send, Heart } from 'lucide-react';
+import { useLanguage } from "../../context/LanguageContext";
 
 const Footer = () => {
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const quickLinks = [
-    { name: "About Us", href: "#" },
-    { name: "The Program", href: "#" },
-    { name: "Learning Path", href: "#" },
-    { name: "Contact", href: "#" },
-  ];
-
-  const resources = [
-    { name: "Student Portal", href: "#" },
-    { name: "FAQs", href: "#" },
-    { name: "Study Materials", href: "#" },
-  ];
-
-  const contact = [
-    { icon: Mail, text: "info@zadacademy.com", href: "mailto:info@zadacademy.com" },
-    { icon: Phone, text: "+1 (555) 123-4567", href: "tel:+15551234567" },
-    { icon: MapPin, text: "123 Education Street, Learning City, LC 12345", href: "#" }
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, href: "#", color: "hover:bg-blue-600", name: "Facebook" },
-    { icon: Twitter, href: "#", color: "hover:bg-sky-500", name: "Twitter" },
-    { icon: Instagram, href: "#", color: "hover:bg-pink-600", name: "Instagram" },
-    { icon: Linkedin, href: "#", color: "hover:bg-blue-700", name: "LinkedIn" }
-  ];
+  // Map string icons back to components
+  const iconMap = {
+    Mail,
+    Phone,
+    MapPin,
+  };
 
   return (
     <footer className="relative bg-black text-white overflow-hidden">
 
       {/* Pattern Overlay */}
       <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: 'radial-linear(circle, white 1px, transparent 1px)',
+        backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
         backgroundSize: '30px 30px'
       }}></div>
 
@@ -46,21 +29,21 @@ const Footer = () => {
             <div className="flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="text-center md:text-left">
                 <h3 className="text-3xl font-bold mb-2 bg-white bg-clip-text text-transparent">
-                  Stay Updated
+                  {t.footer.stayUpdated}
                 </h3>
-                <p className="text-white">Subscribe to our newsletter for the latest updates and Islamic insights</p>
+                <p className="text-white">{t.footer.subscribeDescription}</p>
               </div>
               
               <div className="w-full md:w-auto">
                 <div className="flex gap-2 max-w-md">
                   <input
                     type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 px-6 py-3  backdrop-blur-md border border-white rounded-md text-white placeholder-white outline-none transition-all duration-300"
+                    placeholder={t.footer.placeholderEmail}
+                    className="flex-1 px-6 py-3 backdrop-blur-md border border-white rounded-md text-white placeholder-white outline-none transition-all duration-300"
                   />
                   <button className="px-6 py-3 bg-[#004aad] rounded-md transition-all duration-300 flex items-center gap-2">
                     <Send className="w-5 h-5" />
-                    <span className="hidden sm:inline">Subscribe</span>
+                    <span className="hidden sm:inline">{t.footer.subscribeButton}</span>
                   </button>
                 </div>
               </div>
@@ -76,18 +59,25 @@ const Footer = () => {
             <div className="space-y-6">
               <div className="space-y-4">
                 <h2 className="text-3xl font-bold bg-white bg-clip-text text-transparent">
-                  HSA Academy
+                  {t.footer.aboutTitle}
                 </h2>
                 <p className="text-gray-400 leading-relaxed">
-                  Empowering Muslims worldwide with authentic Islamic education. Learn at your own pace with renowned scholars.
+                  {t.footer.aboutDescription}
                 </p>
               </div>
 
               {/* Social Links */}
               <div className="space-y-3">
-                <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">Follow Us</h4>
+                <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wider">
+                  {t.footer.followUs}
+                </h4>
                 <div className="flex gap-3">
-                  {socialLinks.map((social, index) => {
+                  {[
+                    { icon: Facebook, href: "#", color: "hover:bg-blue-600", name: "Facebook" },
+                    { icon: Twitter, href: "#", color: "hover:bg-sky-500", name: "Twitter" },
+                    { icon: Instagram, href: "#", color: "hover:bg-pink-600", name: "Instagram" },
+                    { icon: Linkedin, href: "#", color: "hover:bg-blue-700", name: "LinkedIn" }
+                  ].map((social, index) => {
                     const Icon = social.icon;
                     return (
                       <a
@@ -106,9 +96,9 @@ const Footer = () => {
 
             {/* Quick Links Column */}
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white">Quick Links</h3>
+              <h3 className="text-xl font-bold text-white">{t.footer.quickLinksTitle}</h3>
               <ul className="space-y-3">
-                {quickLinks.map((link, index) => (
+                {t.footer.quickLinks.map((link, index) => (
                   <li key={index}>
                     <a
                       href={link.href}
@@ -124,9 +114,9 @@ const Footer = () => {
 
             {/* Resources Column */}
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white">Resources</h3>
+              <h3 className="text-xl font-bold text-white">{t.footer.resourcesTitle}</h3>
               <ul className="space-y-3">
-                {resources.map((link, index) => (
+                {t.footer.resources.map((link, index) => (
                   <li key={index}>
                     <a
                       href={link.href}
@@ -142,10 +132,10 @@ const Footer = () => {
 
             {/* Contact Column */}
             <div className="space-y-6">
-              <h3 className="text-xl font-bold text-white">Contact Us</h3>
+              <h3 className="text-xl font-bold text-white">{t.footer.contactTitle}</h3>
               <ul className="space-y-4">
-                {contact.map((item, index) => {
-                  const Icon = item.icon;
+                {t.footer.contact.map((item, index) => {
+                  const Icon = iconMap[item.icon];
                   return (
                     <li key={index}>
                       <a
@@ -171,17 +161,15 @@ const Footer = () => {
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white">
               <p className="flex items-center gap-2">
-                © {currentYear} HSA Academy. Made with 
-                <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> 
-                for the Muslim Ummah
+                {t.footer.copyright(currentYear)}
               </p>
               
               <div className="flex flex-wrap items-center justify-center gap-6">
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">Privacy Policy</a>
+                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.privacyPolicy}</a>
                 <span className="text-gray-600">•</span>
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">Terms of Service</a>
+                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.termsOfService}</a>
                 <span className="text-gray-600">•</span>
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">Cookie Policy</a>
+                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.cookiePolicy}</a>
               </div>
             </div>
           </div>

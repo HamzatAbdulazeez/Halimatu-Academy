@@ -48,6 +48,10 @@ export default function Header() {
             {/* DESKTOP NAV */}
             <nav className="hidden lg:flex items-center gap-2 xl:gap-4">
 
+              <NavLink to="/" className={linkClasses}>
+                Home
+              </NavLink>
+
               <NavLink to="/about" className={linkClasses}>
                 About Us
               </NavLink>
@@ -169,7 +173,7 @@ export default function Header() {
             <div className="fixed top-0 right-0 h-full w-80 bg-white p-4 shadow-xl">
 
               <div className="flex justify-between items-center  border-b border-gray-400 pb-3">
-              <NavLink to="/" onClick={closeAll}>
+                <NavLink to="/" onClick={closeAll}>
                   <img
                     src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
                     alt=""
@@ -182,7 +186,11 @@ export default function Header() {
                 </button>
               </div>
 
-              <nav className="mt-4 space-y-2">
+              <nav className="mt-4 space-y-4">
+
+                <NavLink to="/" className={mobileLink} onClick={closeAll}>
+                  Home
+                </NavLink>
                 <NavLink to="/about" className={mobileLink} onClick={closeAll}>
                   About Us
                 </NavLink>
