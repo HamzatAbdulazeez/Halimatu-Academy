@@ -5,12 +5,12 @@ const NotFoundPage = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 px-6">
       {/* Logo */}
       <Link to="/"> <div className=" flex items-center justify-center">
-      <img
-                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
-                    alt=""
-                    draggable="false"
-                    className="w-32 h-auto"
-                  />
+        <img
+          src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+          alt=""
+          draggable="false"
+          className="w-32 h-auto"
+        />
       </div></Link>
 
       {/* 404 Text */}
