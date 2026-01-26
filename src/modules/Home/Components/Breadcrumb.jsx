@@ -12,7 +12,7 @@ const BannerSection = ({
 }) => {
     return (
         <div
-            className={`relative w-full h-62.5 md:h-75 flex flex-col items-center justify-center text-center text-white ${!backgroundImage ? backgroundColor : ''}`}
+            className={`relative w-full h-62.5 md:h-75 flex flex-col mt-20 items-center justify-center text-center text-white ${!backgroundImage ? backgroundColor : ''}`}
             style={backgroundImage ? {
                 backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: 'cover',
