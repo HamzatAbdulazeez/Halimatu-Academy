@@ -20,13 +20,16 @@ export default function LoginPage() {
             <div className="w-full max-w-md bg-white rounded-lg p-8">
 
                 {/* Logo */}
-                <div className="flex justify-center mb-6">
-                     <Link to="/">
-                                            <div className="w-32 h-8 bg-gray-300 rounded flex items-center justify-center">
-                                                <span className="text-black text-sm">LOGO</span>
-                                            </div>
-                                        </Link>
-                </div>
+                <div className="flex items-center justify-center min-h-20 w-full">
+  <Link to="/">
+    <img
+      src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+      alt="Halimatu Academy Logo"
+      draggable="false"
+      className="w-24 h-auto mb-4"
+    />
+  </Link>
+</div>
 
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -42,7 +45,7 @@ export default function LoginPage() {
 
                     {/* Email / Phone */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="block text-sm text-black font-medium mb-4">
                             Email Address or Phone Number
                         </label>
                         <input
@@ -61,7 +64,7 @@ export default function LoginPage() {
 
                     {/* Password */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="block text-sm text-black font-medium mb-4">
                             Password
                         </label>
                         <div className="relative">
