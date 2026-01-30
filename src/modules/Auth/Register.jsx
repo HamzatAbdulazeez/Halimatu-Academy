@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { usePaystackPayment } from 'react-paystack';
 
 const HSARegistrationFlow = () => {
     const [step, setStep] = useState(1);
@@ -24,9 +23,7 @@ const HSARegistrationFlow = () => {
                     userData={userData}
                     selectedPlan={selectedPlan}
                     setSelectedPlan={setSelectedPlan}
-                    onSuccess={(paymentRef) => {
-                        setStep(3);
-                    }}
+                    onSuccess={() => setStep(3)}
                     onBack={() => setStep(1)}
                 />
             )}
@@ -155,7 +152,6 @@ const RegistrationForm = ({ onNext }) => {
                                 <option value="Nigeria">Nigeria</option>
                                 <option value="USA">United States</option>
                                 <option value="UK">United Kingdom</option>
-                                {/* ... other countries ... */}
                             </select>
                         </div>
 
@@ -258,8 +254,6 @@ const RegistrationForm = ({ onNext }) => {
 };
 
 const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess, onBack }) => {
-    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_b186c94463b3edfc082e19cf169e37b25f583fea';
-
     const [isProcessing, setIsProcessing] = useState(false);
 
     const plans = [
@@ -275,8 +269,6 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
                 'Qur\'an Reading Basics',
                 'Arabic Foundation',
                 'Access to core materials',
-                
-                
             ]
         },
         {
@@ -291,50 +283,58 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
                 'All 6-month features',
                 '50% savings vs monthly',
                 'Full access to Qur\'an + Arabic',
-               
                 'Lifetime resource access',
                 'Certificate',
             ]
         },
     ];
 
-    const config = selectedPlan ? {
-        reference: new Date().getTime().toString(),
-        email: userData.email,
-        amount: selectedPlan.price * 100,
-        publicKey,
-        metadata: {
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
-            phone: userData.phone || '',
-            plan: selectedPlan.name,
-            custom_fields: [
-                { display_name: 'Plan', variable_name: 'plan_name', value: selectedPlan.name }
-            ]
+    const handlePayWithPaystack = async () => {
+        if (!selectedPlan) {
+            alert('Please select a plan first');
+            return;
         }
-    } : null;
 
-    const initializePayment = selectedPlan && config ? usePaystackPayment(config) : null;
+        setIsProcessing(true);
 
-    const handlePaymentSuccess = (reference) => {
-        setIsProcessing(false);
-        alert(
-            `Payment Successful! 🎉\n\n` +
-            `Reference: ${reference.reference || '—'}\n\n` +
-            `Please check your email (${userData.email}) for confirmation details and login instructions.\n` +
-            `You can now log in to your account and begin learning In sha Allah.`
-        );
-        onSuccess(reference);
-    };
+        try {
+            const payload = {
+                email: userData.email.trim(),
+                amount: selectedPlan.price * 100,
+                reference: `hsa-reg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                metadata: {
+                    first_name: userData.firstName || '',
+                    last_name: userData.lastName || '',
+                    phone: userData.phone || '',
+                    plan_name: selectedPlan.name,
+                    plan_id: selectedPlan.id,
+                },
+                callback_url: `${window.location.origin}/payment/success?plan=${selectedPlan.id}`,
+                
+            };
 
-    const handlePaymentClose = () => {
-        setIsProcessing(false);
-        alert(
-            `Payment was cancelled.\n\n` +
-            `No charges were made.\n` +
-            `You can select a plan again and try paying whenever you're ready.`
-        );
-        // User stays on plans page
+            const res = await fetch('https://api.paystack.co/transaction/initialize', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${import.meta.env.VITE_PAYSTACK_SECRET_KEY || 'sk_test_d9c5c69d0b2b7644f7fb5342487845bd2022d8a7'}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const result = await res.json();
+
+            if (!result.status || !result.data?.authorization_url) {
+                throw new Error(result.message || 'Could not initialize payment');
+            }
+
+            // Redirect to Paystack hosted checkout page
+            window.location.href = result.data.authorization_url;
+        } catch (err) {
+            console.error('Payment init error:', err);
+            alert('Failed to start payment: ' + (err.message || 'Please try again'));
+            setIsProcessing(false);
+        }
     };
 
     return (
@@ -402,26 +402,19 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
 
                     <button
                         disabled={!selectedPlan || isProcessing}
-                        onClick={() => {
-                            if (selectedPlan && initializePayment) {
-                                setIsProcessing(true);
-                                initializePayment(handlePaymentSuccess, handlePaymentClose);
-                            } else {
-                                alert('Please select a plan first');
-                            }
-                        }}
+                        onClick={handlePayWithPaystack}
                         className={`px-10 py-4 rounded-xl font-bold text-lg transition-all min-w-55 ${selectedPlan && !isProcessing
                             ? 'bg-linear-to-r from-[#004aad] to-teal-600 text-white shadow-lg hover:shadow-xl'
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                             }`}
                     >
-                        {isProcessing ? 'Processing Payment...' : 'Pay with Paystack →'}
+                        {isProcessing ? 'Redirecting...' : 'Pay with Paystack →'}
                     </button>
                 </div>
 
                 {isProcessing && (
                     <p className="text-center text-gray-600 mt-6 animate-pulse">
-                        Please complete the payment in the popup window...
+                        Redirecting to Paystack secure checkout...
                     </p>
                 )}
             </div>
