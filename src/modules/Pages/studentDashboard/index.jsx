@@ -22,142 +22,88 @@ const studentData = {
 const stats = [
   {
     label: 'Courses Enrolled',
-    value: '5',
+    value: '6',
     icon: <FaBook className="text-2xl" />,
     color: 'from-blue-500 to-blue-600',
-    change: '+2 this semester'
+    change: '+1 this month'
   },
   {
     label: 'Completed Courses',
-    value: '2',
+    value: '3',
     icon: <FaCheckCircle className="text-2xl" />,
     color: 'from-green-500 to-green-600',
-    change: 'Last month'
+    change: '2 this semester'
   },
   {
     label: 'In Progress',
     value: '3',
     icon: <FaClock className="text-2xl" />,
-    color: 'from-orange-500 to-orange-600',
-    change: '72% avg progress'
+    color: 'from-amber-500 to-orange-600',
+    change: '68% average progress'
   },
-  {
-    label: 'Certificates Earned',
-    value: '2',
-    icon: <FaTrophy className="text-2xl" />,
-    color: 'from-purple-500 to-purple-600',
-    change: 'View all'
-  }
 ];
 
 const enrolledCourses = [
   {
     id: 1,
     title: 'Tawheed & Aqeedah Fundamentals',
-    instructor: 'Shaykh AbdulRahman al-Sudais',
-    progress: 78,
-    totalLessons: 28,
-    completedLessons: 22,
-    duration: '14 weeks',
-    nextClass: 'Jan 29, 2026 - 4:00 PM WAT',
+    instructor: 'Shaykh Saalih al-Fawzaan',
+    progress: 82,
+    totalLessons: 24,
+    completedLessons: 20,
+    duration: '12 weeks',
+    nextClass: 'Today, Jan 30, 2026 - 5:00 PM WAT',
     status: 'In Progress',
     thumbnail: 'https://images.unsplash.com/photo-1580130379624-3a069adbffc5?w=800&q=80'
   },
   {
     id: 2,
-    title: 'Quranic Arabic Level 1',
-    instructor: 'Ustadha Aisha al-Farsi',
-    progress: 42,
-    totalLessons: 20,
-    completedLessons: 8,
-    duration: '10 weeks',
-    nextClass: 'Jan 30, 2026 - 6:30 PM WAT',
+    title: 'Quranic Arabic – Level 1 (Reading & Tajweed)',
+    instructor: 'Ustadha Farhat Hashmi',
+    progress: 55,
+    totalLessons: 22,
+    completedLessons: 12,
+    duration: '11 weeks',
+    nextClass: 'Tomorrow, Jan 31, 2026 - 6:00 PM WAT',
     status: 'In Progress',
     thumbnail: 'https://images.unsplash.com/photo-1609816637235-f0b6d9c3e8c7?w=800&q=80'
   },
   {
     id: 3,
-    title: 'Seerah of the Prophet ﷺ',
+    title: 'Seerah of the Prophet ﷺ – Full Series',
     instructor: 'Shaykh Yasir Qadhi',
     progress: 100,
-    totalLessons: 18,
-    completedLessons: 18,
-    duration: '9 weeks',
-    completedDate: 'Dec 20, 2025',
+    totalLessons: 30,
+    completedLessons: 30,
+    duration: '15 weeks',
+    completedDate: 'January 5, 2026',
     status: 'Completed',
     thumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'
   },
-  {
-    id: 4,
-    title: 'Fiqh of Worship',
-    instructor: 'Dr. Bilal Philips',
-    progress: 100,
-    totalLessons: 16,
-    completedLessons: 16,
-    duration: '8 weeks',
-    completedDate: 'Nov 10, 2025',
-    status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1580130379624-3a069adbffc5?w=800&q=80'
-  }
+ 
+  
 ];
 
 const upcomingClasses = [
   {
-    title: 'Tafseer Juz 30 (Live)',
-    date: 'Tomorrow, Jan 28, 2026',
-    time: '5:00 PM WAT',
-    instructor: 'Shaykh Muhammad al-Shareef',
+    title: 'Tawheed & Aqeedah – Live Q&A',
+    date: 'Today, January 30, 2026',
+    time: '5:00 PM – 6:30 PM WAT',
+    instructor: 'Shaykh Saalih al-Fawzaan (recorded + live discussion)',
     duration: '90 minutes',
-    type: 'Live Tafseer'
+    type: 'Live Session',
+    link: '#join-class' // or real zoom/google meet link later
   },
   {
-    title: 'Quranic Arabic Grammar Review',
-    date: 'Jan 30, 2026',
-    time: '6:30 PM WAT',
-    instructor: 'Ustadha Aisha al-Farsi',
-    duration: '60 minutes',
-    type: 'Interactive Session'
+    title: 'Quranic Arabic – Reading Practice',
+    date: 'Tomorrow, January 31, 2026',
+    time: '6:00 PM – 7:15 PM WAT',
+    instructor: 'Ustadha Farhat Hashmi',
+    duration: '75 minutes',
+    type: 'Interactive Class'
   },
-  {
-    title: 'Hadith Sciences – 40 Hadith Nawawi',
-    date: 'Feb 1, 2026',
-    time: '4:00 PM WAT',
-    instructor: 'Shaykh AbdulNasir Jangda',
-    duration: '120 minutes',
-    type: 'Lecture'
-  }
 ];
 
-const recentActivities = [
-  {
-    action: 'Completed lesson',
-    detail: 'Pillars of Salah',
-    course: 'Fiqh of Worship',
-    time: '3 hours ago',
-    icon: <FaCheckCircle className="text-green-500 text-xl" />
-  },
-  {
-    action: 'Submitted assignment',
-    detail: 'Tawheed Essay – Week 6',
-    course: 'Tawheed & Aqeedah',
-    time: 'Yesterday',
-    icon: <FaFileAlt className="text-blue-500 text-xl" />
-  },
-  {
-    action: 'Earned certificate',
-    detail: 'Fiqh of Worship',
-    course: 'Completed Course',
-    time: 'Dec 20, 2025',
-    icon: <FaTrophy className="text-purple-500 text-xl" />
-  },
-  {
-    action: 'Started new module',
-    detail: 'Sarf Level 2 – Verb Patterns',
-    course: 'Quranic Arabic Level 1',
-    time: '2 days ago',
-    icon: <FaPlay className="text-orange-500 text-xl" />
-  }
-];
 
 // ──────────────────────────────────────────────
 
@@ -186,16 +132,6 @@ const StudentDashboard = () => {
               <div className="space-y-6">
                 {enrolledCourses.map((course) => (
                   <EnrolledCourseCard key={course.id} course={course} />
-                ))}
-              </div>
-            </section>
-
-            {/* Recent Activity */}
-            <section className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-              <div className="divide-y divide-gray-100">
-                {recentActivities.map((activity, idx) => (
-                  <RecentActivityItem key={idx} activity={activity} />
                 ))}
               </div>
             </section>

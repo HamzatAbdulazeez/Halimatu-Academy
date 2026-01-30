@@ -1,24 +1,25 @@
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 import {
   FaHome,
   FaBook,
-  FaCalendar,
-  FaVideo,
   FaCertificate,
-  FaSignOutAlt,
   FaBell,
   FaCog,
   FaSearch,
+  FaCreditCard,      // ← good icon for subscription/billing
+  FaSignOutAlt,
 } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-  const handleClick = () => {
-    window.scrollTo(0, 0);
-    if (window.innerWidth < 768) {
+  const handleLinkClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.innerWidth < 1024) {
       toggleSidebar();
     }
   };
+
   const mockUser = {
     name: "Abdul",
     profile: {
@@ -27,140 +28,144 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const handleSignOut = () => {
-
-    alert("Logged out successfully");
-    toggleSidebar();
+    alert("You have been logged out successfully.");
+    if (window.innerWidth < 1024) {
+      toggleSidebar();
+    }
   };
 
   return (
-    <div className="relative">
-      {/* Sidebar */}
+    <>
       <div
-        className={`fixed lg:relative top-0 left-0 h-screen bg-linear-to-b from-[#004aad] to-indigo-900 p-5 flex flex-col transition-transform duration-300 z-40 overflow-y-auto ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0 lg:w-72 w-64`}
+        className={`fixed lg:static top-0 left-0 h-screen bg-gradient-to-b from-[#004aad] to-indigo-900 
+          p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
         {/* Logo */}
-        <div className="flex justify-center">
-          <a href="/" onClick={handleClick}>
+        <div className="flex justify-center mb-8">
+          <NavLink to="/" onClick={handleLinkClick}>
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
-              alt="HSA Logo"
-              className="h-28 w-auto"
+              alt="Halimatu Academy Logo"
+              className="h-24 w-auto object-contain drop-shadow-md"
             />
-          </a>
+          </NavLink>
         </div>
 
         {/* Search */}
-        <div className="mt-5 mb-5 relative">
+        <div className="relative mb-8">
           <input
             type="text"
             placeholder="Search courses..."
-            className="w-full p-3 pl-10 rounded-md bg-white/10 border border-white/20 text-white placeholder-white/50 outline-none focus:bg-white/20"
+            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 
+              text-white placeholder-white/60 outline-none focus:bg-white/20 focus:border-white/40 
+              transition-all duration-200"
           />
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" />
+          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-lg" />
         </div>
 
-        {/* Sidebar Links */}
-        <nav className="flex-1 space-y-2">
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1.5">
           <SidebarItem
             to="/student/dashboard"
-            icon={<FaHome />}
+            icon={<FaHome className="text-xl" />}
             text="Dashboard"
-            onClick={handleClick}
+            onClick={handleLinkClick}
           />
           <SidebarItem
             to="/student/courses"
-            icon={<FaBook />}
+            icon={<FaBook className="text-xl" />}
             text="My Courses"
-            onClick={handleClick}
-          />
-          <SidebarItem
-            to="/student/schedule"
-            icon={<FaCalendar />}
-            text="Class Schedule"
-            onClick={handleClick}
-          />
-          <SidebarItem
-            to="/student/projects"
-            icon={<FaVideo />}
-            text="My Projects"
-            onClick={handleClick}
+            onClick={handleLinkClick}
           />
           <SidebarItem
             to="/student/certificates"
-            icon={<FaCertificate />}
+            icon={<FaCertificate className="text-xl" />}
             text="Certificates"
-            onClick={handleClick}
+            onClick={handleLinkClick}
+          />
+          <SidebarItem
+            to="/student/subscription"
+            icon={<FaCreditCard className="text-xl" />}
+            text="Subscription & Billing"
+            onClick={handleLinkClick}
           />
           <SidebarItem
             to="/student/notifications"
-            icon={<FaBell />}
+            icon={<FaBell className="text-xl" />}
             text="Notifications"
-            onClick={handleClick}
+            onClick={handleLinkClick}
           />
           <SidebarItem
             to="/student/settings"
-            icon={<FaCog />}
+            icon={<FaCog className="text-xl" />}
             text="Settings"
-            onClick={handleClick}
+            onClick={handleLinkClick}
           />
         </nav>
 
-        {/* User Profile */}
-        <a
-          href="/customer/settings"
-          className="mt-auto border-t border-white pt-5 flex items-center"
-          onClick={handleClick}
-        >
-          {mockUser?.profile?.profile_picture ? (
-            <img
-              src={mockUser.profile.profile_picture}
-              alt="User"
-              className="w-12 h-12 rounded-full mr-3 object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 mr-3 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-white">
-              {mockUser?.name?.charAt(0).toUpperCase() || "?"}
-            </div>
-          )}
-          <div>
-            <p className="text-sm font-semibold leading-loose text-white">
-              {mockUser?.name}
-            </p>
-            <p className="text-xs text-white">Account settings</p>
-          </div>
-        </a>
+        {/* User Section */}
+        <div className="mt-auto pt-6 border-t border-white/20">
+          <NavLink
+            to="/student/profile"
+            onClick={handleLinkClick}
+            className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
+          >
+            {mockUser?.profile?.profile_picture ? (
+              <img
+                src={mockUser.profile.profile_picture}
+                alt="Profile"
+                className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-xl">
+                {mockUser?.name?.charAt(0)?.toUpperCase() || "?"}
+              </div>
+            )}
 
-        {/* Logout Button */}
-        <button
-          onClick={handleSignOut}
-          className="mt-6 cursor-pointer bg-gradient text-white py-3 px-4 rounded-md w-full flex items-center justify-center"
-        >
-          <FaSignOutAlt className="mr-2" /> Log Out
-        </button>
+            <div>
+              <p className="font-medium text-white">{mockUser?.name}</p>
+              <p className="text-xs text-white/70">View profile</p>
+            </div>
+          </NavLink>
+
+          <button
+            onClick={handleSignOut}
+            className="mt-5 w-full flex items-center justify-center gap-3 bg-red-600/90 hover:bg-red-700 
+              text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 shadow-sm"
+          >
+            <FaSignOutAlt className="text-lg" />
+            Log Out
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 md:hidden z-30"
+          className="fixed inset-0 bg-black/40 lg:hidden z-30 backdrop-blur-sm"
           onClick={toggleSidebar}
-        ></div>
+        />
       )}
-    </div>
+    </>
   );
 };
 
 const SidebarItem = ({ to, icon, text, onClick }) => {
   return (
-    <a
-      href={to}
+    <NavLink
+      to={to}
       onClick={onClick}
-      className={`flex items-center py-3 px-3 rounded-md cursor-pointer transition-colors text-white hover:bg-gray-200 hover:text-black`}
+      className={({ isActive }) =>
+        `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
+        ${isActive 
+          ? "bg-white/15 text-white font-medium shadow-sm" 
+          : "text-white/90 hover:bg-white/10 hover:text-white"
+        }`
+      }
     >
-      <span className="mr-3">{icon}</span> {text}
-    </a>
+      <span className="text-xl opacity-90">{icon}</span>
+      <span>{text}</span>
+    </NavLink>
   );
 };
 
