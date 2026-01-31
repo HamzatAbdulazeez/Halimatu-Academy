@@ -20,9 +20,7 @@ const UpcomingClassCard = ({ classItem }) => (
         <span>{classItem.time} • {classItem.duration}</span>
       </div>
     </div>
-    <button className="w-full mt-4 py-2.5 bg-[#053276] text-white rounded-lg hover:bg-[#053276]/90 transition-colors font-medium">
-      Join Class
-    </button>
+   
   </div>
 );
 

@@ -66,7 +66,7 @@ const RegistrationForm = ({ onNext }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-8">
+        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-8">
             <div className="w-full max-w-3xl bg-white p-8 md:p-12 rounded-md">
                 <div className="flex items-center justify-center min-h-20 w-full mb-6">
                     <Link to="/">
@@ -338,7 +338,7 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
             <div className="max-w-5xl w-full">
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-bold text-gray-900">Choose Your Learning Plan</h1>
@@ -423,13 +423,13 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
 };
 
 const SuccessPage = ({ userData, selectedPlan }) => (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center p-6">
         <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-10 md:p-16 text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+            <div className="w-24 h-24 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
                 <CheckCircle className="w-14 h-14 text-white" />
             </div>
 
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-[#004aad] to-teal-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-[#004aad] to-teal-600 bg-clip-text text-transparent">
                 Welcome to HSA Academy!
             </h1>
 
@@ -461,7 +461,7 @@ const SuccessPage = ({ userData, selectedPlan }) => (
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Link
                     to="/student/dashboard"
-                    className="px-10 py-5 bg-gradient-to-r from-[#004aad] to-teal-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
+                    className="px-10 py-5 bg-linear-to-r from-[#004aad] to-teal-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition"
                 >
                     Go to Dashboard →
                 </Link>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import {
@@ -8,7 +7,7 @@ import {
   FaBell,
   FaCog,
   FaSearch,
-  FaCreditCard,      // ← good icon for subscription/billing
+  FaCreditCard,  
   FaSignOutAlt,
 } from "react-icons/fa";
 
@@ -37,7 +36,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <>
       <div
-        className={`fixed lg:static top-0 left-0 h-screen bg-gradient-to-b from-[#004aad] to-indigo-900 
+        className={`fixed lg:static top-0 left-0 h-screen bg-linear-to-b from-[#004aad] to-indigo-900 
           p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
@@ -66,12 +65,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-          <SidebarItem
-            to="/student/dashboard"
-            icon={<FaHome className="text-xl" />}
-            text="Dashboard"
-            onClick={handleLinkClick}
-          />
+        <SidebarItem
+  to="/student"
+  icon={<FaHome className="text-xl" />}
+  text="Dashboard"
+  onClick={handleLinkClick}
+  end
+/>
+
           <SidebarItem
             to="/student/courses"
             icon={<FaBook className="text-xl" />}
@@ -150,16 +151,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-const SidebarItem = ({ to, icon, text, onClick }) => {
+const SidebarItem = ({ to, icon, text, onClick, end = false }) => {
   return (
     <NavLink
       to={to}
+      end={end}
       onClick={onClick}
       className={({ isActive }) =>
         `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-        ${isActive 
-          ? "bg-white/15 text-white font-medium shadow-sm" 
-          : "text-white/90 hover:bg-white/10 hover:text-white"
+        ${
+          isActive
+            ? "bg-white/15 text-white font-medium shadow-sm"
+            : "text-white/90 hover:bg-white/10 hover:text-white"
         }`
       }
     >
@@ -168,5 +171,6 @@ const SidebarItem = ({ to, icon, text, onClick }) => {
     </NavLink>
   );
 };
+
 
 export default Sidebar;

@@ -1,322 +1,251 @@
 import React, { useState } from 'react';
-import { 
-  FaUser, FaEnvelope, FaPhone, FaLock, FaCheckCircle, 
-  FaCreditCard, FaShieldAlt, FaArrowRight, FaStar
-} from 'react-icons/fa';
+import { FaCheckCircle, FaCrown, FaCalendarAlt, FaCreditCard, FaHistory } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
-const RegistrationFlow = () => {
-  const [step, setStep] = useState(1);
-  const [userData, setUserData] = useState({});
+const SubscriptionPage = () => {
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const nextStep = (data) => {
-    setUserData({ ...userData, ...data });
-    setStep(step + 1);
+  const user = {
+    subscribed: true,
+    plan: 'basic-6m', // 'basic-6m' | 'basic-12m' | null
+    nextBilling: 'February 28, 2026',
+    paymentMethod: '**** **** **** 4242 (Visa)',
   };
 
-  const prevStep = () => setStep(step - 1);
+  const plans = [
+    {
+      id: 'basic-6m',
+      name: 'Basic Plan',
+      period: '6 Months',
+      price: 25000,
+      displayPrice: '₦25,000',
+      features: [
+        'Qur\'an Reading Basics',
+        'Arabic Foundation',
+        'Access to core materials',
+        'Community support',
+      ],
+      popular: false,
+      color: 'from-blue-600 to-indigo-600',
+    },
+    {
+      id: 'basic-12m',
+      name: 'Full Year Plan',
+      period: '12 Months',
+      price: 50000,
+      displayPrice: '₦50,000',
+      features: [
+        'All Basic Plan features',
+        'Better value (equivalent to two 6-month periods)',
+        'Lifetime resource access',
+        'Certificate upon completion',
+        'Priority support',
+      ],
+      popular: true,
+      color: 'from-green-600 to-emerald-600',
+    },
+  ];
+
+  const handlePaymentRedirect = async (selectedPlan) => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+
+    try {
+      const payload = {
+        email: 'user@example.com', // ← get from real user context
+        amount: selectedPlan.price * 100, // kobo
+        reference: `hsa-upgrade-${Date.now()}`,
+        metadata: {
+          user_id: 'user-id-here', // real user id
+          current_plan: user.plan,
+          new_plan: selectedPlan.id,
+          upgrade: user.subscribed ? true : false,
+        },
+        callback_url: `${window.location.origin}/subscription/success?ref=${encodeURIComponent('upgrade-' + Date.now())}`,
+      };
+
+      const res = await fetch('https://api.paystack.co/transaction/initialize', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_PAYSTACK_SECRET_KEY || 'sk_test_d9c5c69d0b2b7644f7fb5342487845bd2022d8a7'}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+
+      if (!result.status || !result.data?.authorization_url) {
+        throw new Error(result.message || 'Failed to start upgrade');
+      }
+
+      // Redirect to Paystack hosted page
+      window.location.href = result.data.authorization_url;
+    } catch (err) {
+      console.error('Upgrade error:', err);
+      alert('Could not start upgrade: ' + (err.message || 'Please try again'));
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <>
-      {step === 1 && <RegistrationForm onNext={nextStep} />}
-      {step === 2 && <SubscriptionPlans onNext={nextStep} onBack={prevStep} userData={userData} />}
-      {step === 3 && <PaymentPage onComplete={() => setStep(4)} onBack={prevStep} userData={userData} />}
-      {step === 4 && <SuccessPage userData={userData} />}
+      <div className="bg-white px-6 py-4 mb-6">
+        <h1 className="text-2xl font-medium mb-3"> Subscription & Billing</h1>
+        <p className="text-gray-500">
+          <Link to="/student" className="text-[#004aad] hover:underline">
+            Dashboard
+          </Link>{" "}
+          &gt;  Subscription & Billing
+        </p>
+      </div>
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto">
+          {/* Header */}
+          <div className="mb-6">
+           
+            <p className="text-lg text-black">
+              Manage your Halimatu Academy access and unlock more Islamic knowledge
+            </p>
+          </div>
+
+          {/* Current Subscription Status */}
+          <div className="bg-white rounded-md shadow-md p-6 md:p-8 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h2 className="text-2xl font-bold text-black mb-2">
+                  Current Plan: {user.subscribed ? 'Active Subscription' : 'Not Subscribed'}
+                </h2>
+                {user.subscribed && (
+                  <>
+                    <p className="text-black mb-1">
+                      <span className="font-medium">Plan:</span> {user.plan === 'basic-12m' ? 'Full Year' : 'Basic 6 Months'}
+                    </p>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <FaCalendarAlt className="text-[#004aad]" />
+                      Next billing: {user.nextBilling}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                {user.subscribed ? (
+                  <button
+                    onClick={() => handlePaymentRedirect(plans.find(p => p.id === 'basic-12m'))}
+                    disabled={user.plan === 'basic-12m' || isProcessing}
+                    className={`px-6 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2 shadow-md ${user.plan === 'basic-12m'
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-[#004aad] hover:bg-[#003a8c] text-white'
+                      }`}
+                  >
+                    <FaCrown size={18} />
+                    {isProcessing ? 'Redirecting...' : 'Upgrade to Full Year'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handlePaymentRedirect(plans[0])}
+                    disabled={isProcessing}
+                    className="px-6 py-3 bg-[#004aad] hover:bg-[#003a8c] text-white rounded-lg font-medium transition flex items-center justify-center gap-2 shadow-md"
+                  >
+                    Subscribe Now
+                  </button>
+                )}
+
+                <button className="px-6 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-medium transition flex items-center justify-center gap-2">
+                  <FaHistory size={18} />
+                  Billing History
+                </button>
+              </div>
+            </div>
+
+            {user.subscribed && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="flex items-center gap-3 text-black">
+                  <FaCreditCard className="text-[#004aad]" />
+                  <span>Payment Method: {user.paymentMethod}</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Update payment method or cancel subscription in settings
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Plans Comparison */}
+          <div className="bg-white rounded-xl shadow-md p-6 md:p-8">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                Choose Your Learning Path
+              </h2>
+              <p className="text-gray-600">
+                Unlock full access to Qur'an Reading & Arabic courses
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`relative rounded-2xl border ${plan.popular ? 'border-[#004aad] shadow-xl' : 'border-gray-200'
+                    } overflow-hidden bg-white transition-all hover:shadow-2xl`}
+                >
+                  {plan.popular && (
+                    <div className="absolute top-0 right-0 bg-[#004aad] text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
+                      Popular Choice
+                    </div>
+                  )}
+
+                  <div className={`bg-gradient-to-r ${plan.color} p-8 text-white`}>
+                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                    <p className="text-3xl font-extrabold">
+                      {plan.displayPrice}
+                      <span className="text-xl font-normal opacity-90">/{plan.period.toLowerCase()}</span>
+                    </p>
+                  </div>
+
+                  <div className="p-8">
+                    <ul className="space-y-4 mb-8">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <FaCheckCircle className="text-[#004aad] mt-1 shrink-0" size={20} />
+                          <span className="text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => handlePaymentRedirect(plan)}
+                      disabled={user.plan === plan.id || isProcessing}
+                      className={`w-full py-4 rounded-lg font-bold text-lg transition ${user.plan === plan.id
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        : plan.popular
+                          ? 'bg-[#004aad] text-white hover:bg-[#003a8c] shadow-lg'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        }`}
+                    >
+                      {isProcessing
+                        ? 'Redirecting...'
+                        : user.plan === plan.id
+                          ? 'Current Plan'
+                          : user.subscribed
+                            ? 'Upgrade Now'
+                            : 'Subscribe Now'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer note */}
+          <p className="text-center text-gray-500 text-sm mt-10">
+            All plans include secure payments via Paystack. Cancel anytime. Questions? Contact support@halimatuacademy.com
+          </p>
+        </div>
+      </div>
     </>
   );
 };
 
-// Step 1: Registration
-const RegistrationForm = ({ onNext }) => {
-  const [formData, setFormData] = useState({
-    firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '', agreeToTerms: false
-  });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
-  };
-
-  const handleSubmit = () => {
-    if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    if (!formData.agreeToTerms) {
-      alert('Please agree to terms');
-      return;
-    }
-    onNext(formData);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Join Digifted Hub</h1>
-          <p className="text-gray-600">Create your account to access premium courses</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <div className="mb-6">
-            <div className="flex justify-between mb-2">
-              <span className="font-semibold text-gray-800">Personal Information</span>
-              <span className="text-sm text-gray-500">Step 1 of 3</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-[#053276] h-2 rounded-full" style={{ width: '33%' }}></div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">First Name *</label>
-                <input type="text" name="firstName" value={formData.firstName} onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="John" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Last Name *</label>
-                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="Doe" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="john@example.com" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="+234 XXX XXX XXXX" />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password *</label>
-                <input type="password" name="password" value={formData.password} onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="••••••••" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password *</label>
-                <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" placeholder="••••••••" />
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <input type="checkbox" name="agreeToTerms" checked={formData.agreeToTerms} onChange={handleChange} className="mt-1" />
-              <label className="text-sm text-gray-700">I agree to Terms and Conditions</label>
-            </div>
-
-            <button onClick={handleSubmit} className="w-full bg-gradient-to-r from-[#053276] to-indigo-700 text-white py-4 rounded-lg font-semibold hover:opacity-90 flex items-center justify-center gap-2">
-              Continue to Plans <FaArrowRight />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Step 2: Plans
-const SubscriptionPlans = ({ onNext, onBack, userData }) => {
-  const [selectedPlan, setSelectedPlan] = useState(null);
-
-  const plans = [
-    { id: 'basic', name: 'Basic Plan', price: '₦15,000', period: '/month', features: ['5 courses', 'Email support', 'Certificate'], color: 'from-blue-500 to-blue-600' },
-    { id: 'pro', name: 'Professional', price: '₦35,000', period: '/month', popular: true, features: ['ALL courses', 'Live sessions', 'Priority support', '1-on-1 mentorship'], color: 'from-[#053276] to-indigo-700' },
-    { id: 'premium', name: 'Premium', price: '₦75,000', period: '/month', features: ['Everything in Pro', 'Private coaching', 'Custom learning path', 'Job placement'], color: 'from-purple-500 to-purple-700' }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 py-12">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Choose Your Plan</h1>
-          <p className="text-gray-600">Select the perfect plan for your learning journey</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex justify-between mb-2">
-            <span className="font-semibold text-gray-800">Select Subscription Plan</span>
-            <span className="text-sm text-gray-500">Step 2 of 3</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#053276] h-2 rounded-full" style={{ width: '66%' }}></div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {plans.map((plan) => (
-            <div key={plan.id} onClick={() => setSelectedPlan(plan)}
-              className={`bg-white rounded-xl shadow-lg cursor-pointer transition-all hover:scale-105 ${selectedPlan?.id === plan.id ? 'ring-4 ring-[#053276]' : ''} relative`}>
-              {plan.popular && (
-                <div className="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                  <FaStar /> POPULAR
-                </div>
-              )}
-              <div className={`bg-gradient-to-r ${plan.color} p-6 text-white rounded-t-xl`}>
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-sm ml-2">{plan.period}</span>
-                </div>
-              </div>
-              <div className="p-6">
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <FaCheckCircle className="text-green-500 mt-1 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className={`w-full py-3 rounded-lg font-semibold ${selectedPlan?.id === plan.id ? 'bg-[#053276] text-white' : 'bg-gray-100 text-gray-700'}`}>
-                  {selectedPlan?.id === plan.id ? 'Selected' : 'Select Plan'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex gap-4">
-          <button onClick={onBack} className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-300">Back</button>
-          <button onClick={() => selectedPlan && onNext({ ...userData, selectedPlan })} disabled={!selectedPlan}
-            className={`flex-1 py-4 rounded-lg font-semibold flex items-center justify-center gap-2 ${selectedPlan ? 'bg-gradient-to-r from-[#053276] to-indigo-700 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-            Continue to Payment <FaArrowRight />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Step 3: Payment
-const PaymentPage = ({ onComplete, onBack, userData }) => {
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handlePayment = () => {
-    setIsProcessing(true);
-    setTimeout(() => { setIsProcessing(false); onComplete(); }, 2000);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Complete Payment</h1>
-          <p className="text-gray-600">Secure payment to activate your subscription</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex justify-between mb-2">
-            <span className="font-semibold text-gray-800">Payment Information</span>
-            <span className="text-sm text-gray-500">Step 3 of 3</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#053276] h-2 rounded-full" style={{ width: '100%' }}></div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Payment Details</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Card Number</label>
-                <input type="text" placeholder="1234 5678 9012 3456"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Cardholder Name</label>
-                <input type="text" placeholder="JOHN DOE"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Expiry</label>
-                  <input type="text" placeholder="MM/YY"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">CVV</label>
-                  <input type="text" placeholder="123"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#053276]" />
-                </div>
-              </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-                <FaShieldAlt className="text-blue-600 mt-1" />
-                <p className="text-sm text-gray-700">Your payment is secure and encrypted</p>
-              </div>
-              <div className="flex gap-4 pt-4">
-                <button onClick={onBack} className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-lg font-semibold">Back</button>
-                <button onClick={handlePayment} disabled={isProcessing}
-                  className={`flex-1 py-4 rounded-lg font-semibold text-white ${isProcessing ? 'bg-gray-400' : 'bg-green-600 hover:bg-green-700'}`}>
-                  {isProcessing ? 'Processing...' : `Pay ${userData.selectedPlan?.price}`}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Summary</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-600">Plan</p>
-                <p className="font-bold text-gray-800">{userData.selectedPlan?.name}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Student</p>
-                <p className="font-semibold">{userData.firstName} {userData.lastName}</p>
-              </div>
-              <div className="border-t pt-4">
-                <div className="flex justify-between mb-2">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold">{userData.selectedPlan?.price}</span>
-                </div>
-                <div className="flex justify-between font-bold text-xl">
-                  <span>Total</span>
-                  <span className="text-[#053276]">{userData.selectedPlan?.price}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Step 4: Success
-const SuccessPage = ({ userData }) => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white rounded-xl shadow-lg p-12 text-center">
-        <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <FaCheckCircle className="text-white text-5xl" />
-        </div>
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
-        <p className="text-xl text-gray-600 mb-8">Welcome to Digifted Hub, {userData.firstName}!</p>
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
-          <h3 className="font-bold text-gray-800 mb-4">Your Subscription</h3>
-          <p className="text-lg font-semibold text-[#053276]">{userData.selectedPlan?.name}</p>
-          <p className="text-sm text-gray-600 mt-2">Billing: {userData.selectedPlan?.price}{userData.selectedPlan?.period}</p>
-        </div>
-        <div className="space-y-3">
-          <p className="text-gray-700">✓ Account activated successfully</p>
-          <p className="text-gray-700">✓ Welcome email sent to {userData.email}</p>
-          <p className="text-gray-700">✓ Full access to all course materials</p>
-        </div>
-        <a href="/student/dashboard"
-          className="inline-block mt-8 px-8 py-4 bg-gradient-to-r from-[#053276] to-indigo-700 text-white rounded-lg font-semibold hover:opacity-90">
-          Go to Dashboard
-        </a>
-      </div>
-    </div>
-  );
-};
-
-export default RegistrationFlow;
+export default SubscriptionPage;
