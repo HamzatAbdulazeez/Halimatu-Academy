@@ -108,7 +108,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* User Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
           <NavLink
-            to="/student/profile"
+            to="/student/settings"
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >

@@ -20,8 +20,8 @@ export default function Navbar({ toggleSidebar }) {
       {/* Right: Notification & Profile */}
       <div className="flex items-center space-x-6">
         <div className="relative bg-purple-100 p-2 rounded-full">
-          <Bell size={20} className="text-purple-600" />
-          <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full">
+          <Bell size={20} className="text-[#004aad]" />
+          <span className="absolute -top-1 -right-1 bg-[#004aad] text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full">
             6
           </span>
         </div>
@@ -42,7 +42,7 @@ export default function Navbar({ toggleSidebar }) {
                 {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   Profile
                 </li> */}
-                <Link to="/customer/settings"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <Link to="/student/settings"><li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   Settings
                 </li></Link>
                 <li className="px-4 py-2 text-red-500 hover:bg-gray-100 cursor-pointer">
