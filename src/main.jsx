@@ -4,7 +4,6 @@ import "./index.css";
 import { routes } from "./routes";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { LanguageProvider } from "./context/LanguageContext";
-
 const router = createBrowserRouter(routes);
 
 createRoot(document.getElementById("root")).render(
