@@ -86,7 +86,7 @@ const ProgramSection = () => {
                 {/* Content */}
                 <div className="p-6 space-y-4">
                   <div className="space-y-2">
-                    <h3 className="text-lg font-bold text-[#004aad] group-hover:text-black transition-colors duration-300">
+                    <h3 className="text-2xl font-bold text-[#004aad] group-hover:text-black transition-colors duration-300">
                       {subject.title}
                     </h3>
                     <div
@@ -100,7 +100,7 @@ const ProgramSection = () => {
                     {subject.description}
                   </p>
 
-                  <button className="flex items-center gap-2 text-emerald-600 font-semibold text-sm hover:text-emerald-700 transition-colors group/btn">
+                  <button className="flex items-center gap-2 text-[#004aad] underline font-semibold text-sm hover:text-emerald-700 transition-colors group/btn">
                     <span>{t.programSection.learnMore}</span>
                     <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
                   </button>

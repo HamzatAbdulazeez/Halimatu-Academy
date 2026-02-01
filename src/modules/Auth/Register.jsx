@@ -94,7 +94,7 @@ const RegistrationForm = ({ onNext }) => {
                     <p className="text-gray-600 mt-2">Begin your journey of Islamic knowledge with HSA Academy</p>
                 </div>
 
-                <div className="space-y-5">
+                <form className="space-y-5">
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm text-black font-medium mb-4">First Name *</label>
@@ -104,6 +104,7 @@ const RegistrationForm = ({ onNext }) => {
                                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                 placeholder="Enter first name"
+                                required
                             />
                         </div>
                         <div>
@@ -114,6 +115,7 @@ const RegistrationForm = ({ onNext }) => {
                                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                 placeholder="Enter last name"
+                                required
                             />
                         </div>
                     </div>
@@ -127,6 +129,7 @@ const RegistrationForm = ({ onNext }) => {
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                 placeholder="your.email@example.com"
+                                required
                             />
                         </div>
                         <div>
@@ -137,6 +140,7 @@ const RegistrationForm = ({ onNext }) => {
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                 placeholder="+234 000 000 0000"
+                                required
                             />
                         </div>
                     </div>
@@ -147,6 +151,7 @@ const RegistrationForm = ({ onNext }) => {
                             <select
                                 value={formData.country}
                                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                required
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none bg-white">
                                 <option value="">Select your country</option>
                                 <option value="Nigeria">Nigeria</option>
@@ -161,6 +166,7 @@ const RegistrationForm = ({ onNext }) => {
                                 type="date"
                                 value={formData.dateOfBirth}
                                 onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                                required
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                             />
                         </div>
@@ -169,6 +175,7 @@ const RegistrationForm = ({ onNext }) => {
                             <select
                                 value={formData.gender}
                                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                                required
                                 className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none bg-white">
                                 <option value="">Select</option>
                                 <option value="male">Male</option>
@@ -188,6 +195,7 @@ const RegistrationForm = ({ onNext }) => {
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                     placeholder="Create a strong password"
+                                    required
                                 />
                                 <button
                                     type="button"
@@ -209,6 +217,7 @@ const RegistrationForm = ({ onNext }) => {
                                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                     className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
                                     placeholder="Re-enter your password"
+                                    required
                                 />
                                 <button
                                     type="button"
@@ -227,18 +236,20 @@ const RegistrationForm = ({ onNext }) => {
                             checked={agree}
                             onChange={(e) => setAgree(e.target.checked)}
                             className="mt-1 w-4 h-4 accent-[#004aad]"
+                            required
                         />
                         <p className="text-sm text-gray-700">
                             I agree to HSA Academy's{' '}
-                            <a href="/terms" className="text-[#004aad] font-semibold underline">Terms of Service</a>
+                            <a href="/terms" className="text-[#004aad] font-semibold underline" required>Terms of Service</a>
                             {' '}and{' '}
-                            <a href="/privacy" className="text-[#004aad] font-semibold underline">Privacy Policy</a>
+                            <a href="/privacy" className="text-[#004aad] font-semibold underline" required> Privacy Policy</a>
                         </p>
                     </div>
-                </div>
+                </form>
 
                 <button
                     onClick={handleSubmit}
+                    type='submit'
                     className="w-full bg-[#004aad] text-white py-4 mt-6 cursor-pointer rounded-md transition-all duration-300 text-base"
                 >
                     Continue to Subscription Plans →
@@ -310,7 +321,7 @@ const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess,
                     plan_id: selectedPlan.id,
                 },
                 callback_url: `${window.location.origin}/payment/success?plan=${selectedPlan.id}`,
-                
+
             };
 
             const res = await fetch('https://api.paystack.co/transaction/initialize', {

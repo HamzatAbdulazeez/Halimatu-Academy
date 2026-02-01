@@ -14,7 +14,7 @@ const ZadAcademyBanner = () => {
           {/* Left - Image */}
           <div className="relative h-full min-h-80 overflow-hidden">
             <img
-              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768643049/Halimatu-Academy-Images/The-Laila-Dogonyaro-Islamic-Centre-Abuja_tbfeea.jpg"
+              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769958817/Halimatu-Academy-Images/WhatsApp_Image_2026-02-01_at_14.57.38_vskxks.jpg"
               alt={t.about.aboutImageAlt}
               className="absolute inset-0 w-full h-full object-cover"
             />

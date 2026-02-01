@@ -4,14 +4,14 @@ const translations = {
     banner: {
       slides: [
         {
-          title: "Zad Academy Program",
+          title: "HSA Academy Program",
           subtitle: "Learn the Basics of Islam",
           description:
             "Embark on a 2-year learning journey with Zad Academy's free online program.",
           badge: "Featured Program",
           ctaPrimary: "Enroll Now",
           ctaSecondary: "Learn More",
-          image: "https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768633927/Halimatu-Academy-Images/Islamic-Education-1_eufmf8.jpg",
+          image: "https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769959142/Halimatu-Academy-Images/WhatsApp_Image_2026-02-01_at_14.58.04_1_dhakfy.jpg",
           gradient: "from-emerald-600 to-teal-700"
         },
         {
@@ -33,7 +33,7 @@ const translations = {
           badge: "Featured Program",
           ctaPrimary: "Enroll Now",
           ctaSecondary: "Learn More",
-          image: "https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768634979/Halimatu-Academy-Images/q_bzkmjv.jpg",
+          image: "https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769959060/Halimatu-Academy-Images/WhatsApp_Image_2026-02-01_at_14.58.37_1_pwzvm6.jpg",
           gradient: "from-purple-600 to-pink-700"
         }
       ]
@@ -93,17 +93,18 @@ const translations = {
       description:
         "HSA Academy provides a comprehensive Islamic curriculum consisting of seven core subjects, designed to foster a deeper understanding of Islam.",
       subjects: [
-        {
-          title: "Arabic Language",
-          description:
-            "Master the fundamentals of Arabic grammar and vocabulary to better understand the Quran and Islamic texts.",
-          gradient: "from-purple-500 to-indigo-600",
-        },
+        
         {
           title: "Quranic",
           description:
             "Learn the etiquettes and moral character taught in Islam, developing excellence in behavior and interpersonal relations.",
           gradient: "from-pink-500 to-rose-600",
+        },
+        {
+          title: "Arabic Language",
+          description:
+            "Master the fundamentals of Arabic grammar and vocabulary to better understand the Quran and Islamic texts.",
+          gradient: "from-purple-500 to-indigo-600",
         },
       ],
       learnMore: "Learn More",
@@ -111,7 +112,7 @@ const translations = {
     islamicQuote: {
       messenger: "The Messenger of Allah ﷺ said:",
       quote:
-        "“Whoever takes a path upon which to obtain knowledge, Allah makes the path to Paradise easy for him.”",
+        "“Whoever follows a path seeking knowledge, Allah will make easy for him a path to Paradise.”",
       source: "Sahih Muslim",
     },
     learningPath: {
@@ -389,7 +390,7 @@ const translations = {
     islamicQuote: {
       messenger: "قال رسول الله ﷺ:",
       quote:
-        "“من سلك طريقا يطلب فيه العلم سهل الله له به طريقا إلى الجنة.”",
+        "“مَنْ سَلَكَ طَرِيقًا يَطْلُبُ فِيهِ عِلْمًا، سَلَكَ اللَّهُ بِهِ طَرِيقًا مِنْ طُرُقِ الْجَنَّةِ”",
       source: "صحيح مسلم",
     },
 
