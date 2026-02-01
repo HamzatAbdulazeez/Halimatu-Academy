@@ -47,7 +47,7 @@ const AboutUs = () => {
             <BannerSection
                 title="About Us"
                 subtitle=" Transforming Lives Through Islamic Education"
-                backgroundImage="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768923939/1195_1_m7slpm.png"
+                backgroundImage="https://res.cloudinary.com/dbmtogyef/image/upload/v1769957920/_Elegant_Bismillah_Calligraphy_Pin__Inspiring_Islamic_Art_for_Your_Collection__porpjk.jpg"
 
             />
             {/* Who We Are Section */}
@@ -55,9 +55,9 @@ const AboutUs = () => {
                 <div className="section grid md:grid-cols-2 gap-10 items-center">
                     <div >
                         <img
-                            src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768922184/1_IDjA5YyXStwp41oTXZ3orA_rb2mdx.jpg"
+                            src="https://res.cloudinary.com/dbmtogyef/image/upload/v1769958019/%D8%B1%D9%85%D8%B6%D8%A7%D9%86_%D9%83%D8%B1%D9%8A%D9%85_-_Ramadan_karim_lujzjv.jpg"
                             alt="Who We Are"
-                            className="rounded-lg"
+                            className="rounded-lg h-130 w-full object-cover"
                         />
                     </div>
                     <div>
@@ -118,9 +118,9 @@ const AboutUs = () => {
 
                         <div className="relative" style={{ animation: 'fadeIn 0.8s ease-out 0.2s backwards' }}>
                             <img
-                                src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768643098/Halimatu-Academy-Images/iStock-1353458609-scaled_i1ibkq.jpg"
+                                src="https://res.cloudinary.com/dbmtogyef/image/upload/v1769958270/__e4fzye.jpg"
                                 alt="Students learning"
-                                className="relative rounded-3xl"
+                                className="relative h-130 w-full object-cover rounded-3xl"
                             />
                             <div className="absolute -bottom-6 -right-6 bg-white rounded-md p-6 max-w-xs">
                                 <div className="flex items-center gap-3">
@@ -274,7 +274,7 @@ const AboutUs = () => {
                             Join thousands of students worldwide in deepening your understanding of Islam
                         </p>
                         <button className="px-8 py-3 bg-white text-[#004aad] rounded-md text-base cursor-pointer hover:scale-105 transition-all duration-300">
-                            Enroll Now - It's Free!
+                            Enroll Now 
                         </button>
                     </div>
                 </div>
