@@ -6,6 +6,9 @@ import Knowledge from "../modules/Home/Knowledge";
 import Curriculum from "../modules/Home/Curriculum";
 import ContactUsPage from "../modules/Home/Contact";
 import SchedulePage from "../modules/Home/Schedule";
+import FAQsPage from "../modules/Home/FAQs";
+
+// Define landing routes
 
 export const landingRooutes = [
   {
@@ -35,6 +38,10 @@ export const landingRooutes = [
       {
         path: 'schedule',
         element: <SchedulePage />,
+      },
+      {
+        path: 'faqs',
+        element: <FAQsPage />,
       },
       {
         path: "*",

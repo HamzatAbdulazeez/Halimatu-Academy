@@ -46,14 +46,8 @@ const AboutUs = () => {
         <>
             <BannerSection
                 title="About Us"
-<<<<<<< HEAD
-                subtitle=" Transforming Lives Through Islamic Education"
-                backgroundImage="https://res.cloudinary.com/dbmtogyef/image/upload/v1769957920/_Elegant_Bismillah_Calligraphy_Pin__Inspiring_Islamic_Art_for_Your_Collection__porpjk.jpg"
-
-=======
                 subtitle="Transforming Lives Through Islamic Education"
                 backgroundImage="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768923939/1195_1_m7slpm.png"
->>>>>>> e587d13 (Update)
             />
             {/* Who We Are Section */}
             <div className="bg-white Resizer">
