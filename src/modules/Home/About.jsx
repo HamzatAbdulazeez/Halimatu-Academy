@@ -12,7 +12,7 @@ const AboutUs = () => {
         },
         {
             title: "Accessible Education",
-            description: "Break down barriers to Islamic learning by offering free, high-quality education to Muslims globally.",
+            description: "Break down barriers to Islamic learning by offering  high-quality education to Muslims globally.",
             icon: "🌍",
             color: "from-blue-500 to-cyan-500"
         },
@@ -157,7 +157,7 @@ const AboutUs = () => {
 
                             <div className="space-y-3 pt-4">
                                 {[
-                                    "Deliver high-quality Islamic education for free",
+                                    "Deliver high-quality Islamic education",
                                     "Empower students with authentic knowledge",
                                     "Build a global learning community",
                                     "Foster spiritual and intellectual growth"
