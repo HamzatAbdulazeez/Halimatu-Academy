@@ -1,5 +1,5 @@
-import AdminLayout from "../layouts/dashboard/student";
-import AdminDashboard from "../modules/Pages/studentDashboard";
+import AdminLayout from "../layouts/super-dashboard/admin";
+import AdminDashboard from "../modules/Pages/adminDashboard";
 // Define student routes
 
 export const adminRoutes = [

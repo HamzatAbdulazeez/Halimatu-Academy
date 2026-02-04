@@ -1,17 +1,19 @@
 import { NavLink } from "react-router-dom";
-
 import {
   FaHome,
+  FaUsers,
+  FaChalkboardTeacher,
   FaBook,
-  FaCertificate,
-  FaBell,
+  FaChartLine,
+  FaDollarSign,
   FaCog,
-  FaSearch,
-  FaCreditCard,  
+  FaBell,
+  FaShieldAlt,
   FaSignOutAlt,
+  FaSearch,
 } from "react-icons/fa";
 
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (window.innerWidth < 1024) {
@@ -19,15 +21,15 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  const mockUser = {
-    name: "Abdul",
-    profile: {
-      profile_picture: null,
-    },
+  // You can replace this with real auth/user context later
+  const mockAdmin = {
+    name: "Abdul (Admin)",
+    role: "Super Admin",
+    profile_picture: null,
   };
 
   const handleSignOut = () => {
-    alert("You have been logged out successfully.");
+    alert("Admin logged out successfully.");
     if (window.innerWidth < 1024) {
       toggleSidebar();
     }
@@ -36,26 +38,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <>
       <div
-        className={`fixed lg:static top-0 left-0 h-screen bg-linear-to-b from-[#004aad] to-indigo-900 
+        className={`fixed lg:static top-0 left-0 h-screen bg-gradient-to-b from-[#004aad] to-indigo-900 
           p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <NavLink to="/" onClick={handleLinkClick}>
+          <NavLink to="/admin" onClick={handleLinkClick}>
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
               alt="Halimatu Academy Logo"
-              className="h-24 w-auto object-contain drop-shadow-md"
+              className="h-20 w-auto object-contain drop-shadow-md"
             />
           </NavLink>
         </div>
 
-        {/* Search */}
+        {/* Search (optional for admin) */}
         <div className="relative mb-8">
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder="Search users, courses..."
             className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 
               text-white placeholder-white/60 outline-none focus:bg-white/20 focus:border-white/40 
               transition-all duration-200"
@@ -65,68 +67,93 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-        <SidebarItem
-  to="/student"
-  icon={<FaHome className="text-xl" />}
-  text="Dashboard"
-  onClick={handleLinkClick}
-  end
-/>
+          <SidebarItem
+            to="/admin"
+            icon={<FaHome className="text-xl" />}
+            text="Admin Dashboard"
+            onClick={handleLinkClick}
+            end
+          />
 
           <SidebarItem
-            to="/student/courses"
+            to="/admin/users"
+            icon={<FaUsers className="text-xl" />}
+            text="Manage Users"
+            onClick={handleLinkClick}
+          />
+
+          <SidebarItem
+            to="/admin/instructors"
+            icon={<FaChalkboardTeacher className="text-xl" />}
+            text="Instructors"
+            onClick={handleLinkClick}
+          />
+
+          <SidebarItem
+            to="/admin/courses"
             icon={<FaBook className="text-xl" />}
-            text="My Courses"
+            text="Manage Courses"
             onClick={handleLinkClick}
           />
+
           <SidebarItem
-            to="/student/certificates"
-            icon={<FaCertificate className="text-xl" />}
-            text="Certificates"
+            to="/admin/analytics"
+            icon={<FaChartLine className="text-xl" />}
+            text="Analytics & Reports"
             onClick={handleLinkClick}
           />
+
           <SidebarItem
-            to="/student/subscription"
-            icon={<FaCreditCard className="text-xl" />}
-            text="Subscription & Billing"
+            to="/admin/payments"
+            icon={<FaDollarSign className="text-xl" />}
+            text="Payments & Revenue"
             onClick={handleLinkClick}
           />
+
           <SidebarItem
-            to="/student/notifications"
+            to="/admin/notifications"
             icon={<FaBell className="text-xl" />}
             text="Notifications"
             onClick={handleLinkClick}
           />
+
           <SidebarItem
-            to="/student/settings"
+            to="/admin/settings"
             icon={<FaCog className="text-xl" />}
-            text="Settings"
+            text="Platform Settings"
+            onClick={handleLinkClick}
+          />
+
+          <SidebarItem
+            to="/admin/security"
+            icon={<FaShieldAlt className="text-xl" />}
+            text="Security & Roles"
             onClick={handleLinkClick}
           />
         </nav>
 
-        {/* User Section */}
+        {/* User/Admin Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
           <NavLink
-            to="/student/settings"
+            to="/admin/profile"
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >
-            {mockUser?.profile?.profile_picture ? (
+            {mockAdmin?.profile_picture ? (
               <img
-                src={mockUser.profile.profile_picture}
-                alt="Profile"
+                src={mockAdmin.profile_picture}
+                alt="Admin"
                 className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-xl">
-                {mockUser?.name?.charAt(0)?.toUpperCase() || "?"}
+                {mockAdmin?.name?.charAt(0)?.toUpperCase() || "?"}
               </div>
             )}
 
             <div>
-              <p className="font-medium text-white">{mockUser?.name}</p>
-              <p className="text-xs text-white/70">View profile</p>
+              <p className="font-medium text-white">{mockAdmin?.name}</p>
+              <p className="text-xs text-white/70">{mockAdmin?.role}</p>
             </div>
           </NavLink>
 
@@ -161,7 +188,7 @@ const SidebarItem = ({ to, icon, text, onClick, end = false }) => {
         `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
         ${
           isActive
-            ? "bg-white/15 text-white font-medium shadow-sm"
+            ? "bg-white/15 text-white font-medium shadow-sm border-l-4 border-white"
             : "text-white/90 hover:bg-white/10 hover:text-white"
         }`
       }
@@ -172,5 +199,4 @@ const SidebarItem = ({ to, icon, text, onClick, end = false }) => {
   );
 };
 
-
-export default Sidebar;
+export default AdminSidebar;

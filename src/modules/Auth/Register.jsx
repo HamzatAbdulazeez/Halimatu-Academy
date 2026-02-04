@@ -264,7 +264,7 @@ const RegistrationForm = ({ onNext }) => {
     );
 };
 
-const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onSuccess, onBack }) => {
+const SubscriptionPlans = ({ userData, selectedPlan, setSelectedPlan, onBack }) => {
     const [isProcessing, setIsProcessing] = useState(false);
 
     const plans = [

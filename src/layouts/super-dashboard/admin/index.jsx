@@ -1,14 +1,11 @@
-import { useState, useEffect } from "react";
-import Sidebar from "../student/Sidebar";
-import Navbar from "../student/Navbar";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useState, } from "react";
+import Sidebar from "../admin/Sidebar";
+import Navbar from "../admin/Navbar";
+import { Outlet, } from "react-router-dom";
 
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  const navigate = useNavigate();
 
   return (
     <div className="flex h-screen overflow-hidden">

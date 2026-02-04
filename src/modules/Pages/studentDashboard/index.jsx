@@ -89,7 +89,7 @@ const enrolledCourses = [
   },
 ];
 
-export const upcomingClasses = [
+const upcomingClasses = [
 
   {
     id: 2,
