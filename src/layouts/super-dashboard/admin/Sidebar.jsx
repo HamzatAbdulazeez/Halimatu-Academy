@@ -8,9 +8,13 @@ import {
   FaDollarSign,
   FaCog,
   FaBell,
-  FaShieldAlt,
   FaSignOutAlt,
   FaSearch,
+  FaUserGraduate,
+  FaCreditCard,
+  FaVideo,
+  FaCertificate,
+  FaFileAlt,
 } from "react-icons/fa";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
@@ -67,70 +71,98 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-          <SidebarItem
-            to="/admin"
-            icon={<FaHome className="text-xl" />}
-            text="Admin Dashboard"
-            onClick={handleLinkClick}
-            end
-          />
+  <SidebarItem
+    to="/admin"
+    icon={<FaHome className="text-xl" />}
+    text="Dashboard"
+    onClick={handleLinkClick}
+    end
+  />
 
-          <SidebarItem
-            to="/admin/users"
-            icon={<FaUsers className="text-xl" />}
-            text="Manage Users"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/students"
+    icon={<FaUsers className="text-xl" />}
+    text="Manage Students"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/instructors"
-            icon={<FaChalkboardTeacher className="text-xl" />}
-            text="Instructors"
-            onClick={handleLinkClick}
-          />
+  {/* <SidebarItem
+    to="/admin/instructors"
+    icon={<FaChalkboardTeacher className="text-xl" />}
+    text="Manage Instructors"
+    onClick={handleLinkClick}
+  /> */}
 
-          <SidebarItem
-            to="/admin/courses"
-            icon={<FaBook className="text-xl" />}
-            text="Manage Courses"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/courses"
+    icon={<FaBook className="text-xl" />}
+    text="Manage Courses"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/analytics"
-            icon={<FaChartLine className="text-xl" />}
-            text="Analytics & Reports"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/enrollments"
+    icon={<FaUserGraduate className="text-xl" />}
+    text="Enrollments"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/payments"
-            icon={<FaDollarSign className="text-xl" />}
-            text="Payments & Revenue"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/subscriptions"
+    icon={<FaCreditCard className="text-xl" />}
+    text="Subscriptions & Plans"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/notifications"
-            icon={<FaBell className="text-xl" />}
-            text="Notifications"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/payments"
+    icon={<FaDollarSign className="text-xl" />}
+    text="Payments & Revenue"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/settings"
-            icon={<FaCog className="text-xl" />}
-            text="Platform Settings"
-            onClick={handleLinkClick}
-          />
+  <SidebarItem
+    to="/admin/live-sessions"
+    icon={<FaVideo className="text-xl" />}
+    text="Live Sessions"
+    onClick={handleLinkClick}
+  />
 
-          <SidebarItem
-            to="/admin/security"
-            icon={<FaShieldAlt className="text-xl" />}
-            text="Security & Roles"
-            onClick={handleLinkClick}
-          />
-        </nav>
+  <SidebarItem
+    to="/admin/certificates"
+    icon={<FaCertificate className="text-xl" />}
+    text="Certificates"
+    onClick={handleLinkClick}
+  />
+
+  <SidebarItem
+    to="/admin/content"
+    icon={<FaFileAlt className="text-xl" />}
+    text="Course Content"
+    onClick={handleLinkClick}
+  />
+
+  <SidebarItem
+    to="/admin/analytics"
+    icon={<FaChartLine className="text-xl" />}
+    text="Analytics & Reports"
+    onClick={handleLinkClick}
+  />
+
+  <SidebarItem
+    to="/admin/notifications"
+    icon={<FaBell className="text-xl" />}
+    text="Notifications"
+    onClick={handleLinkClick}
+  />
+
+  <SidebarItem
+    to="/admin/settings"
+    icon={<FaCog className="text-xl" />}
+    text="Settings"
+    onClick={handleLinkClick}
+  />
+</nav>
 
         {/* User/Admin Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
