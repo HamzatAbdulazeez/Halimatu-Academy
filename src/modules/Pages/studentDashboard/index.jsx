@@ -1,210 +1,441 @@
 import React from 'react';
-import {
-  FaBook, FaCheckCircle, FaClock, FaStopwatch
-} from 'react-icons/fa';
 
-import StatsCard from './components/StatsCard';
-import EnrolledCourseCard from './components/EnrolledCourseCard';
-import UpcomingClassCard from './components/UpcomingClassCard';
-import ProgressRing from './components/ProgressRing';
+const StudentWelcomeDashboard = () => {
+  // Student Information
+  const studentData = {
+    name: "Abdul Rahman",
+    email: "abdul@example.com",
+    studentId: "HSA-2025-042",
+    enrollmentDate: "February 11, 2026",
+    membershipType: "Premium",
+    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+  };
 
-const studentData = {
-  name: "Abdul",
-  email: "abdul@example.com",
-  studentId: "HSA-2025-042",
-  course: "Islamic Studies Program",
-  enrollmentDate: "September 15, 2025",
-  overallProgress: 68
-};
+  // Enrolled Courses
+  const enrolledCourses = [
+    {
+      id: 1,
+      title: 'Quranic Studies - Complete Foundation',
+      instructor: 'Ustadha Halimatu Academy',
+      duration: '1 Year Program',
+      thumbnail: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80',
+      category: 'Quranic Studies',
+      topics: ['Tajweed Rules', 'Quran Recitation', 'Tafsir & Interpretation', 'Memorization Techniques', 'Quranic Arabic']
+    },
+    {
+      id: 2,
+      title: 'Arabic Language - Complete Mastery',
+      instructor: 'Shaykh Ahmed Al-Masri',
+      duration: '1 Year Program',
+      thumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+      category: 'Arabic Language',
+      topics: ['Arabic Grammar (Nahw)', 'Arabic Morphology (Sarf)', 'Conversational Arabic', 'Reading & Writing', 'Quranic Vocabulary']
+    }
+  ];
 
-const stats = [
-  {
-    label: 'Courses Enrolled',
-    value: '2',
-    icon: <FaBook className="text-2xl" />,
-    color: 'from-blue-500 to-blue-600',
-    change: '+1 this month'
-  },
-  {
-    label: 'Completed Courses',
-    value: '1',
-    icon: <FaCheckCircle className="text-2xl" />,
-    color: 'from-green-500 to-green-600',
-    change: 'Qur\'an Reading Basics'
-  },
-  {
-    label: 'In Progress',
-    value: '1',
-    icon: <FaClock className="text-2xl" />,
-    color: 'from-amber-500 to-orange-600',
-    change: '62% average progress'
-  },
-  {
-    label: 'Learning Hours',
-    value: '18',
-    icon: <FaStopwatch className="text-2xl" />,
-    color: 'from-purple-500 to-purple-600',
-    change: '+4 this month'
-  },
-];
+  // Class Schedule with Google Meet links
+  const classSchedule = [
+    {
+      id: 1,
+      courseTitle: 'Quranic Studies',
+      sessionTitle: 'Tajweed & Recitation Practice',
+      instructor: 'Ustadha Halimatu',
+      scheduledDate: 'Wednesday, February 11, 2026',
+      scheduledTime: '6:00 PM WAT',
+      duration: '90 minutes',
+      googleMeetLink: 'https://meet.google.com/abc-defg-hij',
+      minutesUntil: 300,
+      isToday: true
+    },
+    {
+      id: 2,
+      courseTitle: 'Arabic Language',
+      sessionTitle: 'Conversational Arabic Practice',
+      instructor: 'Shaykh Ahmed Al-Masri',
+      scheduledDate: 'Thursday, February 12, 2026',
+      scheduledTime: '7:30 PM WAT',
+      duration: '75 minutes',
+      googleMeetLink: 'https://meet.google.com/xyz-uvwx-rst',
+      minutesUntil: 1530,
+      isToday: false
+    },
+    {
+      id: 3,
+      courseTitle: 'Quranic Studies',
+      sessionTitle: 'Understanding Surah Al-Mulk',
+      instructor: 'Ustadha Halimatu',
+      scheduledDate: 'Saturday, February 14, 2026',
+      scheduledTime: '4:00 PM WAT',
+      duration: '90 minutes',
+      googleMeetLink: 'https://meet.google.com/lmn-opqr-stu',
+      minutesUntil: 4320,
+      isToday: false
+    },
+    {
+      id: 4,
+      courseTitle: 'Arabic Language',
+      sessionTitle: 'Arabic Grammar - Past Tense Verbs',
+      instructor: 'Shaykh Ahmed Al-Masri',
+      scheduledDate: 'Sunday, February 15, 2026',
+      scheduledTime: '5:00 PM WAT',
+      duration: '75 minutes',
+      googleMeetLink: 'https://meet.google.com/def-ghij-klm',
+      minutesUntil: 5760,
+      isToday: false
+    }
+  ];
 
-const enrolledCourses = [
+  // Learning Statistics
+  const learningStats = {
+    totalStudyHours: 18.5,
+    classesAttended: 6,
+    currentStreak: 5,
+    subscriptionType: '6 Months - Quranic Studies'
+  };
 
-  {
-    id: 1,
-    title: 'Qur\'an Reading Basics',
-    slug: '/courses/quran-reading-basics',
-    instructor: 'HSA Academy Team',
-    progress: 100,
-    totalLessons: 15,
-    completedLessons: 15,
-    estimatedDuration: 450, // ~7.5 hours
-    status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80'
+  // Helper function to format time until class
+  const formatTimeUntil = (minutes) => {
+    if (minutes < 60) return `${minutes} minutes`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''}`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? 's' : ''}`;
+  };
 
-  },
-  {
-    id: 2,
-    title: 'Quranic Arabic – Level 1 (Reading & Tajweed)',
-    slug: '/courses/quranic-arabic-level-1',
-    instructor: 'Ustadha Halimatu Academy',
-    progress: 55,
-    totalLessons: 22,
-    completedLessons: 12,
-    estimatedDuration: 660,
-    status: 'In Progress',
-    thumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80'
-  },
-  {
-    id: 3,
-    title: 'Seerah of the Prophet ﷺ – Full Series',
-    slug: '/courses/seerah-of-the-prophet',
-    instructor: 'Shaykh Yasir Qadhi (adapted)',
-    progress: 100,
-    totalLessons: 30,
-    completedLessons: 30,
-    estimatedDuration: 900,
-    status: 'Completed',
-    thumbnail: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80'
-  },
-];
+  // Copy to clipboard function
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Meeting link copied to clipboard!');
+  };
 
-const upcomingClasses = [
-
-  {
-    id: 2,
-    title: 'Qur\'an Recitation & Tajweed Correction Session',
-    date: 'Saturday, February 7, 2026',
-    time: '4:00 PM – 5:30 PM WAT',
-    instructor: 'Ustadha Halimatu Academy',
-    duration: '90 minutes',
-    type: 'Live Correction Class',
-    link: '/student/live/tajweed-correction-feb7',
-    isToday: false,
-  },
-  {
-    id: 3,
-    title: 'Arabic Foundation – Vocabulary & Basic Grammar',
-    date: 'Wednesday, February 11, 2026',
-    time: '7:00 PM – 8:15 PM WAT',
-    instructor: 'HSA Arabic Team',
-    duration: '75 minutes',
-    type: 'Interactive Workshop',
-    link: '/student/live/arabic-foundation-feb11',
-    isToday: false,
-  },
-  {
-    id: 4,
-    title: 'Tawheed Revision – Common Misconceptions',
-    date: 'Sunday, February 15, 2026',
-    time: '5:30 PM – 7:00 PM WAT',
-    instructor: 'Shaykh (recorded) + HSA Moderator',
-    duration: '90 minutes',
-    type: 'Live Q&A & Discussion',
-    link: '/student/live/tawheed-revision-feb15',
-    isToday: false,
-  }
-];
-
-
-// ──────────────────────────────────────────────
-
-const StudentDashboard = () => {
   return (
-    <div className="">
-      <main className=" mx-auto">
-        {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {stats.map((stat, idx) => (
-            <StatsCard key={idx} {...stat} />
-          ))}
+    <>
+      <div className="space-y-8">
+        {/* Welcome Header */}
+        <div className="bg-gradient text-white">
+          <div className="py-8 px-4 mb-8 ">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src={studentData.profileImage}
+                  alt={studentData.name}
+                  className="w-16 h-16 rounded-full border-4 border-white/30 object-cover"
+                />
+                <div>
+                  <h1 className="text-3xl font-bold">
+                    As-salamu alaykum, {studentData.name}! 👋
+                  </h1>
+                  <p className="text-blue-100 mt-1">
+                    Ready to continue your Islamic learning journey?
+                  </p>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                <p className="text-sm text-blue-100">Student ID</p>
+                <p className="font-semibold">{studentData.studentId}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Main Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-8">
-            {/* My Courses */}
-            <section className="bg-white rounded-md p-6 md:p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">My Courses</h2>
-                <a href="/student/courses" className="text-[#053276] hover:underline font-medium">
-                  View All →
-                </a>
+        <div className=" ">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white rounded-md p-6 border-l-4 border-blue-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-black text-sm font-medium">Enrolled Courses</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">2</p>
+                </div>
+                <div className="text-4xl">📚</div>
               </div>
-              <div className="space-y-6">
-                {enrolledCourses.map((course) => (
-                  <EnrolledCourseCard key={course.id} course={course} />
-                ))}
+              <p className="text-xs text-gray-500 mt-2">Active programs</p>
+            </div>
+
+            <div className="bg-white rounded-md p-6 border-l-4 border-green-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-black text-sm font-medium">Classes Attended</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {learningStats.classesAttended}
+                  </p>
+                </div>
+                <div className="text-4xl">✅</div>
               </div>
-            </section>
+              <p className="text-xs text-gray-500 mt-2">Total sessions</p>
+            </div>
+
+            <div className="bg-white rounded-md p-6 border-l-4 border-purple-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-black text-sm font-medium">Study Hours</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {learningStats.totalStudyHours}
+                  </p>
+                </div>
+                <div className="text-4xl">⏰</div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">This month</p>
+            </div>
+
+            <div className="bg-white rounded-md p-6 border-l-4 border-orange-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-black text-sm font-medium">Current Streak</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-1">
+                    {learningStats.currentStreak}
+                  </p>
+                </div>
+                <div className="text-4xl">🔥</div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Days in a row</p>
+            </div>
           </div>
 
-          {/* Right Sidebar */}
-          <aside className="space-y-8">
-            {/* Upcoming Classes */}
-            <section className="bg-white rounded-md p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Classes</h2>
-              <div className="space-y-5">
-                {upcomingClasses.map((cls, idx) => (
-                  <UpcomingClassCard key={idx} classItem={cls} />
-                ))}
-              </div>
-              {/* <a
-                href="/student/schedule"
-                className="block mt-5 text-center text-[#053276] hover:underline font-medium"
-              >
-                View Full Schedule →
-              </a> */}
-            </section>
+          {/* Main Grid */}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left Side - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* My Enrolled Courses */}
+              <section className="bg-white rounded-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">📚 My Enrolled Courses</h2>
+                  <span className="text-sm text-gray-500">2 Active Courses</span>
+                </div>
 
-            {/* Overall Progress */}
-            <section className="bg-white rounded-md p-6 md:p-8 flex flex-col items-center justify-center text-center min-h-80">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-                Learning Progress
-              </h2>
+                <div className="space-y-6">
+                  {enrolledCourses.map((course) => (
+                    <div key={course.id} className="border border-gray-200 rounded-lg overflow-hidden ">
+                      <div className="flex flex-col sm:flex-row">
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-full sm:w-48 h-48 object-cover"
+                        />
+                        <div className="flex-1 p-5">
+                          <div className="mb-3">
+                            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full mb-2">
+                              {course.category}
+                            </span>
+                            <h3 className="text-xl font-bold text-gray-900 mb-1">
+                              {course.title}
+                            </h3>
+                            <p className="text-sm text-gray-600 mb-1">
+                              Instructor: {course.instructor}
+                            </p>
+                            <p className="text-sm text-blue-600 font-medium">
+                              📅 {course.duration}
+                            </p>
+                          </div>
 
-              <ProgressRing
-                progress={studentData?.overallProgress || 0}
-                size={160}
-                strokeWidth={14}
-                className="mb-6"
-              />
+                          <div className="mb-4">
+                            {/* <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                              {course.description}
+                            </p> */}
 
-              <p className="text-base font-medium text-gray-700">
-                Overall Course Progress
-              </p>
+                            <div className="mt-3">
+                              <p className="text-xs font-semibold text-gray-600 mb-2">What you will learn:</p>
+                              <div className="flex flex-wrap gap-2">
+                                {course.topics.map((topic, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md"
+                                  >
+                                    {topic}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-              <p className="text-sm text-gray-500 mt-1">
-                {studentData?.overallProgress >= 75
-                  ? "You're doing amazingly well! Keep going 🤲"
-                  : "Keep up the great work — you're getting there!"}
-              </p>
-            </section>
-          </aside>
+              {/* Class Schedule */}
+              <section className="bg-white rounded-md p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">🕐 Upcoming Class Schedule</h2>
+                  <a href="/schedule" className="text-[#053276] hover:underline text-sm font-medium">
+                    View Full Calendar →
+                  </a>
+                </div>
+
+                <div className="space-y-4">
+                  {classSchedule.map((classItem) => (
+                    <div
+                      key={classItem.id}
+                      className={`border-l-4 ${classItem.isToday
+                          ? 'border-green-500 bg-green-50'
+                          : 'border-blue-500 bg-white'
+                        } border rounded-lg p-5 hovmd transition-shadow`}
+                    >
+                      <div className="flex items-start justify-between flex-wrap gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                              Scheduled
+                            </span>
+                            {classItem.isToday && (
+                              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold animate-pulse">
+                                📍 Today!
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">
+                            {classItem.sessionTitle}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-1">
+                            {classItem.courseTitle} • {classItem.instructor}
+                          </p>
+                          <div className="flex items-center gap-4 text-sm text-gray-700 mt-2 flex-wrap">
+                            <span>📅 {classItem.scheduledDate}</span>
+                            <span>⏰ {classItem.scheduledTime}</span>
+                            <span>⏱️ {classItem.duration}</span>
+                          </div>
+                          <p className="text-sm text-blue-600 font-medium mt-2">
+                            Starts in {formatTimeUntil(classItem.minutesUntil)}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <a
+                            href={classItem.googleMeetLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#053276] text-white px-6 py-2 rounded-lg hover:bg-[#042050] transition-colors font-medium inline-flex items-center justify-center gap-2"
+                          >
+                            <span>Join on Google Meet</span>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                          <button
+                            onClick={() => copyToClipboard(classItem.googleMeetLink)}
+                            className="bg-gray-100 text-gray-700 px-4 py-1 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                          >
+                            Copy Link
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </div>
+
+            {/* Right Sidebar */}
+            <aside className="space-y-6">
+             
+
+              {/* Subscription Info */}
+              <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-md p-6 border border-blue-200">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">📋 Subscription Details</h2>
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-1">Current Plan</p>
+                    <p className="font-bold text-lg text-gray-900">
+                      {learningStats.subscriptionType}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      ✓ Access to Quranic Studies program
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-4">
+                    <p className="text-sm text-gray-600 mb-1">Subscription Status</p>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <p className="font-semibold text-green-700">Active</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Enrolled since {studentData.enrollmentDate}
+                    </p>
+                  </div>
+                  <div className="bg-blue-600 text-white rounded-lg p-4">
+                    <p className="text-sm text-blue-100 mb-2">
+                      💡 Upgrade to unlock Arabic Language course!
+                    </p>
+                    <a
+                      href="/upgrade"
+                      className="block w-full bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium text-center text-sm"
+                    >
+                      Upgrade Now →
+                    </a>
+                  </div>
+                </div>
+              </section>
+
+              {/* Study Reminder */}
+              <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-md p-6">
+                <h2 className="text-xl font-bold mb-3">💡 Daily Reminder</h2>
+                <p className="text-blue-100 text-sm mb-4">
+                  &quot;Seek knowledge from the cradle to the grave.&quot;
+                  <br />
+                  <span className="text-xs italic">- Prophet Muhammad ﷺ</span>
+                </p>
+                <div className="bg-white/20 rounded-lg p-3 backdrop-blur-sm">
+                  <p className="text-sm font-medium">🎯 Today&apos;s Goal</p>
+                  <p className="text-xs text-blue-100 mt-1">
+                    Complete at least one lesson and review yesterday&apos;s notes
+                  </p>
+                </div>
+              </section>
+
+              {/* Learning Tips */}
+              <section className="bg-white rounded-md p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">💭 Learning Tips</h2>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">✓</span>
+                    <span>Review previous lessons before attending new classes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">✓</span>
+                    <span>Practice daily, even if just for 15 minutes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">✓</span>
+                    <span>Don&apos;t hesitate to ask questions during live sessions</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">✓</span>
+                    <span>Join study groups to learn with fellow students</span>
+                  </li>
+                </ul>
+              </section>
+
+              {/* Account Info */}
+              <section className="bg-white rounded-md p-6">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">👤 Account Info</h2>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-gray-600">Membership</p>
+                    <p className="font-semibold text-gray-900">{studentData.membershipType}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Enrolled Since</p>
+                    <p className="font-semibold text-gray-900">{studentData.enrollmentDate}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Email</p>
+                    <p className="font-semibold text-gray-900 text-xs">{studentData.email}</p>
+                  </div>
+                  <a
+                    href="/settings"
+                    className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-2 rounded-lg transition-colors font-medium text-center mt-4"
+                  >
+                    Manage Account
+                  </a>
+                </div>
+              </section>
+            </aside>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 
-export default StudentDashboard;
+export default StudentWelcomeDashboard;

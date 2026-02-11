@@ -73,12 +73,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   end
 />
 
-          <SidebarItem
+          {/* <SidebarItem
             to="/student/courses"
             icon={<FaBook className="text-xl" />}
             text="My Courses"
             onClick={handleLinkClick}
-          />
+          /> */}
           <SidebarItem
             to="/student/certificates"
             icon={<FaCertificate className="text-xl" />}
