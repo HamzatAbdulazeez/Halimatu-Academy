@@ -89,7 +89,7 @@ const StudentWelcomeDashboard = () => {
   const learningStats = {
     totalStudyHours: 18.5,
     classesAttended: 6,
-    currentStreak: 5,
+    currentStreak: 3,
     subscriptionType: '6 Months - Quranic Studies'
   };
 
@@ -333,8 +333,8 @@ const StudentWelcomeDashboard = () => {
               {/* Subscription Info */}
               <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-md p-6 border border-blue-200">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">📋 Subscription Details</h2>
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg p-4">
+                <div className="space-y-6">
+                  <div className="bg-white rounded-lg p-6">
                     <p className="text-sm text-gray-600 mb-1">Current Plan</p>
                     <p className="font-bold text-lg text-gray-900">
                       {learningStats.subscriptionType}
@@ -343,7 +343,7 @@ const StudentWelcomeDashboard = () => {
                       ✓ Access to Quranic Studies program
                     </p>
                   </div>
-                  <div className="bg-white rounded-lg p-4">
+                  <div className="bg-white rounded-lg p-6">
                     <p className="text-sm text-gray-600 mb-1">Subscription Status</p>
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -353,7 +353,7 @@ const StudentWelcomeDashboard = () => {
                       Enrolled since {studentData.enrollmentDate}
                     </p>
                   </div>
-                  <div className="bg-blue-600 text-white rounded-lg p-4">
+                  <div className="bg-blue-600 text-white rounded-lg p-6">
                     <p className="text-sm text-blue-100 mb-2">
                       💡 Upgrade to unlock Arabic Language course!
                     </p>
@@ -375,7 +375,7 @@ const StudentWelcomeDashboard = () => {
                   <br />
                   <span className="text-xs italic">- Prophet Muhammad ﷺ</span>
                 </p>
-                <div className="bg-white/20 rounded-lg p-3 backdrop-blur-sm">
+                <div className="bg-white/20 rounded-lg p-6 backdrop-blur-sm">
                   <p className="text-sm font-medium">🎯 Today&apos;s Goal</p>
                   <p className="text-xs text-blue-100 mt-1">
                     Complete at least one lesson and review yesterday&apos;s notes

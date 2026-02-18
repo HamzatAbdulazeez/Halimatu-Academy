@@ -115,39 +115,12 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   />
 
   <SidebarItem
-    to="/admin/payments"
-    icon={<FaDollarSign className="text-xl" />}
-    text="Payments & Revenue"
-    onClick={handleLinkClick}
-  />
-
-  <SidebarItem
-    to="/admin/live-sessions"
-    icon={<FaVideo className="text-xl" />}
-    text="Live Sessions"
-    onClick={handleLinkClick}
-  />
-
-  <SidebarItem
     to="/admin/certificates"
     icon={<FaCertificate className="text-xl" />}
     text="Certificates"
     onClick={handleLinkClick}
   />
 
-  <SidebarItem
-    to="/admin/content"
-    icon={<FaFileAlt className="text-xl" />}
-    text="Course Content"
-    onClick={handleLinkClick}
-  />
-
-  <SidebarItem
-    to="/admin/analytics"
-    icon={<FaChartLine className="text-xl" />}
-    text="Analytics & Reports"
-    onClick={handleLinkClick}
-  />
 
   <SidebarItem
     to="/admin/notifications"
