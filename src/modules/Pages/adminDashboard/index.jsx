@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, BookOpen, DollarSign, Award, TrendingUp, Video, UserCheck, Clock } from 'lucide-react';
+import { Users, BookOpen, DollarSign, Award, Video, UserCheck, Clock } from 'lucide-react';
 
 const AdminDashboard = () => {
   // Sample data
@@ -19,14 +19,6 @@ const AdminDashboard = () => {
       icon: BookOpen,
       color: 'from-emerald-500 to-teal-500',
       bgColor: 'bg-emerald-50'
-    },
-    {
-      title: 'Total Revenue',
-      value: '₦567,890',
-      change: '+23%',
-      icon: DollarSign,
-      color: 'from-purple-500 to-pink-500',
-      bgColor: 'bg-purple-50'
     },
     {
       title: 'Certificates Issued',
@@ -65,7 +57,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -163,7 +155,7 @@ const AdminDashboard = () => {
           </a>
           <a href="/admin/payments" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
             <DollarSign className="w-8 h-8 mx-auto mb-3 text-purple-600" />
-            <h3 className="font-semibold text-gray-900">View Payments</h3>
+            <h3 className="font-semibold text-gray-900">Subscription & Plans</h3>
           </a>
           <a href="/admin/certificates" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
             <Award className="w-8 h-8 mx-auto mb-3 text-orange-600" />

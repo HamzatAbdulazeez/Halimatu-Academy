@@ -11,11 +11,9 @@ const ManageStudents = () => {
       name: 'Abdullah Rahman',
       email: 'abdullah@email.com',
       phone: '+234 801 234 5678',
-      course: 'Basic Qur\'an Reading & Arabic',
       plan: '12 Months',
       enrolled: 'Jan 15, 2027',
       status: 'active',
-      progress: 45,
       lastActive: '2 hours ago'
     },
     {
@@ -23,11 +21,9 @@ const ManageStudents = () => {
       name: 'Fatima Hassan',
       email: 'fatima@email.com',
       phone: '+234 802 345 6789',
-      course: 'Hadith Studies',
       plan: '6 Months',
       enrolled: 'Jan 20, 2027',
       status: 'active',
-      progress: 65,
       lastActive: '1 day ago'
     },
     {
@@ -35,11 +31,9 @@ const ManageStudents = () => {
       name: 'Omar Ali',
       email: 'omar@email.com',
       phone: '+234 803 456 7890',
-      course: 'Tafsīr',
       plan: '12 Months',
       enrolled: 'Jan 10, 2027',
       status: 'active',
-      progress: 78,
       lastActive: '5 hours ago'
     },
     {
@@ -47,11 +41,9 @@ const ManageStudents = () => {
       name: 'Aisha Mohamed',
       email: 'aisha@email.com',
       phone: '+234 804 567 8901',
-      course: 'Fiqh',
       plan: '6 Months',
       enrolled: 'Dec 25, 2026',
       status: 'inactive',
-      progress: 30,
       lastActive: '1 week ago'
     },
     {
@@ -59,11 +51,9 @@ const ManageStudents = () => {
       name: 'Ibrahim Yusuf',
       email: 'ibrahim@email.com',
       phone: '+234 805 678 9012',
-      course: 'Tawhīd',
       plan: '12 Months',
       enrolled: 'Jan 25, 2027',
       status: 'active',
-      progress: 25,
       lastActive: 'Just now'
     },
     {
@@ -71,11 +61,9 @@ const ManageStudents = () => {
       name: 'Khadija Ahmed',
       email: 'khadija@email.com',
       phone: '+234 806 789 0123',
-      course: 'Sīrah',
       plan: '6 Months',
       enrolled: 'Jan 5, 2027',
       status: 'suspended',
-      progress: 50,
       lastActive: '3 days ago'
     }
   ];
@@ -179,9 +167,7 @@ const ManageStudents = () => {
                 <tr>
                   <th className="px-6 py-4 text-left text-lg text-black">Student</th>
                   <th className="px-6 py-4 text-left text-lg text-black">Contact</th>
-                  <th className="px-6 py-4 text-left text-lg text-black">Course</th>
                   <th className="px-6 py-4 text-left text-lg text-black">Plan</th>
-                  <th className="px-6 py-4 text-left text-lg text-black">Progress</th>
                   <th className="px-6 py-4 text-left text-lg text-black">Status</th>
                   <th className="px-6 py-4 text-left text-lg text-black">Actions</th>
                 </tr>
@@ -205,24 +191,7 @@ const ManageStudents = () => {
                       <p className="text-sm text-gray-500">{student.phone}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-gray-900">{student.course}</p>
-                    </td>
-                    <td className="px-6 py-4">
                       <p className="text-sm font-semibold text-[#004aad]">{student.plan}</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="w-32">
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-gray-600">Progress</span>
-                          <span className="font-semibold">{student.progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-gradient h-2 rounded-full"
-                            style={{ width: `${student.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(student.status)}
