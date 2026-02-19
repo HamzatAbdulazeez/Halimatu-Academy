@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const StudentWelcomeDashboard = () => {
   // Student Information
@@ -38,48 +39,24 @@ const StudentWelcomeDashboard = () => {
     {
       id: 1,
       courseTitle: 'Quranic Studies',
-      sessionTitle: 'Tajweed & Recitation Practice',
-      instructor: 'Ustadha Halimatu',
-      scheduledDate: 'Wednesday, February 11, 2026',
-      scheduledTime: '6:00 PM WAT',
-      duration: '90 minutes',
-      googleMeetLink: 'https://meet.google.com/abc-defg-hij',
-      minutesUntil: 300,
-      isToday: true
-    },
-    {
-      id: 2,
-      courseTitle: 'Arabic Language',
-      sessionTitle: 'Conversational Arabic Practice',
-      instructor: 'Shaykh Ahmed Al-Masri',
-      scheduledDate: 'Thursday, February 12, 2026',
-      scheduledTime: '7:30 PM WAT',
-      duration: '75 minutes',
-      googleMeetLink: 'https://meet.google.com/xyz-uvwx-rst',
-      minutesUntil: 1530,
-      isToday: false
-    },
-    {
-      id: 3,
-      courseTitle: 'Quranic Studies',
       sessionTitle: 'Understanding Surah Al-Mulk',
       instructor: 'Ustadha Halimatu',
       scheduledDate: 'Saturday, February 14, 2026',
       scheduledTime: '4:00 PM WAT',
       duration: '90 minutes',
-      googleMeetLink: 'https://meet.google.com/lmn-opqr-stu',
+      googleMeetLink: 'https://meet.google.com/iym-uyfg-onv',
       minutesUntil: 4320,
       isToday: false
     },
     {
-      id: 4,
+      id: 2,
       courseTitle: 'Arabic Language',
       sessionTitle: 'Arabic Grammar - Past Tense Verbs',
       instructor: 'Shaykh Ahmed Al-Masri',
       scheduledDate: 'Sunday, February 15, 2026',
       scheduledTime: '5:00 PM WAT',
       duration: '75 minutes',
-      googleMeetLink: 'https://meet.google.com/def-ghij-klm',
+      googleMeetLink: 'https://meet.google.com/afp-dtxj-dyy',
       minutesUntil: 5760,
       isToday: false
     }
@@ -87,7 +64,6 @@ const StudentWelcomeDashboard = () => {
 
   // Learning Statistics
   const learningStats = {
-    totalStudyHours: 18.5,
     classesAttended: 6,
     currentStreak: 3,
     subscriptionType: '6 Months - Quranic Studies'
@@ -140,7 +116,7 @@ const StudentWelcomeDashboard = () => {
 
         <div className=" ">
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-md p-6 border-l-4 border-blue-500">
               <div className="flex items-center justify-between">
                 <div>
@@ -163,19 +139,6 @@ const StudentWelcomeDashboard = () => {
                 <div className="text-4xl">✅</div>
               </div>
               <p className="text-xs text-gray-500 mt-2">Total sessions</p>
-            </div>
-
-            <div className="bg-white rounded-md p-6 border-l-4 border-purple-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-black text-sm font-medium">Study Hours</p>
-                  <p className="text-3xl font-bold text-gray-900 mt-1">
-                    {learningStats.totalStudyHours}
-                  </p>
-                </div>
-                <div className="text-4xl">⏰</div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">This month</p>
             </div>
 
             <div className="bg-white rounded-md p-6 border-l-4 border-orange-500">
@@ -258,9 +221,9 @@ const StudentWelcomeDashboard = () => {
               <section className="bg-white rounded-md p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-900">🕐 Upcoming Class Schedule</h2>
-                  <a href="/schedule" className="text-[#053276] hover:underline text-sm font-medium">
+                  {/* <a href="/schedule" className="text-[#053276] hover:underline text-sm font-medium">
                     View Full Calendar →
-                  </a>
+                  </a> */}
                 </div>
 
                 <div className="space-y-4">
@@ -357,18 +320,15 @@ const StudentWelcomeDashboard = () => {
                     <p className="text-sm text-blue-100 mb-2">
                       💡 Upgrade to unlock Arabic Language course!
                     </p>
-                    <a
-                      href="/upgrade"
-                      className="block w-full bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium text-center text-sm"
-                    >
-                      Upgrade Now →
-                    </a>
+                    <Link to="/student/subscription" className="block w-full bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors font-medium text-center text-sm">
+  Upgrade Now →
+</Link>
                   </div>
                 </div>
               </section>
 
               {/* Study Reminder */}
-              <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-md p-6">
+              <section className="bg-linear-to-br from-blue-600 to-blue-700 text-white rounded-md p-6">
                 <h2 className="text-xl font-bold mb-3">💡 Daily Reminder</h2>
                 <p className="text-blue-100 text-sm mb-4">
                   &quot;Seek knowledge from the cradle to the grave.&quot;
@@ -381,29 +341,6 @@ const StudentWelcomeDashboard = () => {
                     Complete at least one lesson and review yesterday&apos;s notes
                   </p>
                 </div>
-              </section>
-
-              {/* Learning Tips */}
-              <section className="bg-white rounded-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">💭 Learning Tips</h2>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    <span>Review previous lessons before attending new classes</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    <span>Practice daily, even if just for 15 minutes</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    <span>Don&apos;t hesitate to ask questions during live sessions</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    <span>Join study groups to learn with fellow students</span>
-                  </li>
-                </ul>
               </section>
 
               {/* Account Info */}

@@ -2,10 +2,6 @@ import { NavLink } from "react-router-dom";
 import {
   FaHome,
   FaUsers,
-  FaChalkboardTeacher,
-  FaBook,
-  FaChartLine,
-  FaDollarSign,
   FaCog,
   FaBell,
   FaSignOutAlt,
@@ -14,7 +10,6 @@ import {
   FaCreditCard,
   FaVideo,
   FaCertificate,
-  FaFileAlt,
 } from "react-icons/fa";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
@@ -93,12 +88,12 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     onClick={handleLinkClick}
   /> */}
 
-  <SidebarItem
+  {/* <SidebarItem
     to="/admin/courses"
     icon={<FaBook className="text-xl" />}
     text="Manage Courses"
     onClick={handleLinkClick}
-  />
+  /> */}
 
   <SidebarItem
     to="/admin/enrollments"

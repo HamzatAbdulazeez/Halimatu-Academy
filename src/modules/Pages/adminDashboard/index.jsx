@@ -144,15 +144,15 @@ const AdminDashboard = () => {
 
     
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <a href="/admin/students" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
             <Users className="w-8 h-8 mx-auto mb-3 text-blue-600" />
             <h3 className="font-semibold text-gray-900">Manage Students</h3>
           </a>
-          <a href="/admin/courses" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
+          {/* <a href="/admin/courses" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
             <BookOpen className="w-8 h-8 mx-auto mb-3 text-emerald-600" />
             <h3 className="font-semibold text-gray-900">Manage Courses</h3>
-          </a>
+          </a> */}
           <a href="/admin/payments" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">
             <DollarSign className="w-8 h-8 mx-auto mb-3 text-purple-600" />
             <h3 className="font-semibold text-gray-900">Subscription & Plans</h3>
