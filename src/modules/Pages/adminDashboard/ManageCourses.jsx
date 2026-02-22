@@ -51,7 +51,7 @@ const ManageView = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-black mb-2">Manage Courses</h1>
-                        <p className="text-gray-600">All Islamic courses offered at HSA Academy</p>
+                        <p className="text-gray-600">All Islamic courses offered at HALĪMATU SA'DIYYAH ISlamic Academy</p>
                     </div>
                     <button className="px-6 py-3 bg-gradient text-white rounded-md hover:shadow-lg transition-all flex items-center gap-2">
                         <Plus className="w-5 h-5" />

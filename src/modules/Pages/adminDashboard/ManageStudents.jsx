@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Download, Eye, Edit, Trash2, Mail, MoreVertical, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Search, Download, Eye, Edit, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
 
 const ManageStudents = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -101,12 +101,12 @@ const ManageStudents = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-black mb-2">Manage Students</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-1 sm:mb-2">Manage Students</h1>
             <p className="text-black">View and manage all enrolled students</p>
           </div>
-          <button className="px-6 py-3 bg-gradient cursor-pointer text-white rounded-md hover:shadow-lg transition-all">
+          {/* <button className="px-6 py-3 bg-gradient cursor-pointer text-white rounded-md hover:shadow-lg transition-all">
             + Add Student
-          </button>
+          </button> */}
         </div>
 
         {/* Stats */}

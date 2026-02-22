@@ -25,7 +25,7 @@ const EnrolledCourseCard = ({ course }) => {
             alt={course.title}
             className="w-full h-48 sm:h-full object-cover"
           />
-          
+
           {/* Overlay play button / status */}
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             {isCompleted ? (
@@ -42,15 +42,14 @@ const EnrolledCourseCard = ({ course }) => {
           {/* Status badge on image */}
           <div className="absolute top-3 right-3">
             <span
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-md ${
-                isCompleted
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-md ${isCompleted
                   ? 'bg-green-600 text-white'
                   : isInProgress
-                  ? 'bg-[#004aad] text-white'
-                  : isComingSoon
-                  ? 'bg-[#004aad] text-white'
-                  : 'bg-[#004aad] text-white'
-              }`}
+                    ? 'bg-[#004aad] text-white'
+                    : isComingSoon
+                      ? 'bg-[#004aad] text-white'
+                      : 'bg-[#004aad] text-white'
+                }`}
             >
               {course.status}
             </span>
@@ -65,7 +64,7 @@ const EnrolledCourseCard = ({ course }) => {
                 {course.title}
               </h3>
               <p className="text-sm text-gray-600 mt-1">
-                by {course.instructor || 'HSA Academy'}
+                by {course.instructor || 'HALĪMATU SADIYYAH ISlamic Academy'}
               </p>
             </div>
 
@@ -105,11 +104,10 @@ const EnrolledCourseCard = ({ course }) => {
               </div>
               <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all duration-700 ease-out ${
-                    isCompleted
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${isCompleted
                       ? 'bg-[#004aad]'
                       : 'bg-linear-to-r from-[#004aad] to-indigo-600'
-                  }`}
+                    }`}
                   style={{ width: `${course.progress}%` }}
                 />
               </div>

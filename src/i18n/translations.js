@@ -4,7 +4,7 @@ const translations = {
     banner: {
       slides: [
         {
-          title: "HSA Academy Program",
+          title: "HALĪMATU SA'DIYYAH ISlamic Academy Program",
           subtitle: "Learn the Basics of Islam",
           description:
             "Embark on a 2-year learning journey with Zad Academy's free online program.",
@@ -70,7 +70,7 @@ const translations = {
     about: {
       aboutImageAlt: "Students learning",
       aboutTitle: "Transforming Lives Through Islamic Education",
-      aboutDescription: "HSA Academy is a pioneering online Islamic education platform dedicated to making authentic Islamic knowledge accessible to Muslims worldwide.",
+      aboutDescription: "HALĪMATU SA'DIYYAH ISlamic Academy is a pioneering online Islamic education platform dedicated to making authentic Islamic knowledge accessible to Muslims worldwide.",
       featureCurriculumTitle: "Authentic Curriculum",
       featureCurriculumDesc: "Based on classical Islamic texts and teachings",
       featureFlexibleTitle: "Flexible Learning",
@@ -92,9 +92,9 @@ const translations = {
       headerBadge: "Islamic Curriculum",
       title: "The Program",
       description:
-        "HSA Academy provides a comprehensive Islamic curriculum consisting of seven core subjects, designed to foster a deeper understanding of Islam.",
+        "HALĪMATU SA'DIYYAH ISlamic Academy provides a comprehensive Islamic curriculum consisting of seven core subjects, designed to foster a deeper understanding of Islam.",
       subjects: [
-        
+
         {
           title: "Quranic",
           description:
@@ -119,7 +119,7 @@ const translations = {
     learningPath: {
       header: "Learning Path",
       description:
-        "Enroll in HSA Academy's free online program and begin your journey.",
+        "Enroll in HALĪMATU SA'DIYYAH ISlamic Academy's free online program and begin your journey.",
       button: "Find out more",
       steps: [
         {
@@ -154,14 +154,14 @@ const translations = {
       subheaderTestimonials: "Join thousands of satisfied students who have transformed their lives through Islamic education",
       tagTestimonials: "Student Success Stories",
       headerFAQs: "Frequently Asked Questions",
-      subheaderFAQs: "Everything you need to know about HSA Academy",
+      subheaderFAQs: "Everything you need to know about HALĪMATU SA'DIYYAH ISlamic Academy",
       tagFAQs: "Got Questions?",
       testimonials: [
         {
           name: "Amina Hassan",
           location: "Lagos, Nigeria",
           rating: 5,
-          text: "HSA Academy has transformed my understanding of Islam. The structured curriculum and knowledgeable instructors made learning accessible and enjoyable.",
+          text: "HALĪMATU SA'DIYYAH ISlamic Academy has transformed my understanding of Islam. The structured curriculum and knowledgeable instructors made learning accessible and enjoyable.",
           course: "Year 1 Graduate",
           image: "https://images.pexels.com/photos/8121852/pexels-photo-8121852.jpeg"
         },
@@ -223,7 +223,7 @@ const translations = {
       faqs: [
         {
           question: "Is the program really free?",
-          answer: "Yes! HSA Academy is completely free for all students. We believe Islamic education should be accessible to everyone, regardless of financial circumstances. There are no hidden fees or charges."
+          answer: "Yes! HALĪMATU SA'DIYYAH ISlamic Academy is completely free for all students. We believe Islamic education should be accessible to everyone, regardless of financial circumstances. There are no hidden fees or charges."
         },
         {
           question: "What are the language options available?",
@@ -244,11 +244,11 @@ const translations = {
       subscribeDescription: "Subscribe to our newsletter for the latest updates and Islamic insights",
       placeholderEmail: "Enter your email",
       subscribeButton: "Subscribe",
-  
-      aboutTitle: "HSA Academy",
+
+      aboutTitle: "HALĪMATU SA'DIYYAH ISlamic Academy",
       aboutDescription: "Empowering Muslims worldwide with authentic Islamic education. Learn at your own pace with renowned scholars.",
       followUs: "Follow Us",
-  
+
       quickLinksTitle: "Quick Links",
       quickLinks: [
         { name: "About Us", href: "#" },
@@ -256,22 +256,22 @@ const translations = {
         { name: "Learning Path", href: "#" },
         { name: "Contact", href: "#" },
       ],
-  
+
       resourcesTitle: "Resources",
       resources: [
         { name: "Student Portal", href: "#" },
         { name: "FAQs", href: "#" },
         { name: "Study Materials", href: "#" },
       ],
-  
+
       contactTitle: "Contact Us",
       contact: [
         { icon: "Mail", text: "info@hsacademy.com", href: "mailto:info@hsacademy.com" },  // updated domain to match academy name
-        { icon: "Phone", text: "+234 800 HSA ACADEMY", href: "tel:+2348004722233" },     // example Nigerian format
+        { icon: "Phone", text: "+234 800 HALĪMATU SA'DIYYAH ISlamic Academy", href: "tel:+2348004722233" },     // example Nigerian format
         { icon: "MapPin", text: "Port Harcourt, Rivers State, Nigeria", href: "#" }      // localized
       ],
-  
-      copyright: (year) => `© ${year} HSA Academy. Made with ❤️ for the Muslim Ummah`,
+
+      copyright: (year) => `© ${year} HALĪMATU SA'DIYYAH ISlamic Academy. Made with ❤️ for the Muslim Ummah`,
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",
       cookiePolicy: "Cookie Policy"
@@ -525,11 +525,11 @@ const translations = {
       subscribeDescription: "اشترك في نشرتنا الإخبارية للحصول على آخر التحديثات والرؤى الإسلامية",
       placeholderEmail: "أدخل بريدك الإلكتروني",
       subscribeButton: "اشترك",
-  
+
       aboutTitle: "أكاديمية HSA",
       aboutDescription: "تمكين المسلمين في جميع أنحاء العالم بالتعليم الإسلامي الأصيل. تعلم بوتيرتك الخاصة مع علماء مشهورين.",
       followUs: "تابعنا",
-  
+
       quickLinksTitle: "روابط سريعة",
       quickLinks: [
         { name: "من نحن", href: "#" },
@@ -537,21 +537,21 @@ const translations = {
         { name: "مسار التعلم", href: "#" },
         { name: "اتصل بنا", href: "#" },
       ],
-  
+
       resourcesTitle: "الموارد",
       resources: [
         { name: "بوابة الطالب", href: "#" },
         { name: "الأسئلة الشائعة", href: "#" },
         { name: "مواد الدراسة", href: "#" },
       ],
-  
+
       contactTitle: "اتصل بنا",
       contact: [
         { icon: "Mail", text: "info@hsacademy.com", href: "mailto:info@hsacademy.com" },
-        { icon: "Phone", text: "+234 800 HSA ACADEMY", href: "tel:+2348004722233" },
+        { icon: "Phone", text: "+234 800 HALĪMATU SA'DIYYAH ISlamic Academy", href: "tel:+2348004722233" },
         { icon: "MapPin", text: "بورت هاركورت، ولاية ريفرز، نيجيريا", href: "#" }
       ],
-  
+
       copyright: (year) => `© ${year} أكاديمية HSA. صُنع بحب ❤️ للأمة الإسلامية`,
       privacyPolicy: "سياسة الخصوصية",
       termsOfService: "شروط الخدمة",

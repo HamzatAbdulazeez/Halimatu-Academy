@@ -21,15 +21,15 @@ export default function LoginPage() {
 
                 {/* Logo */}
                 <div className="flex items-center justify-center min-h-20 w-full">
-  <Link to="/">
-    <img
-      src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
-      alt="Halimatu Academy Logo"
-      draggable="false"
-      className="w-24 h-auto mb-4"
-    />
-  </Link>
-</div>
+                    <Link to="/">
+                        <img
+                            src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+                            alt="Halimatu Academy Logo"
+                            draggable="false"
+                            className="w-24 h-auto mb-4"
+                        />
+                    </Link>
+                </div>
 
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -37,7 +37,7 @@ export default function LoginPage() {
                         Login
                     </h1>
                     <p className="text-base text-black mt-2">
-                        Sign in to access your HSA Academy dashboard
+                        Sign in to access your HALĪMATU SA'DIYYAH ISlamic Academy dashboard
                     </p>
                 </div>
 

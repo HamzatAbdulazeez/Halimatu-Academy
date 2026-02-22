@@ -91,7 +91,7 @@ const RegistrationForm = ({ onNext }) => {
 
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-black">Create Your Account</h2>
-                    <p className="text-gray-600 mt-2">Begin your journey of Islamic knowledge with HSA Academy</p>
+                    <p className="text-gray-600 mt-2">Begin your journey of Islamic knowledge with HALĪMATU SA'DIYYAH ISlamic Academy</p>
                 </div>
 
                 <form className="space-y-5">
@@ -239,7 +239,7 @@ const RegistrationForm = ({ onNext }) => {
                             required
                         />
                         <p className="text-sm text-gray-700">
-                            I agree to HSA Academy's{' '}
+                            I agree to HALĪMATU SA'DIYYAH ISlamic Academy's{' '}
                             <a href="/terms" className="text-[#004aad] font-semibold underline" required>Terms of Service</a>
                             {' '}and{' '}
                             <a href="/privacy" className="text-[#004aad] font-semibold underline" required> Privacy Policy</a>
@@ -441,7 +441,7 @@ const SuccessPage = ({ userData, selectedPlan }) => (
             </div>
 
             <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-[#004aad] to-teal-600 bg-clip-text text-transparent">
-                Welcome to HSA Academy!
+                Welcome to HALĪMATU SA'DIYYAH ISlamic Academy!
             </h1>
 
             <p className="text-2xl text-gray-700 mb-10">

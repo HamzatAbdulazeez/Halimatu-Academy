@@ -51,9 +51,9 @@ const AdminDashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-black mb-2">Welcome Back, Admin! 👋</h1>
-            <p className="text-black">Here's what's happening with HSA Academy today</p>
+            <p className="text-black">Here's what's happening with HALĪMATU SA'DIYYAH ISlamic Academy today</p>
           </div>
-          
+
         </div>
 
         {/* Stats Grid */}
@@ -66,9 +66,8 @@ const AdminDashboard = () => {
                   <div className={`p-3 ${stat.bgColor} rounded-xl`}>
                     <Icon className={`w-6 h-6 ${stat.color} text-black`} style={{ strokeWidth: 2.5 }} />
                   </div>
-                  <span className={`text-sm font-semibold ${
-                    stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <span className={`text-sm font-semibold ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                    }`}>
                     {stat.change}
                   </span>
                 </div>
@@ -80,7 +79,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-        
+
           {/* Recent Enrollments */}
           <div className="lg:col-span-2 bg-white rounded-md p-6">
             <div className="flex items-center justify-between mb-6">
@@ -142,7 +141,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-    
+
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-4">
           <a href="/admin/students" className="bg-white rounded-md p-6 transition-all hover:-translate-y-1 text-center">

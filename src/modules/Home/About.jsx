@@ -64,10 +64,10 @@ const AboutUs = () => {
                             Who We Are
                         </h2>
                         <p className="text-black text-base leading-loose mb-4">
-                            At HSA Academy, we're more than just an online learning platform — we're your trusted companion in the journey of Islamic knowledge and spiritual growth. Founded by dedicated scholars and educators, we bring authentic Islamic education to Muslims worldwide.
+                            At HALĪMATU SA'DIYYAH ISlamic Academy, we're more than just an online learning platform — we're your trusted companion in the journey of Islamic knowledge and spiritual growth. Founded by dedicated scholars and educators, we bring authentic Islamic education to Muslims worldwide.
                         </p>
                         <p className="text-black text-base leading-loose mb-6">
-                            Whether you're a beginner seeking to understand the fundamentals of Islam, a student looking to deepen your knowledge of Quran and Hadith, or someone striving to strengthen your faith, HSA Academy is your comprehensive platform for accessible, authentic, and transformative Islamic education.
+                            Whether you're a beginner seeking to understand the fundamentals of Islam, a student looking to deepen your knowledge of Quran and Hadith, or someone striving to strengthen your faith, HALĪMATU SA'DIYYAH ISlamic Academy is your comprehensive platform for accessible, authentic, and transformative Islamic education.
                         </p>
                         <Link
                             to="/contact"
@@ -95,7 +95,7 @@ const AboutUs = () => {
 
                             <div className="space-y-2 text-base text-black leading-loose">
                                 <p>
-                                    In an age where access to authentic Islamic knowledge can be challenging, HSA Academy was born from a simple yet powerful vision: to make comprehensive Islamic education accessible to every Muslim, regardless of their location or circumstances.
+                                    In an age where access to authentic Islamic knowledge can be challenging, HALĪMATU SA'DIYYAH ISlamic Academy was born from a simple yet powerful vision: to make comprehensive Islamic education accessible to every Muslim, regardless of their location or circumstances.
                                 </p>
 
                                 <p>
@@ -273,7 +273,7 @@ const AboutUs = () => {
                             Join thousands of students worldwide in deepening your understanding of Islam
                         </p>
                         <button className="px-8 py-3 bg-white text-[#004aad] rounded-md text-base cursor-pointer hover:scale-105 transition-all duration-300">
-                            Enroll Now 
+                            Enroll Now
                         </button>
                     </div>
                 </div>

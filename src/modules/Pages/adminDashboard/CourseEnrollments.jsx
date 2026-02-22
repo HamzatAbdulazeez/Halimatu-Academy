@@ -106,7 +106,7 @@ const EnrollmentsPage = () => {
         
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-black mb-2">Course Enrollments</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-black mb-1 sm:mb-2">Course Enrollments</h1>
           <p className="text-gray-600">Track all student course enrollments and subscriptions</p>
         </div>
 

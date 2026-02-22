@@ -53,7 +53,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         </div>
 
         {/* Search (optional for admin) */}
-        <div className="relative mb-8">
+        {/* <div className="relative mb-8">
           <input
             type="text"
             placeholder="Search users, courses..."
@@ -62,7 +62,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
               transition-all duration-200"
           />
           <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-lg" />
-        </div>
+        </div> */}
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">

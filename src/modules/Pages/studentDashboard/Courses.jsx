@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, } from "react";
 import {
     BookOpen,
     ChevronDown,
@@ -59,11 +59,11 @@ const CoursesPage = () => {
         },
     ];
 
-    useEffect(() => {
-        if (selectedCourse && selectedCourse.modules.length) {
-            setOpenModule(selectedCourse.modules[0].id);
-        }
-    }, [selectedCourse]);
+    // useEffect(() => {
+    //     if (selectedCourse && selectedCourse.modules.length) {
+    //         setOpenModule(selectedCourse.modules[0].id);
+    //     }
+    // }, [selectedCourse]);
 
     const getModuleProgress = (module) => {
         const total = module.lessons.length;
