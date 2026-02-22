@@ -81,20 +81,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     onClick={handleLinkClick}
   />
 
-  {/* <SidebarItem
-    to="/admin/instructors"
-    icon={<FaChalkboardTeacher className="text-xl" />}
-    text="Manage Instructors"
-    onClick={handleLinkClick}
-  /> */}
-
-  {/* <SidebarItem
-    to="/admin/courses"
-    icon={<FaBook className="text-xl" />}
-    text="Manage Courses"
-    onClick={handleLinkClick}
-  /> */}
-
   <SidebarItem
     to="/admin/enrollments"
     icon={<FaUserGraduate className="text-xl" />}
@@ -135,7 +121,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         {/* User/Admin Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
           <NavLink
-            to="/admin/profile"
+            to="/admin/settings"
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >

@@ -110,8 +110,6 @@ const EnrollmentsPage = () => {
           <p className="text-gray-600">Track all student course enrollments and subscriptions</p>
         </div>
 
-       
-
         {/* Filters */}
         <div className="bg-white rounded-md p-6">
           <div className="flex flex-col md:flex-row gap-4">
