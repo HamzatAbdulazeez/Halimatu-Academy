@@ -125,7 +125,7 @@ const SubscriptionsPage = () => {
 
         {/* Pricing Plans */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Current Plans</h2>
+          <h2 className="text-2xl text-gray-900 mb-4">Current Plans</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {plans.map((plan) => (
               <div

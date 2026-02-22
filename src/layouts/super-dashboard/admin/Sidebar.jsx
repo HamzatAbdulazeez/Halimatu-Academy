@@ -1,18 +1,25 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import {
   FaHome,
   FaUsers,
   FaCog,
   FaBell,
   FaSignOutAlt,
-  FaSearch,
   FaUserGraduate,
   FaCreditCard,
-  FaVideo,
   FaCertificate,
+  FaBookOpen,
+  FaLink,
+  FaListUl,
+  FaChevronDown,
 } from "react-icons/fa";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
+  const location = useLocation();
+  const isCourseActive = location.pathname.startsWith("/admin/course");
+  const [courseOpen, setCourseOpen] = useState(isCourseActive);
+
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     if (window.innerWidth < 1024) {
@@ -20,7 +27,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  // You can replace this with real auth/user context later
   const mockAdmin = {
     name: "Abdul (Admin)",
     role: "Super Admin",
@@ -52,71 +58,118 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           </NavLink>
         </div>
 
-        {/* Search (optional for admin) */}
-        {/* <div className="relative mb-8">
-          <input
-            type="text"
-            placeholder="Search users, courses..."
-            className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 
-              text-white placeholder-white/60 outline-none focus:bg-white/20 focus:border-white/40 
-              transition-all duration-200"
-          />
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 text-lg" />
-        </div> */}
-
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-  <SidebarItem
-    to="/admin"
-    icon={<FaHome className="text-xl" />}
-    text="Dashboard"
-    onClick={handleLinkClick}
-    end
-  />
+          <SidebarItem
+            to="/admin"
+            icon={<FaHome className="text-xl" />}
+            text="Dashboard"
+            onClick={handleLinkClick}
+            end
+          />
 
-  <SidebarItem
-    to="/admin/students"
-    icon={<FaUsers className="text-xl" />}
-    text="Manage Students"
-    onClick={handleLinkClick}
-  />
+          <SidebarItem
+            to="/admin/students"
+            icon={<FaUsers className="text-xl" />}
+            text="Manage Students"
+            onClick={handleLinkClick}
+          />
 
-  <SidebarItem
-    to="/admin/enrollments"
-    icon={<FaUserGraduate className="text-xl" />}
-    text="Enrollments"
-    onClick={handleLinkClick}
-  />
+          <SidebarItem
+            to="/admin/enrollments"
+            icon={<FaUserGraduate className="text-xl" />}
+            text="Enrollments"
+            onClick={handleLinkClick}
+          />
 
-  <SidebarItem
-    to="/admin/subscriptions"
-    icon={<FaCreditCard className="text-xl" />}
-    text="Subscriptions & Plans"
-    onClick={handleLinkClick}
-  />
+          <div>
+            <button
+              onClick={() => setCourseOpen((prev) => !prev)}
+              className={`w-full flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
+                ${isCourseActive
+                  ? "bg-white/15 text-white text-md border-l-4 border-white"
+                  : "text-white/90 hover:bg-white/10 hover:text-white"
+                }`}
+            >
+              <span className="text-xl opacity-90">
+                <FaBookOpen />
+              </span>
+              <span className="flex-1 text-left">Course Management</span>
+              <FaChevronDown
+                className={`text-xs opacity-70 transition-transform duration-300 ${courseOpen ? "rotate-180" : ""
+                  }`}
+              />
+            </button>
 
-  <SidebarItem
-    to="/admin/certificates"
-    icon={<FaCertificate className="text-xl" />}
-    text="Certificates"
-    onClick={handleLinkClick}
-  />
+            {/* Sub-items */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"
+                }`}
+            >
+              <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
+                <NavLink
+                  to="/admin/course-management/links"
+                  onClick={handleLinkClick}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm transition-all duration-200
+                    ${isActive
+                      ? "bg-white/15 text-white font-semibold"
+                      : "text-white/75 hover:bg-white/10 hover:text-white"
+                    }`
+                  }
+                >
+                  <FaLink className="text-base opacity-80 shrink-0" />
+                  <span>Class Schedule & Links</span>
+                </NavLink>
+
+                <NavLink
+                  to="/admin/course-management/topics"
+                  onClick={handleLinkClick}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm transition-all duration-200
+                    ${isActive
+                      ? "bg-white/15 text-white font-semibold"
+                      : "text-white/75 hover:bg-white/10 hover:text-white"
+                    }`
+                  }
+                >
+                  <FaListUl className="text-base opacity-80 shrink-0" />
+                  <span>What You Will Learn</span>
+                </NavLink>
+              </div>
+            </div>
+          </div>
+
+          <SidebarItem
+            to="/admin/subscriptions"
+            icon={<FaCreditCard className="text-xl" />}
+            text="Subscriptions & Plans"
+            onClick={handleLinkClick}
+          />
+
+          <SidebarItem
+            to="/admin/certificates"
+            icon={<FaCertificate className="text-xl" />}
+            text="Certificates"
+            onClick={handleLinkClick}
+          />
 
 
-  <SidebarItem
-    to="/admin/notifications"
-    icon={<FaBell className="text-xl" />}
-    text="Notifications"
-    onClick={handleLinkClick}
-  />
 
-  <SidebarItem
-    to="/admin/settings"
-    icon={<FaCog className="text-xl" />}
-    text="Settings"
-    onClick={handleLinkClick}
-  />
-</nav>
+          <SidebarItem
+            to="/admin/notifications"
+            icon={<FaBell className="text-xl" />}
+            text="Notifications"
+            onClick={handleLinkClick}
+          />
+
+          <SidebarItem
+            to="/admin/settings"
+            icon={<FaCog className="text-xl" />}
+            text="Settings"
+            onClick={handleLinkClick}
+          />
+        </nav>
 
         {/* User/Admin Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
@@ -136,7 +189,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                 {mockAdmin?.name?.charAt(0)?.toUpperCase() || "?"}
               </div>
             )}
-
             <div>
               <p className="font-medium text-white">{mockAdmin?.name}</p>
               <p className="text-xs text-white/70">{mockAdmin?.role}</p>
@@ -172,10 +224,9 @@ const SidebarItem = ({ to, icon, text, onClick, end = false }) => {
       onClick={onClick}
       className={({ isActive }) =>
         `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-        ${
-          isActive
-            ? "bg-white/15 text-white font-medium shadow-sm border-l-4 border-white"
-            : "text-white/90 hover:bg-white/10 hover:text-white"
+        ${isActive
+          ? "bg-white/15 text-white font-medium shadow-sm border-l-4 border-white"
+          : "text-white/90 hover:bg-white/10 hover:text-white"
         }`
       }
     >

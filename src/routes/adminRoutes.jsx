@@ -6,6 +6,8 @@ import EnrollmentsPage from "../modules/Pages/adminDashboard/CourseEnrollments";
 import PlanPage from "../modules/Pages/adminDashboard/PlansPage"
 import Certificate from "../modules/Pages/adminDashboard/Certificates";
 import NotificationPage from "../modules/Pages/adminDashboard/Notification";
+import AdminClassLinksPage from '../modules/Pages/adminDashboard/AdminClassLinksPage';
+import AdminTopicsPage from '../modules/Pages/adminDashboard/AdminTopicsPage';
 import SettingsPage from "../modules/Pages/adminDashboard/Setting";
 
 // Define student routes
@@ -46,6 +48,14 @@ export const adminRoutes = [
       {
         path: "settings",
         element: <SettingsPage />,
+      },
+      {
+        path: "course-management/links",
+        element: <AdminClassLinksPage />,
+      },
+      {
+        path: "course-management/topics",
+        element: <AdminTopicsPage />,
       },
       // Add other student dashboard routes here
     ],

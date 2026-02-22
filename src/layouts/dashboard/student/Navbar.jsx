@@ -19,10 +19,10 @@ export default function Navbar({ toggleSidebar }) {
 
       {/* Right: Notification & Profile */}
       <div className="flex items-center space-x-6">
-        <div className="relative bg-purple-100 p-2 rounded-full">
-          <Bell size={20} className="text-[#004aad]" />
+      <div className="relative bg-[#004aad] p-2 rounded-full">
+          <Bell size={20} className="text-white" />
           <span className="absolute -top-1 -right-1 bg-[#004aad] text-white text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full">
-            6
+            4
           </span>
         </div>
 
