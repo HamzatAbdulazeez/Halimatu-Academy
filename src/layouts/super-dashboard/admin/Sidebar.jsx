@@ -43,7 +43,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <>
       <div
-        className={`fixed lg:static top-0 left-0 h-screen bg-gradient-to-b from-[#004aad] to-indigo-900 
+        className={`fixed lg:static top-0 left-0 h-screen bg-linear-to-b from-[#004aad] to-indigo-900 
           p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
