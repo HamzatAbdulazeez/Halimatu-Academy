@@ -105,8 +105,8 @@ const HSARegistration = () => {
           <div className="w-20 h-20 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Account Created Successfully!</h1>
-          <p className="text-xl text-gray-700 mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Account Created Successfully!</h1>
+          <p className="text-base text-gray-700 mb-8">
             Assalamu Alaikum, {formData.firstName} {formData.middleName ? formData.middleName + ' ' : ''}{formData.lastName}
           </p>
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 mb-8">
@@ -123,12 +123,6 @@ const HSARegistration = () => {
               className="px-8 py-4 bg-[#004aad] text-white rounded-lg font-medium hover:bg-[#003a8c] transition"
             >
               Verify OTP Now
-            </Link>
-            <Link 
-              to="/login" 
-              className="px-8 py-4 border border-[#004aad] text-[#004aad] rounded-lg font-medium hover:bg-blue-50 transition"
-            >
-              Go to Login
             </Link>
           </div>
           <p className="mt-10 text-gray-600">May Allah increase you in knowledge 🤲</p>

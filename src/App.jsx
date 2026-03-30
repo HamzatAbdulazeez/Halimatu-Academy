@@ -24,12 +24,7 @@ const App = () => {
           {renderRoutes(routes)}
         </Routes>
         
-        <Toaster 
-          position="top-center" 
-          richColors 
-          closeButton
-          duration={5000}
-        />
+        <Toaster position="top-center" richColors closeButton />
       </Router>
     </LanguageProvider>
   );

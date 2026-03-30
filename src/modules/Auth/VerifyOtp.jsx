@@ -1,188 +1,184 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Loader2, CheckCircle } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { verifyOtp } from "../../api/authApi";
 
-const VerifyOtp = () => {
-  const [otp, setOtp] = useState(['', '', '', '', '', '']); // 6-digit OTP
-  const [loading, setLoading] = useState(false);
-  const [resendLoading, setResendLoading] = useState(false);
-  const [countdown, setCountdown] = useState(60);
+export default function VerifyOtpPage() {
+    const [otp, setOtp] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+    const [email, setEmail] = useState("");
 
-  const location = useLocation();
-  const navigate = useNavigate();
-  const email = location.state?.email || '';
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  // Redirect if no email passed
-  useEffect(() => {
-    if (!email) {
-      toast.error("No email found. Please register again.");
-      navigate('/register');
+    // Get email from previous page (Register or Forgot Password)
+    useEffect(() => {
+        const passedEmail = location.state?.email;
+        if (passedEmail) {
+            setEmail(passedEmail);
+        } else {
+            // Fallback: redirect back to register if no email
+            navigate("/register");
+        }
+    }, [location.state, navigate]);
+
+    const handleVerifyOtp = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        if (!email) {
+            setError("Email is missing. Please register again.");
+            setLoading(false);
+            return;
+        }
+
+        if (!otp.trim() || otp.length < 4) {
+            setError("Please enter a valid OTP code.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            await verifyOtp({
+                email: email,
+                code: otp.trim(),
+            });
+
+            // Success → Show success message then redirect to login
+            setSuccess(true);
+
+            // Auto redirect to login after 2 seconds
+            setTimeout(() => {
+                navigate("/login");
+            }, 2000);
+
+        } catch (err) {
+            const errorMsg = err.response?.data?.detail 
+                          || err.response?.data?.message 
+                          || err.message 
+                          || "Invalid OTP. Please try again.";
+            setError(errorMsg);
+            console.error("OTP verification error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Success Screen
+    if (success) {
+        return (
+            <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+                <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-10 text-center">
+                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle className="w-12 h-12 text-emerald-600" />
+                    </div>
+
+                    <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                        Verification Successful!
+                    </h1>
+
+                    <p className="text-gray-600 mb-8">
+                        Your account has been verified successfully.<br />
+                        You will be redirected to the login page shortly.
+                    </p>
+
+                    <Link
+                        to="/login"
+                        className="block w-full bg-[#004aad] text-white py-3 rounded-lg font-medium hover:bg-[#003a8c] transition"
+                    >
+                        Go to Login Now
+                    </Link>
+                </div>
+            </div>
+        );
     }
-  }, [email, navigate]);
 
-  // Countdown for resend OTP
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [countdown]);
+    // OTP Form
+    return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+            <div className="w-full max-w-md mx-auto bg-white rounded-2xl p-8">
+                {/* Logo */}
+                        <div className="flex items-center justify-center min-h-20 w-full">
+                          <Link to="/">
+                            <img
+                              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+                              alt="Halimatu Academy Logo"
+                              draggable="false"
+                              className="w-24 h-auto mb-4"
+                            />
+                          </Link>
+                        </div>
 
-  const handleOtpChange = (index, value) => {
-    if (isNaN(value)) return; // Only allow numbers
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                        Verify Your Email
+                    </h1>
+                    <p className="text-gray-600 text-sm">
+                        Enter the OTP sent to<br />
+                        <strong>{email}</strong>
+                    </p>
+                </div>
 
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+                {error && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-center text-sm">
+                        {error}
+                    </div>
+                )}
 
-    // Auto-focus next input
-    if (value !== '' && index < 5) {
-      const nextInput = document.getElementById(`otp-${index + 1}`);
-      if (nextInput) nextInput.focus();
-    }
-  };
+                <form onSubmit={handleVerifyOtp} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            OTP Code
+                        </label>
+                        <input
+                            type="text"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            className="w-full px-4 py-4 text-center text-2xl tracking-widest border border-gray-300 rounded-lg outline-none focus:border-[#004aad]"
+                            placeholder="123456"
+                            maxLength={6}
+                            required
+                        />
+                        <p className="text-xs text-gray-500 text-center mt-2">
+                            Check your email for the 6-digit code
+                        </p>
+                    </div>
 
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && otp[index] === '' && index > 0) {
-      const prevInput = document.getElementById(`otp-${index - 1}`);
-      if (prevInput) prevInput.focus();
-    }
-  };
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-[#004aad] text-white py-4 rounded-lg font-medium hover:bg-[#003a8c] transition flex items-center justify-center gap-2 disabled:opacity-70"
+                    >
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Verifying...
+                            </>
+                        ) : (
+                            "Verify OTP"
+                        )}
+                    </button>
+                </form>
 
-  const handleVerifyOtp = async () => {
-    const otpCode = otp.join('');
-    
-    if (otpCode.length !== 6) {
-      toast.error("Please enter the complete 6-digit OTP");
-      return;
-    }
+                <div className="text-center mt-8 space-y-4">
+                    <Link
+                        to="/login"
+                        className="text-[#004aad] hover:text-blue-700 underline block text-sm"
+                    >
+                        Back to Login
+                    </Link>
 
-    setLoading(true);
-
-    try {
-      // TODO: Replace with your actual verify OTP API call
-      // const response = await verifyOtp(email, otpCode);
-
-      console.log("Verifying OTP:", { email, otp: otpCode });
-
-      // Simulate success for now (replace with real API call)
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      toast.success("Account verified successfully!");
-      navigate('/student'); // or wherever your dashboard is
-
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Invalid OTP. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    if (countdown > 0) return;
-
-    setResendLoading(true);
-
-    try {
-      // TODO: Add your resend OTP API call here
-      console.log("Resending OTP to:", email);
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success("New OTP sent to your email");
-      setCountdown(60);
-      setOtp(['', '', '', '', '', '']);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to resend OTP");
-    } finally {
-      setResendLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md bg-white rounded-2xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-[#004aad] text-white px-8 py-10 text-center">
-          <Link to="/">
-            <img
-              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
-              alt="Halimatu Academy Logo"
-              className="w-20 h-auto mx-auto mb-4"
-            />
-          </Link>
-          <h1 className="text-3xl font-bold">Verify Your Account</h1>
-          <p className="mt-2 text-blue-100">Enter the OTP sent to your email</p>
+                    <button
+                        onClick={() => navigate("/register")}
+                        className="text-gray-500 hover:text-gray-700 text-sm"
+                    >
+                        Didn't receive code? Register again
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div className="p-8">
-          <div className="text-center mb-8">
-            <p className="text-gray-600">
-              We sent a 6-digit code to<br />
-              <strong>{email}</strong>
-            </p>
-          </div>
-
-          {/* OTP Input Fields */}
-          <div className="flex justify-center gap-3 mb-8">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                id={`otp-${index}`}
-                type="text"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-xl focus:border-[#004aad] focus:ring-2 focus:ring-blue-200 outline-none transition-all"
-              />
-            ))}
-          </div>
-
-          {/* Verify Button */}
-          <button
-            onClick={handleVerifyOtp}
-            disabled={loading || otp.join('').length !== 6}
-            className="w-full bg-[#004aad] hover:bg-[#003a8c] text-white py-4 rounded-xl font-medium text-lg transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Verifying...
-              </>
-            ) : (
-              "Verify OTP"
-            )}
-          </button>
-
-          {/* Resend OTP */}
-          <div className="text-center mt-6">
-            <button
-              onClick={handleResendOtp}
-              disabled={countdown > 0 || resendLoading}
-              className="text-[#004aad] hover:underline text-sm disabled:text-gray-400 disabled:no-underline"
-            >
-              {resendLoading ? "Sending..." : 
-                countdown > 0 ? `Resend OTP in ${countdown}s` : "Resend OTP"}
-            </button>
-          </div>
-
-          {/* Back to Register */}
-          <div className="text-center mt-8">
-            <Link
-              to="/register"
-              className="text-gray-600 hover:text-[#004aad] text-sm"
-            >
-              ← Back to Registration
-            </Link>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default VerifyOtp;
+    );
+}
