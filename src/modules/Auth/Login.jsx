@@ -1,19 +1,100 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { loginUser } from "../../api/authApi";
 
 export default function LoginPage() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
+    const navigate = useNavigate();
 
-    const [loginData, setLoginData] = useState({
-        emailOrPhone: "",
-        password: "",
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!loginData.email || !loginData.password) {
+      toast.error("Please enter your email and password.");
+      return;
+    }
+
+    setLoading(true);
+    console.log("🔵 Sending login request:", {
+      email: loginData.email.trim().toLowerCase(),
+      password: "********" // Don't log actual password
     });
 
-    const handleLogin = () => {
-        console.log("Login attempt:", loginData, rememberMe);
-    };
+    try {
+      const credentials = {
+        email: loginData.email.trim().toLowerCase(),
+        password: loginData.password,
+      };
+
+      const res = await loginUser(credentials);
+      console.log("🟢 Login response:", res);
+
+      // Check response structure
+      if (!res) {
+        toast.error("No response from server");
+        return;
+      }
+
+      // Handle different response structures
+      const token = res.token || res.data?.token || res.access_token;
+      const user = res.user || res.data?.user;
+
+      console.log("🟢 Extracted token:", token ? "Yes" : "No");
+      console.log("🟢 Extracted user:", user ? "Yes" : "No");
+
+      if (!token || !user) {
+        console.error("Response structure:", res);
+        toast.error("Invalid server response. Check console.");
+        return;
+      }
+
+      // Save token
+      if (rememberMe) {
+        localStorage.setItem("token", token);
+      } else {
+        sessionStorage.setItem("token", token);
+      }
+      localStorage.setItem("user", JSON.stringify(user));
+
+      toast.success("Welcome back! 👋");
+
+      // Navigate based on role
+      const role = user.role?.toLowerCase() || "student";
+      console.log("🟢 User role:", role);
+
+      setTimeout(() => {
+        if (role === "admin" || role === "administrator") {
+          navigate("/admin");
+        } else {
+          navigate("/student");
+        }
+      }, 1000);
+
+    } catch (err) {
+      console.error("🔴 Login error:", err);
+      console.error("🔴 Error response:", err.response);
+      console.error("🔴 Error message:", err.message);
+
+      const errorMessage = err.response?.data?.message 
+        || err.response?.data?.error 
+        || err.message 
+        || "Login failed. Please try again.";
+      
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
@@ -33,33 +114,26 @@ export default function LoginPage() {
 
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                        Login
-                    </h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Login</h1>
                     <p className="text-base text-black mt-2">
-                        Sign in to access your HALĪMATU SA'DIYYAH ISlamic Academy dashboard
+                        Sign in to access your dashboard
                     </p>
                 </div>
 
-                <form className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-6">
 
-                    {/* Email / Phone */}
+                    {/* Email */}
                     <div>
                         <label className="block text-sm text-black font-medium mb-4">
-                            Email Address or Phone Number
+                            Email Address
                         </label>
                         <input
-                            type="text"
-                            placeholder="john@example.com or +234 801 234 5678"
-                            className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none"
-                            value={loginData.emailOrPhone}
+                            type="email"
+                            placeholder="john@example.com"
+                            className="w-full p-4 border border-gray-300 rounded-md text-sm outline-none focus:border-[#004aad] transition"
+                            value={loginData.email}
+                            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                             required
-                            onChange={(e) =>
-                                setLoginData({
-                                    ...loginData,
-                                    emailOrPhone: e.target.value,
-                                })
-                            }
                         />
                     </div>
 
@@ -72,41 +146,35 @@ export default function LoginPage() {
                             <input
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
-                                className="w-full p-4 pr-12 border border-gray-300 rounded-md text-sm outline-none"
+                                className="w-full p-4 pr-12 border border-gray-300 rounded-md text-sm outline-none focus:border-[#004aad] transition"
                                 value={loginData.password}
-                                onChange={(e) =>
-                                    setLoginData({
-                                        ...loginData,
-                                        password: e.target.value,
-                                    })
-                                }
+                                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                                 required
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
                     </div>
 
-                    {/* Remember + Forgot */}
+                    {/* Remember Me + Forgot Password */}
                     <div className="flex items-center justify-between">
-                        <label className="flex items-center gap-2 text-sm text-gray-600">
+                        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={rememberMe}
                                 onChange={(e) => setRememberMe(e.target.checked)}
-                                required
                             />
                             Remember me
                         </label>
 
                         <Link
                             to="/forgot-password"
-                            className="text-sm text-blue-600 underline"
+                            className="text-sm text-blue-600 hover:underline"
                         >
                             Forgot password?
                         </Link>
@@ -114,11 +182,18 @@ export default function LoginPage() {
 
                     {/* Login Button */}
                     <button
-                        onClick={handleLogin}
                         type="submit"
-                        className="w-full bg-[#004aad] text-white py-3 rounded-md font-medium hover:bg-black transition"
+                        disabled={loading}
+                        className="w-full bg-[#004aad] text-white py-3 rounded-md font-medium hover:bg-[#003a8c] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Sign In
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Signing in...
+                            </>
+                        ) : (
+                            "Sign In"
+                        )}
                     </button>
 
                     {/* Divider */}
@@ -129,7 +204,10 @@ export default function LoginPage() {
                     </div>
 
                     {/* Google Login */}
-                    <button className="w-full flex items-center justify-center py-3 border border-gray-300 rounded-md hover:bg-gray-50">
+                    <button
+                        type="button"
+                        className="w-full flex items-center justify-center py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition"
+                    >
                         <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -139,16 +217,14 @@ export default function LoginPage() {
                         Sign in with Google
                     </button>
 
-                    {/* Register */}
+                    {/* Register Link */}
                     <p className="text-center text-sm mt-4">
-                        Don’t have an account?{" "}
-                        <Link
-                            to="/register"
-                            className="text-[#004aad] underline"
-                        >
+                        Don't have an account?{" "}
+                        <Link to="/register" className="text-[#004aad] underline hover:text-blue-700">
                             Register here
                         </Link>
                     </p>
+
                 </form>
             </div>
         </div>

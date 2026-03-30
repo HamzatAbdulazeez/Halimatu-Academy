@@ -10,7 +10,7 @@ import FAQsPage from "../modules/Home/FAQs";
 
 // Define landing routes
 
-export const landingRooutes = [
+export const landingRoutes = [
   {
     path: "/",
     element: <LandingLayout />,
