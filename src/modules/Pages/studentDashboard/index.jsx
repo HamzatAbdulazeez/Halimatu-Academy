@@ -9,7 +9,8 @@ const StudentWelcomeDashboard = () => {
     try {
       const stored = localStorage.getItem("user"); 
       if (stored) {
-        setUser(JSON.parse(stored));
+        const parsedUser = JSON.parse(stored);
+        setTimeout(() => setUser(parsedUser), 0);
       }
     } catch (err) {
       console.error("Failed to parse user from localStorage:", err);

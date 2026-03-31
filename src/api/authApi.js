@@ -191,3 +191,29 @@ export const changePassword = async (passwordData) => {
     }
 };
 
+// ====================== UPLOAD PROFILE PICTURE ======================
+export const uploadProfilePicture = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file); 
+      const response = await axiosInstance.post("/user/upload-profile-picture", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Upload Profile Picture API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+
+
+  // ====================== REMOVE PROFILE PICTURE ======================
+export const removeProfilePicture = async () => {
+    try {
+      const response = await axiosInstance.delete("/user/profile-picture");
+      return response.data;
+    } catch (error) {
+      console.error("Remove Profile Picture API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };

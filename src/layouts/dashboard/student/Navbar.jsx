@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell, Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../../../api/authApi";
@@ -7,6 +7,7 @@ import Alert from "../../../components/Alert";
 export default function Navbar({ toggleSidebar }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [user, setUser] = useState(null);
 
   const [alertConfig, setAlertConfig] = useState({
     show: false,
@@ -17,11 +18,29 @@ export default function Navbar({ toggleSidebar }) {
 
   const navigate = useNavigate();
 
+  // ── Pull user from localStorage ──────────────────────────────
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const userData = JSON.parse(stored);
+        setTimeout(() => setUser(userData), 0);
+      }
+    } catch (err) {
+      console.error("Failed to parse user from localStorage:", err);
+    }
+  }, []);
+
+  // ── Derived values ───────────────────────────────────────────
+  const profilePic = user?.profile_picture || null;
+  const initials = (
+    (user?.first_name?.charAt(0) || "") +
+    (user?.last_name?.charAt(0) || "")
+  ).toUpperCase() || "U";
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
-
     setIsLoggingOut(true);
-
     let apiSuccess = false;
 
     try {
@@ -31,16 +50,13 @@ export default function Navbar({ toggleSidebar }) {
       console.warn("Logout API failed:", error);
     }
 
-   
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     sessionStorage.clear();
 
-    
     setIsDropdownOpen(false);
 
-   
     setAlertConfig({
       show: true,
       type: apiSuccess ? "success" : "warning",
@@ -50,10 +66,9 @@ export default function Navbar({ toggleSidebar }) {
         : "Session expired. Logged out locally",
     });
 
-    
     setTimeout(() => {
       navigate("/login", { replace: true });
-      window.location.reload(); 
+      window.location.reload();
     }, 1500);
 
     setIsLoggingOut(false);
@@ -61,13 +76,10 @@ export default function Navbar({ toggleSidebar }) {
 
   return (
     <>
-      {/* ✅ Alert */}
       {alertConfig.show && (
         <Alert
           alert={alertConfig}
-          onClose={() =>
-            setAlertConfig((prev) => ({ ...prev, show: false }))
-          }
+          onClose={() => setAlertConfig((prev) => ({ ...prev, show: false }))}
         />
       )}
 
@@ -95,29 +107,43 @@ export default function Navbar({ toggleSidebar }) {
             </span>
           </div>
 
-          {/* Profile */}
+          {/* Profile Avatar */}
           <div className="relative">
-            <img
-              src="https://randomuser.me/api/portraits/women/2.jpg"
-              alt="User"
-              className="w-8 h-8 rounded-full cursor-pointer"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            />
+            {profilePic ? (
+              <img
+                src={profilePic}
+                alt="User"
+                className="w-9 h-9 rounded-full cursor-pointer object-cover ring-2 ring-[#004aad]/20"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              />
+            ) : (
+              <div
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-9 h-9 rounded-full cursor-pointer bg-[#004aad] flex items-center justify-center text-white text-sm font-bold ring-2 ring-[#004aad]/20"
+              >
+                {initials}
+              </div>
+            )}
 
             {/* Dropdown */}
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
+                {/* User info at top of dropdown */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-semibold text-gray-800 truncate">
+                    {[user?.first_name, user?.last_name].filter(Boolean).join(" ") || "User"}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">{user?.email || ""}</p>
+                </div>
                 <ul className="py-2">
                   <Link to="/student/settings">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
                       Settings
                     </li>
                   </Link>
-
-                  {/* ✅ Logout */}
                   <li
                     onClick={handleLogout}
-                    className={`px-4 py-2 text-red-500 hover:bg-gray-100 cursor-pointer ${
+                    className={`px-4 py-2 text-red-500 hover:bg-gray-100 cursor-pointer text-sm ${
                       isLoggingOut ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >

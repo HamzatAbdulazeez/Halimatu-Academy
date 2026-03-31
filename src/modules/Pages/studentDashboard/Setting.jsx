@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import { getProfile, updateProfile, changePassword } from "../../../api/authApi";
+import { getProfile, updateProfile, changePassword, uploadProfilePicture } from "../../../api/authApi";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("personalDetails");
@@ -28,6 +28,7 @@ const Settings = () => {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [pictureLoading, setPictureLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -50,7 +51,7 @@ const Settings = () => {
           country:         data.country         || "",
           profile_picture: data.profile_picture || null,
         });
-      };
+      }
 
       try {
         const data = await getProfile();
@@ -61,7 +62,7 @@ const Settings = () => {
           const stored = localStorage.getItem("user");
           if (stored) {
             applyProfile(JSON.parse(stored));
-            setFetchError("Showing saved data. ");
+            setFetchError("Showing saved data. Some info may be outdated.");
           } else {
             setFetchError("Could not load profile. Please check your connection.");
           }
@@ -83,12 +84,56 @@ const Settings = () => {
 
   const handleButtonClick = () => fileInputRef.current?.click();
 
-  const uploadImage = (e) => {
+  const uploadImage = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const url = URL.createObjectURL(file);
-      setProfile({ ...profile, profile_picture: url });
+
+      // Show preview immediately
+      const previewUrl = URL.createObjectURL(file);
+      setProfile((prev) => ({ ...prev, profile_picture: previewUrl }));
       e.target.value = "";
+
+      setPictureLoading(true);
+      clearMessages();
+      try {
+        const data = await uploadProfilePicture(file);
+
+        // Get the real server URL from response
+        const serverUrl =
+          data?.profile_picture ||
+          data?.url             ||
+          data?.image_url       ||
+          previewUrl;
+
+        // ── Update state ─────────────────────────────────────────
+        setProfile((prev) => ({ ...prev, profile_picture: serverUrl }));
+
+        // ── Sync to localStorage so Navbar updates immediately ───
+        try {
+          const stored = localStorage.getItem("user");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            parsed.profile_picture = serverUrl;
+            localStorage.setItem("user", JSON.stringify(parsed));
+            // Fire storage event so Navbar picks it up without reload
+            window.dispatchEvent(new Event("storage"));
+          }
+        } catch {
+          // Failed to sync profile picture to localStorage
+        }
+
+        setSuccessMessage("Profile picture updated successfully!");
+      } catch (err) {
+        setErrorMessage(
+          err.response?.data?.detail ||
+          err.response?.data?.message ||
+          "Failed to upload picture. Please try again."
+        );
+        // Revert preview on failure
+        setProfile((prev) => ({ ...prev, profile_picture: null }));
+      } finally {
+        setPictureLoading(false);
+      }
     }
   };
 
@@ -220,25 +265,34 @@ const Settings = () => {
 
               {/* Profile Picture */}
               <div className="mt-2 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                {profile.profile_picture ? (
-                  <img
-                    src={profile.profile_picture}
-                    alt="Profile"
-                    className="w-24 h-24 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-[#004aad] flex items-center justify-center text-xl font-bold text-white">
-                    {initials}
-                  </div>
-                )}
+                <div className="relative">
+                  {profile.profile_picture ? (
+                    <img
+                      src={profile.profile_picture}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-[#004aad] flex items-center justify-center text-xl font-bold text-white">
+                      {initials}
+                    </div>
+                  )}
+                  {/* Loading overlay while uploading */}
+                  {pictureLoading && (
+                    <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center">
+                      <Loader2 className="w-6 h-6 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
                 <div>
                   <p className="font-semibold text-gray-800 text-lg">{displayName}</p>
                   <p className="text-gray-400 text-sm mb-2">{profile.email}</p>
                   <button
                     onClick={handleButtonClick}
-                    className="border px-4 py-2 text-[#004aad] rounded-lg border-[#004aad] text-sm hover:bg-blue-50 transition"
+                    disabled={pictureLoading}
+                    className="border px-4 py-2 text-[#004aad] rounded-lg border-[#004aad] text-sm hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Change Picture
+                    {pictureLoading ? "Uploading..." : "Change Picture"}
                   </button>
                 </div>
                 <input
