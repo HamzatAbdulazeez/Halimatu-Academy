@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { getProfile, updateProfile, updatePassword } from "../../../api/authApi";
 
 const Settings = () => {
@@ -18,8 +18,12 @@ const Settings = () => {
     profile_picture: null,
   });
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const [fetchLoading, setFetchLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -34,8 +38,9 @@ const Settings = () => {
     const fetchProfile = async () => {
       setFetchLoading(true);
       setFetchError("");
-      try {
-        const data = await getProfile();
+
+      // Helper: populate profile state from any data object
+      const applyProfile = (data) => {
         setProfile({
           first_name:      data.first_name      || "",
           last_name:       data.last_name       || "",
@@ -46,14 +51,28 @@ const Settings = () => {
           country:         data.country         || "",
           profile_picture: data.profile_picture || null,
         });
+      };
+
+      try {
+        // Try API first
+        const data = await getProfile();
+        applyProfile(data);
       } catch (err) {
-        const msg =
-          err.response?.data?.detail ||
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to load profile.";
-        setFetchError(msg);
         console.error("Fetch profile error:", err);
+
+        // ── Fallback: localStorage so the page always loads ──────────
+        try {
+          const stored = localStorage.getItem("user");
+          if (stored) {
+            applyProfile(JSON.parse(stored));
+            // Soft yellow warning — not a blocker
+            setFetchError("Showing saved data.");
+          } else {
+            setFetchError("Could not load profile. Please check your connection.");
+          }
+        } catch {
+          setFetchError("Could not load profile. Please check your connection.");
+        }
       } finally {
         setFetchLoading(false);
       }
@@ -91,6 +110,7 @@ const Settings = () => {
     try {
       await updateProfile(profile);
       setSuccessMessage("Profile updated successfully!");
+      setFetchError(""); // clear soft warning on successful save
     } catch (err) {
       setErrorMessage(
         err.response?.data?.detail ||
@@ -102,13 +122,17 @@ const Settings = () => {
     }
   };
 
-  // ── Submit: Password ─────────────────────────────────────────────
-  const handleUpdatePassword = async (e) => {
+  // ── Submit: Change Password ──────────────────────────────────────
+  const handleupdatePassword = async (e) => {
     e.preventDefault();
     clearMessages();
 
+    if (!currentPassword) {
+      setErrorMessage("Please enter your current password.");
+      return;
+    }
     if (password.length < 8) {
-      setErrorMessage("Password must be at least 8 characters.");
+      setErrorMessage("New password must be at least 8 characters.");
       return;
     }
     if (password !== confirmPassword) {
@@ -118,26 +142,31 @@ const Settings = () => {
 
     setSubmitLoading(true);
     try {
-      await updatePassword({ new_password: password });
-      setSuccessMessage("Password updated successfully!");
+      await updatePassword({
+        current_password: currentPassword,
+        new_password:     password,
+        confirm_password: confirmPassword,
+      });
+      setSuccessMessage("Password changed successfully!");
+      setCurrentPassword("");
       setPassword("");
       setConfirmPassword("");
     } catch (err) {
       setErrorMessage(
         err.response?.data?.detail ||
         err.response?.data?.message ||
-        "Failed to update password. Please try again."
+        "Failed to change password. Please try again."
       );
     } finally {
       setSubmitLoading(false);
     }
   };
 
-  // ── Derived display name ─────────────────────────────────────────
+  // ── Derived display values ───────────────────────────────────────
   const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "User";
-  const initials = (profile.first_name?.charAt(0) || "") + (profile.last_name?.charAt(0) || "") || "U";
+  const initials = ((profile.first_name?.charAt(0) || "") + (profile.last_name?.charAt(0) || "")).toUpperCase() || "U";
 
-  // ── Loading / Error state for initial fetch ──────────────────────
+  // ── Loading spinner ──────────────────────────────────────────────
   if (fetchLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -146,20 +175,7 @@ const Settings = () => {
     );
   }
 
-  if (fetchError) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <p className="text-red-600 font-medium">{fetchError}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="bg-[#004aad] text-white px-6 py-2 rounded-lg hover:bg-[#003a8c] transition"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
+  // ── Main render — always shows even if API failed ────────────────
   return (
     <>
       {/* Header */}
@@ -196,8 +212,21 @@ const Settings = () => {
             <div>
               <h2 className="text-xl font-medium mb-4">Profile</h2>
 
+              {/* Soft warning banner — non-blocking, with retry */}
+              {fetchError && (
+                <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
+                  <span>⚠️ {fetchError}</span>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="ml-4 text-yellow-800 underline text-xs font-medium whitespace-nowrap"
+                  >
+                    Retry
+                  </button>
+                </div>
+              )}
+
               {/* Profile Picture */}
-              <div className="mt-6 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="mt-2 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
                 {profile.profile_picture ? (
                   <img
                     src={profile.profile_picture}
@@ -206,7 +235,7 @@ const Settings = () => {
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-[#004aad] flex items-center justify-center text-xl font-bold text-white">
-                    {initials.toUpperCase()}
+                    {initials}
                   </div>
                 )}
                 <div>
@@ -255,7 +284,7 @@ const Settings = () => {
               {/* Feedback messages */}
               {successMessage && (
                 <div className="mt-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm">
-                  {successMessage}
+                  ✓ {successMessage}
                 </div>
               )}
               {errorMessage && (
@@ -270,7 +299,6 @@ const Settings = () => {
                 {/* ── Personal Details ── */}
                 {activeTab === "personalDetails" && (
                   <form className="space-y-4" onSubmit={handleUpdateProfile}>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-700 mb-2 text-sm font-medium">First Name</label>
@@ -375,31 +403,74 @@ const Settings = () => {
                   </form>
                 )}
 
-                {/* ── Update Password ── */}
+                {/* ── Change Password ── */}
                 {activeTab === "updatePassword" && (
-                  <form className="space-y-4 max-w-md" onSubmit={handleUpdatePassword}>
+                  <form className="space-y-5 max-w-md" onSubmit={handleupdatePassword}>
+
+                    {/* Current Password */}
                     <div>
-                      <label className="block text-gray-700 mb-2 text-sm font-medium">New Password</label>
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-lg outline-none focus:border-[#004aad] transition"
-                        placeholder="At least 8 characters"
-                        required
-                      />
+                      <label className="block text-gray-700 mb-2 text-sm font-medium">Current Password</label>
+                      <div className="relative">
+                        <input
+                          type={showCurrent ? "text" : "password"}
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          className="w-full p-4 pr-12 border border-gray-300 rounded-lg outline-none focus:border-[#004aad] transition"
+                          placeholder="Enter your current password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCurrent(!showCurrent)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        >
+                          {showCurrent ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
                     </div>
 
+                    {/* New Password */}
                     <div>
-                      <label className="block text-gray-700 mb-2 text-sm font-medium">Confirm Password</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-lg outline-none focus:border-[#004aad] transition"
-                        placeholder="Re-enter new password"
-                        required
-                      />
+                      <label className="block text-gray-700 mb-2 text-sm font-medium">New Password</label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full p-4 pr-12 border border-gray-300 rounded-lg outline-none focus:border-[#004aad] transition"
+                          placeholder="At least 8 characters"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        >
+                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div>
+                      <label className="block text-gray-700 mb-2 text-sm font-medium">Confirm New Password</label>
+                      <div className="relative">
+                        <input
+                          type={showConfirm ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="w-full p-4 pr-12 border border-gray-300 rounded-lg outline-none focus:border-[#004aad] transition"
+                          placeholder="Re-enter new password"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(!showConfirm)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                        >
+                          {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                      </div>
                       {confirmPassword.length > 0 && (
                         <p className={`text-xs mt-1 ${password === confirmPassword ? "text-emerald-600" : "text-red-500"}`}>
                           {password === confirmPassword ? "✓ Passwords match" : "✗ Passwords do not match"}
@@ -415,10 +486,10 @@ const Settings = () => {
                       {submitLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Updating...
+                          Changing Password...
                         </>
                       ) : (
-                        "Update Password"
+                        "Change Password"
                       )}
                     </button>
                   </form>

@@ -7,7 +7,7 @@ const StudentWelcomeDashboard = () => {
   // ── Pull user from localStorage on mount ──────────────────────
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("user"); // adjust key if yours is different
+      const stored = localStorage.getItem("user"); 
       if (stored) {
         setUser(JSON.parse(stored));
       }
