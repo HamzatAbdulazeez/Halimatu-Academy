@@ -122,7 +122,7 @@ const StudentWelcomeDashboard = () => {
                 )}
                 <div>
                   <h1 className="text-3xl font-bold">
-                    As-salamu alaykum, {fullName}! 👋
+                  Welcome ,  {fullName}! 👋
                   </h1>
                   <p className="text-blue-100 mt-1">
                     Ready to continue your Islamic learning journey?

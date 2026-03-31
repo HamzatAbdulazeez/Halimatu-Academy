@@ -142,7 +142,7 @@ export const resetPassword = async (resetPayload) => {
 // ====================== GET PROFILE ======================
 export const getProfile = async () => {
     try {
-        const response = await axiosInstance.get("/auth/profile");
+        const response = await axiosInstance.get("/user/profile");
         return response.data;
     } catch (error) {
         console.error("Get Profile API Error:", error.response?.data || error.message);
@@ -167,7 +167,7 @@ export const updateProfile = async (profileData) => {
             (key) => payload[key] === undefined && delete payload[key]
         );
 
-        const response = await axiosInstance.patch("/auth/profile", payload);
+        const response = await axiosInstance.put("/user/profile", payload);
         return response.data;
     } catch (error) {
         console.error("Update Profile API Error:", error.response?.data || error.message);

@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import { getProfile, updateProfile, updatePassword } from "../../../api/authApi";
+import { getProfile, updateProfile, changePassword } from "../../../api/authApi";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("personalDetails");
@@ -39,7 +39,6 @@ const Settings = () => {
       setFetchLoading(true);
       setFetchError("");
 
-      // Helper: populate profile state from any data object
       const applyProfile = (data) => {
         setProfile({
           first_name:      data.first_name      || "",
@@ -54,19 +53,15 @@ const Settings = () => {
       };
 
       try {
-        // Try API first
         const data = await getProfile();
         applyProfile(data);
       } catch (err) {
         console.error("Fetch profile error:", err);
-
-        // ── Fallback: localStorage so the page always loads ──────────
         try {
           const stored = localStorage.getItem("user");
           if (stored) {
             applyProfile(JSON.parse(stored));
-            // Soft yellow warning — not a blocker
-            setFetchError("Showing saved data.");
+            setFetchError("Showing saved data. ");
           } else {
             setFetchError("Could not load profile. Please check your connection.");
           }
@@ -110,7 +105,7 @@ const Settings = () => {
     try {
       await updateProfile(profile);
       setSuccessMessage("Profile updated successfully!");
-      setFetchError(""); // clear soft warning on successful save
+      setFetchError("");
     } catch (err) {
       setErrorMessage(
         err.response?.data?.detail ||
@@ -123,7 +118,7 @@ const Settings = () => {
   };
 
   // ── Submit: Change Password ──────────────────────────────────────
-  const handleupdatePassword = async (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
     clearMessages();
 
@@ -142,7 +137,7 @@ const Settings = () => {
 
     setSubmitLoading(true);
     try {
-      await updatePassword({
+      await changePassword({
         current_password: currentPassword,
         new_password:     password,
         confirm_password: confirmPassword,
@@ -166,7 +161,6 @@ const Settings = () => {
   const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "User";
   const initials = ((profile.first_name?.charAt(0) || "") + (profile.last_name?.charAt(0) || "")).toUpperCase() || "U";
 
-  // ── Loading spinner ──────────────────────────────────────────────
   if (fetchLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -175,7 +169,6 @@ const Settings = () => {
     );
   }
 
-  // ── Main render — always shows even if API failed ────────────────
   return (
     <>
       {/* Header */}
@@ -212,7 +205,7 @@ const Settings = () => {
             <div>
               <h2 className="text-xl font-medium mb-4">Profile</h2>
 
-              {/* Soft warning banner — non-blocking, with retry */}
+              {/* Soft warning banner */}
               {fetchError && (
                 <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
                   <span>⚠️ {fetchError}</span>
@@ -281,7 +274,7 @@ const Settings = () => {
                 </button>
               </div>
 
-              {/* Feedback messages */}
+              {/* Feedback */}
               {successMessage && (
                 <div className="mt-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm">
                   ✓ {successMessage}
@@ -293,7 +286,6 @@ const Settings = () => {
                 </div>
               )}
 
-              {/* Tab Content */}
               <div className="mt-6">
 
                 {/* ── Personal Details ── */}
@@ -405,7 +397,7 @@ const Settings = () => {
 
                 {/* ── Change Password ── */}
                 {activeTab === "updatePassword" && (
-                  <form className="space-y-5 max-w-md" onSubmit={handleupdatePassword}>
+                  <form className="space-y-5 max-w-md" onSubmit={handleChangePassword}>
 
                     {/* Current Password */}
                     <div>

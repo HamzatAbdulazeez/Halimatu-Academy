@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, CheckCircle, Loader2 } from 'lucide-react';
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 import { registerUser } from "../../api/authApi";  
 import { handleApiError } from "../../api/handleApiError";
+import Alert from "../../components/Alert";
 
 const HSARegistration = () => {
 
@@ -27,6 +27,22 @@ const HSARegistration = () => {
   const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Alert state
+  const [alert, setAlert] = useState({ 
+    show: false, 
+    message: "", 
+    type: "info",
+    title: "" 
+  });
+
+  const showAlert = (message, type = "error", title = "") => {
+    setAlert({ show: true, message, type, title });
+  };
+
+  const closeAlert = () => {
+    setAlert(prev => ({ ...prev, show: false }));
+  };
+
   const calculateAge = (dob) => {
     if (!dob) return '';
     const birthDate = new Date(dob);
@@ -39,32 +55,32 @@ const HSARegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    closeAlert();
 
     // Client-side validation
     if (!formData.firstName || !formData.lastName || !formData.email ||
         !formData.dateOfBirth || !formData.country || !formData.city || !formData.password) {
-      toast.error('Please fill all required fields');
+      showAlert("Please fill all required fields", "error", "Validation Error");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      showAlert("Passwords do not match", "error", "Password Error");
       return;
     }
 
     if (formData.password.length < 8) {
-      toast.error('Password must be at least 8 characters long');
+      showAlert("Password must be at least 8 characters long", "error", "Password Error");
       return;
     }
 
     if (!agree) {
-      toast.error('You must agree to the terms and conditions');
+      showAlert("You must agree to the terms and conditions", "error", "Agreement Required");
       return;
     }
 
     setLoading(true);
 
-    // Prepare data exactly as your authApi.js expects
     const registerPayload = {
       firstName: formData.firstName.trim(),
       middleName: formData.middleName.trim() || null,
@@ -76,7 +92,6 @@ const HSARegistration = () => {
       country: formData.country,
       city: formData.city.trim(),
       password: formData.password,
-
     };
 
     try {
@@ -87,7 +102,7 @@ const HSARegistration = () => {
       if (res.token) localStorage.setItem("token", res.token);
       if (res.user) localStorage.setItem("user", JSON.stringify(res.user));
 
-      toast.success("Account created successfully!");
+      showAlert("Account created successfully! Redirecting...", "success", "Registration Successful");
       setRegistered(true);
 
     } catch (err) {
@@ -133,7 +148,15 @@ const HSARegistration = () => {
 
   // Main Registration Form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12 relative">
+      
+      {/* Alert Component */}
+      <Alert 
+        alert={alert} 
+        onClose={closeAlert}
+        position="top-center"
+      />
+
       <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-[#004aad] text-white px-8 py-10 text-center">
@@ -163,16 +186,6 @@ const HSARegistration = () => {
                   required
                 />
               </div>
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                <input
-                  type="text"
-                  value={formData.middleName}
-                  onChange={e => setFormData({ ...formData, middleName: e.target.value })}
-                  placeholder="Optional"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none placeholder-gray-400"
-                />
-              </div> */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Last Name <span className="text-red-500">*</span></label>
                 <input
