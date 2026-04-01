@@ -34,7 +34,7 @@ const Settings = () => {
 
   const fileInputRef = useRef(null);
 
-  // ── Fetch profile on mount ──────────────────────────────────────
+  // ── Fetch profile on mount ─
   useEffect(() => {
     const fetchProfile = async () => {
       setFetchLoading(true);
@@ -77,7 +77,7 @@ const Settings = () => {
     fetchProfile();
   }, []);
 
-  // ── Handlers ────────────────────────────────────────────────────
+  // ── Handlers ───────────────
   const handleChange = (e) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   };
@@ -105,7 +105,7 @@ const Settings = () => {
           data?.image_url       ||
           previewUrl;
 
-        // ── Update state ─────────────────────────────────────────
+        // ── Update state ────
         setProfile((prev) => ({ ...prev, profile_picture: serverUrl }));
 
         // ── Sync to localStorage so Navbar updates immediately ───
@@ -142,7 +142,7 @@ const Settings = () => {
     setErrorMessage("");
   };
 
-  // ── Submit: Personal Details ─────────────────────────────────────
+  // ── Submit: Personal Details 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     clearMessages();
@@ -162,7 +162,7 @@ const Settings = () => {
     }
   };
 
-  // ── Submit: Change Password ──────────────────────────────────────
+  // ── Submit: Change Password ─
   const handleChangePassword = async (e) => {
     e.preventDefault();
     clearMessages();
@@ -202,7 +202,7 @@ const Settings = () => {
     }
   };
 
-  // ── Derived display values ───────────────────────────────────────
+  // ── Derived display values ──
   const displayName = [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "User";
   const initials = ((profile.first_name?.charAt(0) || "") + (profile.last_name?.charAt(0) || "")).toUpperCase() || "U";
 
