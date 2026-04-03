@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { notify } from "../utils/toast";
 
 export const handleApiError = (err) => {
     console.error("API Error:", err);
@@ -6,23 +6,22 @@ export const handleApiError = (err) => {
     const data = err.response?.data;
 
     if (!data) {
-        toast.error("Network error. Check your connection.");
+        notify.error("Network error. Check your connection.");
         return;
     }
+
     if (data.errors && typeof data.errors === "object") {
         Object.values(data.errors).forEach((messages) => {
             const msg = Array.isArray(messages) ? messages[0] : messages;
-            toast.error(msg);
+            notify.error(msg);
         });
         return;
     }
 
-    // Simple message
     if (data.message) {
-        toast.error(data.message);
+        notify.error(data.message);
         return;
     }
 
-    // Fallback
-    toast.error("Something went wrong. Please try again.");
+    notify.error("Something went wrong. Please try again.");
 };

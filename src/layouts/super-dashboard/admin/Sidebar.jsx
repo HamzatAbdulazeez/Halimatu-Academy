@@ -1,5 +1,7 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { logoutUser } from "../../../api/authApi";
+import { notify } from "../../../utils/toast";
 import {
   FaHome,
   FaUsers,
@@ -17,8 +19,20 @@ import {
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isCourseActive = location.pathname.startsWith("/admin/course");
   const [courseOpen, setCourseOpen] = useState(isCourseActive);
+
+  // 1. Get Real Admin Data from storage
+  const storedAdmin = JSON.parse(
+    sessionStorage.getItem("adminUser") || localStorage.getItem("adminUser") || "{}"
+  );
+
+  const adminInfo = {
+    name: storedAdmin?.name || "Admin User",
+    role: "Super Admin", // Or pull from storedAdmin.role if it's a string
+    profile_picture: storedAdmin?.profile_picture || null,
+  };
 
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -27,16 +41,24 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  const mockAdmin = {
-    name: "Abdul (Admin)",
-    role: "Super Admin",
-    profile_picture: null,
-  };
+  // 2. Functional Logout
+  const handleSignOut = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      console.warn("API logout failed, clearing local session.");
+    } finally {
+      // Clear all possible admin sessions
+      sessionStorage.clear();
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("adminUser");
 
-  const handleSignOut = () => {
-    alert("Admin logged out successfully.");
-    if (window.innerWidth < 1024) {
-      toggleSidebar();
+      notify.success("Admin logged out successfully.");
+      
+      if (window.innerWidth < 1024) {
+        toggleSidebar();
+      }
+      navigate("/admin-login");
     }
   };
 
@@ -154,8 +176,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
             onClick={handleLinkClick}
           />
 
-
-
           <SidebarItem
             to="/admin/notifications"
             icon={<FaBell className="text-xl" />}
@@ -171,27 +191,27 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           />
         </nav>
 
-        {/* User/Admin Section */}
+        {/* Real Admin Section */}
         <div className="mt-auto pt-6 border-t border-white/20">
           <NavLink
             to="/admin/settings"
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >
-            {mockAdmin?.profile_picture ? (
+            {adminInfo.profile_picture ? (
               <img
-                src={mockAdmin.profile_picture}
+                src={adminInfo.profile_picture}
                 alt="Admin"
                 className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
               />
             ) : (
               <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-xl">
-                {mockAdmin?.name?.charAt(0)?.toUpperCase() || "?"}
+                {adminInfo.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div>
-              <p className="font-medium text-white">{mockAdmin?.name}</p>
-              <p className="text-xs text-white/70">{mockAdmin?.role}</p>
+            <div className="max-w-[140px] truncate">
+              <p className="font-medium text-white truncate text-sm">{adminInfo.name}</p>
+              <p className="text-[10px] text-white/70 uppercase tracking-wider">{adminInfo.role}</p>
             </div>
           </NavLink>
 

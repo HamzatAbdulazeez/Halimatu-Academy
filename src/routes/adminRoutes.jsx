@@ -1,3 +1,5 @@
+import { Navigate } from "react-router-dom";
+import AdminProtectedRoute from "../components/AdminProtectedRoute";
 import AdminLayout from "../layouts/super-dashboard/admin";
 import AdminDashboard from "../modules/Pages/adminDashboard";
 import ManageStudents from "../modules/Pages/adminDashboard/ManageStudents";
@@ -10,54 +12,32 @@ import AdminClassLinksPage from '../modules/Pages/adminDashboard/AdminClassLinks
 import AdminTopicsPage from '../modules/Pages/adminDashboard/AdminTopicsPage';
 import SettingsPage from "../modules/Pages/adminDashboard/Setting";
 
-// Define student routes
-
 export const adminRoutes = [
   {
-    path: "/admin",
-    element: <AdminLayout />,
+    
+    element: <AdminProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <AdminDashboard />,
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminDashboard /> },
+          { path: "students", element: <ManageStudents /> },
+          { path: "courses", element: <ManagePage /> },
+          { path: "enrollments", element: <EnrollmentsPage /> },
+          { path: "subscriptions", element: <PlanPage /> },
+          { path: "certificates", element: <Certificate /> },
+          { path: "notifications", element: <NotificationPage /> },
+          { path: "settings", element: <SettingsPage /> },
+          { path: "course-management/links", element: <AdminClassLinksPage /> },
+          { path: "course-management/topics", element: <AdminTopicsPage /> },
+        ],
       },
-      {
-        path: "students",
-        element: <ManageStudents />,
-      },
-      {
-        path: "courses",
-        element: <ManagePage />,
-      },
-      {
-        path: "enrollments",
-        element: <EnrollmentsPage />,
-      },
-      {
-        path: "subscriptions",
-        element: <PlanPage />,
-      },
-      {
-        path: "certificates",
-        element: <Certificate />,
-      },
-      {
-        path: "notifications",
-        element: <NotificationPage />,
-      },
-      {
-        path: "settings",
-        element: <SettingsPage />,
-      },
-      {
-        path: "course-management/links",
-        element: <AdminClassLinksPage />,
-      },
-      {
-        path: "course-management/topics",
-        element: <AdminTopicsPage />,
-      },
-      // Add other student dashboard routes here
     ],
+  },
+ 
+  {
+    path: "/admin/*",
+    element: <Navigate to="/admin-login" replace />,
   },
 ];
