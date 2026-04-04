@@ -15,27 +15,27 @@ import {
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+
   const [studentInfo, setStudentInfo] = useState({
     name: "Student",
     profile_picture: null,
   });
 
-useEffect(() => {
-  const loadUser = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const rawName = storedUser.name?.name || storedUser.name || "Student";
-    setStudentInfo({
-      name: String(rawName),
-      profile_picture: storedUser.profile_picture || storedUser.profile?.profile_picture || null,
-    });
-  };
+  useEffect(() => {
+    const loadUser = () => {
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const rawName = storedUser.name?.name || storedUser.name || "Student";
+      setStudentInfo({
+        name: String(rawName),
+        profile_picture: storedUser.profile_picture || storedUser.profile?.profile_picture || null,
+      });
+    };
 
-  loadUser(); // Initial load
-  
-  window.addEventListener("storage", loadUser);
-  return () => window.removeEventListener("storage", loadUser);
-}, []);
+    loadUser(); // Initial load
+
+    window.addEventListener("storage", loadUser);
+    return () => window.removeEventListener("storage", loadUser);
+  }, []);
 
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -47,28 +47,28 @@ useEffect(() => {
   const handleSignOut = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
-  
+
     try {
       await logoutUser();
-      notify.success("Logged out successfully!"); 
+      notify.success("Logged out successfully!");
     } catch (error) {
       console.warn("Logout API failed:", error?.response || error.message);
-      notify.error("Session cleared locally."); 
+      notify.error("Session cleared locally.");
     } finally {
       // Clear all local data
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
       sessionStorage.clear();
-  
+
       if (window.innerWidth < 1024) toggleSidebar();
-  
+
       // Redirect after a short delay so user sees the toast
       setTimeout(() => {
         navigate("/login", { replace: true });
-        window.location.reload(); 
+        window.location.reload();
       }, 1000);
-  
+
       setIsLoggingOut(false);
     }
   };
@@ -84,7 +84,7 @@ useEffect(() => {
         <div className="flex justify-center mb-8 shrink-0">
           <NavLink to="/" onClick={handleLinkClick}>
             <img
-              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
               alt="Academy Logo"
               className="h-20 w-auto object-contain drop-shadow-lg brightness-110"
               draggable="false"
@@ -170,8 +170,8 @@ const SidebarItem = ({ to, icon, text, onClick, end = false }) => (
     onClick={onClick}
     className={({ isActive }) =>
       `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-      ${isActive 
-        ? "bg-white/15 text-white font-bold border-l-4 border-white shadow-inner" 
+      ${isActive
+        ? "bg-white/15 text-white font-bold border-l-4 border-white shadow-inner"
         : "text-white/90 hover:bg-white/10 hover:text-white"}`
     }
   >

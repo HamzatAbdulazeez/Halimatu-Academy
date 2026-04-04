@@ -6,11 +6,11 @@ import { notify } from "../../utils/toast";
 
 // ─── Password rules ────────────────────────────────────────────────────────────
 const PASSWORD_RULES = [
-  { id: "minLength", label: "At least 8 characters",                      test: (p) => p.length >= 8 },
-  { id: "uppercase", label: "At least one uppercase letter (A–Z)",        test: (p) => /[A-Z]/.test(p) },
-  { id: "lowercase", label: "At least one lowercase letter (a–z)",        test: (p) => /[a-z]/.test(p) },
-  { id: "number",    label: "At least one number (0–9)",                  test: (p) => /[0-9]/.test(p) },
-  { id: "special",   label: "At least one special character (# @ ! $ …)", test: (p) => /[^A-Za-z0-9]/.test(p) },
+  { id: "minLength", label: "At least 8 characters", test: (p) => p.length >= 8 },
+  { id: "uppercase", label: "At least one uppercase letter (A–Z)", test: (p) => /[A-Z]/.test(p) },
+  { id: "lowercase", label: "At least one lowercase letter (a–z)", test: (p) => /[a-z]/.test(p) },
+  { id: "number", label: "At least one number (0–9)", test: (p) => /[0-9]/.test(p) },
+  { id: "special", label: "At least one special character (# @ ! $ …)", test: (p) => /[^A-Za-z0-9]/.test(p) },
 ];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,7 +20,7 @@ const PHONE_REGEX = /^[+]?[\d\s\-().]{7,20}$/;
 const calculateAge = (dob) => {
   if (!dob) return '';
   const birthDate = new Date(dob);
-  const today     = new Date();
+  const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const m = today.getMonth() - birthDate.getMonth();
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
@@ -42,13 +42,13 @@ const INITIAL_ERRORS = {
 };
 
 export default function HSARegistration() {
-  const [formData, setFormData]                 = useState(INITIAL_FORM);
-  const [showPassword, setShowPassword]         = useState(false);
+  const [formData, setFormData] = useState(INITIAL_FORM);
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agree, setAgree]                       = useState(false);
-  const [registered, setRegistered]             = useState(false);
-  const [loading, setLoading]                   = useState(false);
-  const [passwordFocused, setPasswordFocused]   = useState(false);
+  const [agree, setAgree] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
 
   // Per-field inline errors
   const [fieldErrors, setFieldErrors] = useState(INITIAL_ERRORS);
@@ -77,7 +77,7 @@ export default function HSARegistration() {
         if (value.trim().length < 2) return "Last name must be at least 2 characters.";
         return "";
       case "email":
-        if (!value.trim())                   return "Email address is required.";
+        if (!value.trim()) return "Email address is required.";
         if (!EMAIL_REGEX.test(value.trim())) return "Please enter a valid email address.";
         return "";
       case "phone":
@@ -86,7 +86,7 @@ export default function HSARegistration() {
       case "dateOfBirth": {
         if (!value) return "Date of birth is required.";
         const age = calculateAge(value);
-        if (age < 5)  return "You must be at least 5 years old to register.";
+        if (age < 5) return "You must be at least 5 years old to register.";
         if (age > 120) return "Please enter a valid date of birth.";
         return "";
       }
@@ -97,15 +97,15 @@ export default function HSARegistration() {
         if (!value.trim()) return "City is required.";
         return "";
       case "password":
-        if (!value)                          return "Password is required.";
-        if (value.length < 8)                return "Password must be at least 8 characters.";
-        if (!/[A-Z]/.test(value))            return "Password needs at least one uppercase letter (A–Z).";
-        if (!/[a-z]/.test(value))            return "Password needs at least one lowercase letter (a–z).";
-        if (!/[0-9]/.test(value))            return "Password needs at least one number (0–9).";
-        if (!/[^A-Za-z0-9]/.test(value))     return "Password needs at least one special character (e.g. #, @, !).";
+        if (!value) return "Password is required.";
+        if (value.length < 8) return "Password must be at least 8 characters.";
+        if (!/[A-Z]/.test(value)) return "Password needs at least one uppercase letter (A–Z).";
+        if (!/[a-z]/.test(value)) return "Password needs at least one lowercase letter (a–z).";
+        if (!/[0-9]/.test(value)) return "Password needs at least one number (0–9).";
+        if (!/[^A-Za-z0-9]/.test(value)) return "Password needs at least one special character (e.g. #, @, !).";
         return "";
       case "confirmPassword":
-        if (!value)                          return "Please confirm your password.";
+        if (!value) return "Please confirm your password.";
         // We compare against the current formData, but also accept value passed directly
         return "";
       default:
@@ -136,8 +136,8 @@ export default function HSARegistration() {
         err = !value
           ? "Please confirm your password."
           : value !== formData.password
-          ? "Passwords do not match."
-          : "";
+            ? "Passwords do not match."
+            : "";
       }
       setFieldErrors((prev) => ({ ...prev, [name]: err }));
     }
@@ -153,8 +153,8 @@ export default function HSARegistration() {
       err = !value
         ? "Please confirm your password."
         : value !== formData.password
-        ? "Passwords do not match."
-        : "";
+          ? "Passwords do not match."
+          : "";
     }
     setFieldErrors((prev) => ({ ...prev, [name]: err }));
   };
@@ -162,15 +162,15 @@ export default function HSARegistration() {
   // ─── Validate ALL fields before submit ────────────────────────────────────
   const validateAll = () => {
     const errors = { ...INITIAL_ERRORS };
-    const fields = ["firstName","lastName","email","phone","dateOfBirth","country","city","password"];
+    const fields = ["firstName", "lastName", "email", "phone", "dateOfBirth", "country", "city", "password"];
     fields.forEach((f) => { errors[f] = validateField(f, formData[f]); });
 
     // confirmPassword
     errors.confirmPassword = !formData.confirmPassword
       ? "Please confirm your password."
       : formData.confirmPassword !== formData.password
-      ? "Passwords do not match."
-      : "";
+        ? "Passwords do not match."
+        : "";
 
     // Mark all as touched
     const allTouched = {};
@@ -200,23 +200,23 @@ export default function HSARegistration() {
     setLoading(true);
 
     const registerPayload = {
-      firstName:   formData.firstName.trim(),
-      middleName:  formData.middleName.trim() || null,
-      lastName:    formData.lastName.trim(),
-      email:       formData.email.trim().toLowerCase(),
-      phone:       formData.phone.trim() || null,
+      firstName: formData.firstName.trim(),
+      middleName: formData.middleName.trim() || null,
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim() || null,
       dateOfBirth: formData.dateOfBirth,
-      gender:      formData.gender || null,
-      country:     formData.country,
-      city:        formData.city.trim(),
-      password:    formData.password,
+      gender: formData.gender || null,
+      country: formData.country,
+      city: formData.city.trim(),
+      password: formData.password,
     };
 
     try {
       const res = await registerUser(registerPayload);
 
       if (res?.token) localStorage.setItem("token", res.token);
-      if (res?.user)  localStorage.setItem("user", JSON.stringify(res.user));
+      if (res?.user) localStorage.setItem("user", JSON.stringify(res.user));
 
       notify.success("Account created successfully! Please check your email for the OTP.");
       setRegistered(true);
@@ -236,10 +236,10 @@ export default function HSARegistration() {
         return;
       }
 
-      const status        = err.response?.status;
+      const status = err.response?.status;
       const serverMessage = err.response?.data?.message
-                          || err.response?.data?.error
-                          || err.response?.data?.detail;
+        || err.response?.data?.error
+        || err.response?.data?.detail;
 
       switch (status) {
 
@@ -259,8 +259,8 @@ export default function HSARegistration() {
         case 422:
           if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
             err.response.data.errors.forEach((fieldErr) => {
-              const msg   = fieldErr.message || fieldErr.msg || JSON.stringify(fieldErr);
-              const field = fieldErr.field   || fieldErr.path;
+              const msg = fieldErr.message || fieldErr.msg || JSON.stringify(fieldErr);
+              const field = fieldErr.field || fieldErr.path;
               if (field && Object.prototype.hasOwnProperty.call(INITIAL_ERRORS, field)) {
                 setFieldErrors((prev) => ({ ...prev, [field]: msg }));
               }
@@ -297,10 +297,9 @@ export default function HSARegistration() {
 
   // ─── Input class helper ────────────────────────────────────────────────────
   const inputClass = (field, extra = "") =>
-    `w-full px-4 py-3 border rounded-lg outline-none placeholder-gray-400 transition ${extra} ${
-      touched[field] && fieldErrors[field]
-        ? "border-red-500 focus:border-red-500 bg-red-50"
-        : "border-gray-300 focus:border-[#004aad]"
+    `w-full px-4 py-3 border rounded-lg outline-none placeholder-gray-400 transition ${extra} ${touched[field] && fieldErrors[field]
+      ? "border-red-500 focus:border-red-500 bg-red-50"
+      : "border-gray-300 focus:border-[#004aad]"
     }`;
 
   // ─── Field error hint ──────────────────────────────────────────────────────
@@ -357,7 +356,7 @@ export default function HSARegistration() {
         <div className="bg-[#004aad] text-white px-8 py-10 text-center">
           <Link to="/">
             <img
-              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
               alt="Halimatu Academy Logo"
               className="w-20 h-auto mx-auto mb-4"
             />
@@ -500,11 +499,10 @@ export default function HSARegistration() {
                   value={formData.country}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 border rounded-lg outline-none bg-white transition ${
-                    touched.country && fieldErrors.country
-                      ? "border-red-500 bg-red-50 text-gray-600"
-                      : "border-gray-300 text-gray-600 focus:border-[#004aad]"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg outline-none bg-white transition ${touched.country && fieldErrors.country
+                    ? "border-red-500 bg-red-50 text-gray-600"
+                    : "border-gray-300 text-gray-600 focus:border-[#004aad]"
+                    }`}
                 >
                   <option value="" disabled>Select your country</option>
                   <option value="Nigeria">Nigeria</option>
@@ -566,13 +564,12 @@ export default function HSARegistration() {
                     {passwordRuleResults.map((rule) => (
                       <li
                         key={rule.id}
-                        className={`flex items-center gap-2 text-xs transition-colors ${
-                          rule.passed ? "text-green-600" : "text-gray-500"
-                        }`}
+                        className={`flex items-center gap-2 text-xs transition-colors ${rule.passed ? "text-green-600" : "text-gray-500"
+                          }`}
                       >
                         {rule.passed
                           ? <CheckCircle2 size={13} className="shrink-0 text-green-500" />
-                          : <XCircle      size={13} className="shrink-0 text-gray-400"  />
+                          : <XCircle size={13} className="shrink-0 text-gray-400" />
                         }
                         {rule.label}
                       </li>
@@ -609,12 +606,11 @@ export default function HSARegistration() {
 
                 {/* Live match indicator */}
                 {touched.confirmPassword && formData.confirmPassword && (
-                  <p className={`mt-1.5 text-xs flex items-center gap-1 ${
-                    formData.confirmPassword === formData.password ? "text-green-600" : "text-red-600"
-                  }`}>
+                  <p className={`mt-1.5 text-xs flex items-center gap-1 ${formData.confirmPassword === formData.password ? "text-green-600" : "text-red-600"
+                    }`}>
                     {formData.confirmPassword === formData.password
                       ? <><CheckCircle2 size={13} className="shrink-0" /> Passwords match</>
-                      : <><XCircle      size={13} className="shrink-0" /> Passwords do not match</>
+                      : <><XCircle size={13} className="shrink-0" /> Passwords do not match</>
                     }
                   </p>
                 )}
@@ -632,7 +628,7 @@ export default function HSARegistration() {
               />
               <label htmlFor="agree" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
                 I agree to Halimatu Academy's{" "}
-                <Link to="/terms"   className="text-[#004aad] hover:underline">Terms of Service</Link>
+                <Link to="/terms" className="text-[#004aad] hover:underline">Terms of Service</Link>
                 {" "}and{" "}
                 <Link to="/privacy" className="text-[#004aad] hover:underline">Privacy Policy</Link>
               </label>

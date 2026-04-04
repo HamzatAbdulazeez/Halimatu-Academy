@@ -38,10 +38,10 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          
+
           // Safeguard against [object Object] and nested name fields
           const rawName = parsed.name?.name || parsed.name || parsed.first_name || "Admin User";
-          
+
           setAdminInfo({
             name: String(rawName),
             role: parsed.role || "Super Admin",
@@ -54,7 +54,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     };
 
     loadAdmin(); // Initial load
-    
+
     // ✅ This makes the sidebar update INSTANTLY when you change the profile picture in Settings
     window.addEventListener("storage", loadAdmin);
     return () => window.removeEventListener("storage", loadAdmin);
@@ -81,7 +81,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       localStorage.removeItem("token"); // Clean up standard keys too
       localStorage.removeItem("user");
       sessionStorage.clear();
-      
+
       if (window.innerWidth < 1024) toggleSidebar();
       navigate("/admin-login");
     }
@@ -98,7 +98,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         <div className="flex justify-center mb-8 shrink-0">
           <NavLink to="/" onClick={handleLinkClick}>
             <img
-              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
               alt="Halimatu Academy Logo"
               className="h-20 w-auto object-contain drop-shadow-lg brightness-110"
               draggable="false"
@@ -204,8 +204,8 @@ const SidebarItem = ({ to, icon, text, onClick, end = false }) => (
     onClick={onClick}
     className={({ isActive }) =>
       `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-      ${isActive 
-        ? "bg-white/15 text-white font-bold border-l-4 border-white shadow-inner" 
+      ${isActive
+        ? "bg-white/15 text-white font-bold border-l-4 border-white shadow-inner"
         : "text-white/90 hover:bg-white/10 hover:text-white"}`
     }
   >

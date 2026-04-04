@@ -6,7 +6,7 @@ const NotFoundPage = () => {
       {/* Logo */}
       <Link to="/"> <div className=" flex items-center justify-center">
         <img
-          src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+          src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
           alt=""
           draggable="false"
           className="w-32 h-auto"

@@ -34,7 +34,7 @@ export default function Header() {
         setAuthState({
           isLoggedIn: true,
           isAdmin: false,
-          dashboardUrl: "/student" 
+          dashboardUrl: "/student"
         });
       } else {
         setAuthState({
@@ -99,8 +99,7 @@ export default function Header() {
   };
 
   const linkClasses = ({ isActive }) =>
-    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-      isActive ? "text-[#004AAD]" : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD]" : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
     }`;
 
   const mobileLink = "block w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50";
@@ -118,7 +117,7 @@ export default function Header() {
               <div className="flex items-center">
                 <NavLink to="/" onClick={closeAll}>
                   <img
-                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
+                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
                     alt="Logo"
                     className="w-24 h-auto"
                   />
@@ -208,7 +207,7 @@ export default function Header() {
               <div className="fixed top-0 right-0 h-full w-80 bg-white p-4 shadow-xl">
                 <div className="flex justify-between items-center border-b border-gray-400 pb-3">
                   <NavLink to="/" onClick={closeAll}>
-                    <img src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png" alt="Logo" className="w-20 h-auto" />
+                    <img src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png" alt="Logo" className="w-20 h-auto" />
                   </NavLink>
                   <button onClick={closeAll}><X /></button>
                 </div>
@@ -216,7 +215,7 @@ export default function Header() {
                 <nav className="mt-4 space-y-4">
                   <NavLink to="/" className={mobileLink} onClick={closeAll}>Home</NavLink>
                   <NavLink to="/about" className={mobileLink} onClick={closeAll}>About Us</NavLink>
-                  
+
                   {/* AUTH MOBILE - CONDITIONAL RENDERING */}
                   <div className="pt-3 space-y-2">
                     {authState.isLoggedIn ? (
