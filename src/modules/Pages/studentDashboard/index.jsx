@@ -1,36 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+// ✅ Moved trigger outside to keep the component clean
+const triggerProfileSync = () => {
+  window.dispatchEvent(new Event("storage"));
+};
+
 const StudentWelcomeDashboard = () => {
   const [user, setUser] = useState(null);
 
-  // ── Pull user from localStorage on mount ──────────────────────
+  // ── Sync user from localStorage & Listen for Changes ──────────
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("user"); 
-      if (stored) {
-        const parsedUser = JSON.parse(stored);
-        setTimeout(() => setUser(parsedUser), 0);
+    const loadUserData = () => {
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+          const parsedUser = JSON.parse(stored);
+          setUser(parsedUser);
+        }
+      } catch (err) {
+        console.error("Failed to parse user from localStorage:", err);
       }
-    } catch (err) {
-      console.error("Failed to parse user from localStorage:", err);
-    }
+    };
+
+    loadUserData();
+    window.addEventListener("storage", loadUserData);
+    return () => window.removeEventListener("storage", loadUserData);
   }, []);
 
-  // ── Derived display values ─────────────────────────────────────
+  // ── 🔍 The "Detective" Variables ─────────────────────────────
+  const profilePic =
+    user?.profile_picture ||
+    user?.profile?.profile_picture ||
+    user?.image ||
+    null;
+
+  const studentId =
+    user?.student_id ||
+    user?.profile?.student_id ||
+    user?.id_number ||
+    "—";
+
   const fullName = user
     ? [user.first_name, user.last_name].filter(Boolean).join(" ")
     : "Student";
 
   const initials = user
-    ? ((user.first_name?.charAt(0) || "") + (user.last_name?.charAt(0) || "")).toUpperCase()
+    ? ((user.first_name?.charAt(0) || user.name?.charAt(0) || "") +
+      (user.last_name?.charAt(0) || "")).toUpperCase()
     : "S";
 
-  const studentId  = user?.student_id    || "—";
-  const email      = user?.email         || "—";
-  const profilePic = user?.profile_picture || null;
+  const email = user?.email || "—";
 
-  // ── Static course / schedule data (replace with API later) ────
+  // ── Static course / schedule data ────
   const enrolledCourses = [
     {
       id: 1,
@@ -123,7 +145,7 @@ const StudentWelcomeDashboard = () => {
                 )}
                 <div>
                   <h1 className="text-3xl font-bold">
-                  Welcome ,  {fullName}! 👋
+                    Welcome ,  {fullName}! 👋
                   </h1>
                   <p className="text-blue-100 mt-1">
                     Ready to continue your Islamic learning journey?

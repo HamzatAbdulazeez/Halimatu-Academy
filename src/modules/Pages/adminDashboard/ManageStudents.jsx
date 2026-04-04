@@ -24,7 +24,7 @@ const ManageStudents = () => {
       const [usersRes, statsRes] = await Promise.all([getUsers(), getUserStats()]);
       setStudents(Array.isArray(usersRes) ? usersRes : usersRes?.data || []);
       if (statsRes) setStats(statsRes);
-    } catch (err) {
+    } catch {
       notify.error("Failed to load students data");
     } finally {
       setLoading(false);

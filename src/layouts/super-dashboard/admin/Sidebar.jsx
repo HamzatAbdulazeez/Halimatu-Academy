@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logoutUser } from "../../../api/authApi";
 import { notify } from "../../../utils/toast";
 import {
@@ -23,16 +23,42 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const isCourseActive = location.pathname.startsWith("/admin/course");
   const [courseOpen, setCourseOpen] = useState(isCourseActive);
 
-  // 1. Get Real Admin Data from storage
-  const storedAdmin = JSON.parse(
-    sessionStorage.getItem("adminUser") || localStorage.getItem("adminUser") || "{}"
-  );
+  // Maintain Admin Data with persistent state
+  const [adminInfo, setAdminInfo] = useState({
+    name: "Admin User",
+    role: "Super Admin",
+    profile_picture: null,
+  });
 
-  const adminInfo = {
-    name: storedAdmin?.name || "Admin User",
-    role: "Super Admin", // Or pull from storedAdmin.role if it's a string
-    profile_picture: storedAdmin?.profile_picture || null,
-  };
+  // ✅ Fixed Effect: Listens for updates and uses the correct Admin keys
+  useEffect(() => {
+    const loadAdmin = () => {
+      // Use the specific key you use for Admins (usually "adminUser" or "user")
+      const stored = localStorage.getItem("adminUser") || localStorage.getItem("user");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          
+          // Safeguard against [object Object] and nested name fields
+          const rawName = parsed.name?.name || parsed.name || parsed.first_name || "Admin User";
+          
+          setAdminInfo({
+            name: String(rawName),
+            role: parsed.role || "Super Admin",
+            profile_picture: parsed.profile_picture || parsed.profile?.profile_picture || null,
+          });
+        } catch (err) {
+          console.error("Failed to parse admin data", err);
+        }
+      }
+    };
+
+    loadAdmin(); // Initial load
+    
+    // ✅ This makes the sidebar update INSTANTLY when you change the profile picture in Settings
+    window.addEventListener("storage", loadAdmin);
+    return () => window.removeEventListener("storage", loadAdmin);
+  }, []);
 
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -41,23 +67,22 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  // 2. Functional Logout
   const handleSignOut = async () => {
     try {
       await logoutUser();
+      notify.success("Admin logged out successfully.");
     } catch {
       console.warn("API logout failed, clearing local session.");
+      notify.info("Session cleared locally.");
     } finally {
-      // Clear all possible admin sessions
-      sessionStorage.clear();
+      // Complete cleanup
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
-
-      notify.success("Admin logged out successfully.");
+      localStorage.removeItem("token"); // Clean up standard keys too
+      localStorage.removeItem("user");
+      sessionStorage.clear();
       
-      if (window.innerWidth < 1024) {
-        toggleSidebar();
-      }
+      if (window.innerWidth < 1024) toggleSidebar();
       navigate("/admin-login");
     }
   };
@@ -69,191 +94,124 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <NavLink to="/admin" onClick={handleLinkClick}>
+        {/* Logo Section */}
+        <div className="flex justify-center mb-8 shrink-0">
+          <NavLink to="/" onClick={handleLinkClick}>
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1769389099/Halimatu-Academy-Images/logo_3_1_bmduex.png"
               alt="Halimatu Academy Logo"
-              className="h-20 w-auto object-contain drop-shadow-md"
+              className="h-20 w-auto object-contain drop-shadow-lg brightness-110"
+              draggable="false"
             />
           </NavLink>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-          <SidebarItem
-            to="/admin"
-            icon={<FaHome className="text-xl" />}
-            text="Dashboard"
-            onClick={handleLinkClick}
-            end
-          />
+          <SidebarItem to="/admin" icon={<FaHome />} text="Dashboard" onClick={handleLinkClick} end />
+          <SidebarItem to="/admin/students" icon={<FaUsers />} text="Manage Students" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/enrollments" icon={<FaUserGraduate />} text="Enrollments" onClick={handleLinkClick} />
 
-          <SidebarItem
-            to="/admin/students"
-            icon={<FaUsers className="text-xl" />}
-            text="Manage Students"
-            onClick={handleLinkClick}
-          />
-
-          <SidebarItem
-            to="/admin/enrollments"
-            icon={<FaUserGraduate className="text-xl" />}
-            text="Enrollments"
-            onClick={handleLinkClick}
-          />
-
+          {/* Dropdown for Course Management */}
           <div>
             <button
               onClick={() => setCourseOpen((prev) => !prev)}
               className={`w-full flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-                ${isCourseActive
-                  ? "bg-white/15 text-white text-md border-l-4 border-white"
-                  : "text-white/90 hover:bg-white/10 hover:text-white"
-                }`}
+                ${isCourseActive ? "bg-white/15 text-white border-l-4 border-white" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
             >
-              <span className="text-xl opacity-90">
-                <FaBookOpen />
-              </span>
-              <span className="flex-1 text-left">Course Management</span>
-              <FaChevronDown
-                className={`text-xs opacity-70 transition-transform duration-300 ${courseOpen ? "rotate-180" : ""
-                  }`}
-              />
+              <FaBookOpen className="text-xl opacity-90" />
+              <span className="flex-1 text-left text-sm font-medium">Course Management</span>
+              <FaChevronDown className={`text-xs opacity-70 transition-transform duration-300 ${courseOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {/* Sub-items */}
-            <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"
-                }`}
-            >
+            <div className={`overflow-hidden transition-all duration-300 ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
               <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
                 <NavLink
                   to="/admin/course-management/links"
                   onClick={handleLinkClick}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm transition-all duration-200
-                    ${isActive
-                      ? "bg-white/15 text-white font-semibold"
-                      : "text-white/75 hover:bg-white/10 hover:text-white"
-                    }`
+                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
+                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
                   }
                 >
-                  <FaLink className="text-base opacity-80 shrink-0" />
-                  <span>Class Schedule & Links</span>
+                  <FaLink className="shrink-0" />
+                  <span>Schedule & Links</span>
                 </NavLink>
 
                 <NavLink
                   to="/admin/course-management/topics"
                   onClick={handleLinkClick}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm transition-all duration-200
-                    ${isActive
-                      ? "bg-white/15 text-white font-semibold"
-                      : "text-white/75 hover:bg-white/10 hover:text-white"
-                    }`
+                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
+                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
                   }
                 >
-                  <FaListUl className="text-base opacity-80 shrink-0" />
-                  <span>What You Will Learn</span>
+                  <FaListUl className="shrink-0" />
+                  <span>Curriculum Topics</span>
                 </NavLink>
               </div>
             </div>
           </div>
 
-          <SidebarItem
-            to="/admin/subscriptions"
-            icon={<FaCreditCard className="text-xl" />}
-            text="Subscriptions & Plans"
-            onClick={handleLinkClick}
-          />
-
-          <SidebarItem
-            to="/admin/certificates"
-            icon={<FaCertificate className="text-xl" />}
-            text="Certificates"
-            onClick={handleLinkClick}
-          />
-
-          <SidebarItem
-            to="/admin/notifications"
-            icon={<FaBell className="text-xl" />}
-            text="Notifications"
-            onClick={handleLinkClick}
-          />
-
-          <SidebarItem
-            to="/admin/settings"
-            icon={<FaCog className="text-xl" />}
-            text="Settings"
-            onClick={handleLinkClick}
-          />
+          <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard />} text="Subscriptions" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/certificates" icon={<FaCertificate />} text="Certificates" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/notifications" icon={<FaBell />} text="Notifications" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/settings" icon={<FaCog />} text="Settings" onClick={handleLinkClick} />
         </nav>
 
-        {/* Real Admin Section */}
-        <div className="mt-auto pt-6 border-t border-white/20">
-          <NavLink
-            to="/admin/settings"
-            onClick={handleLinkClick}
-            className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
-          >
+        {/* Profile & Logout Section */}
+        <div className="mt-auto pt-6 border-t border-white/20 space-y-4">
+          <div className="flex items-center gap-3 p-2">
             {adminInfo.profile_picture ? (
               <img
                 src={adminInfo.profile_picture}
-                alt="Admin"
-                className="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-xl">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
                 {adminInfo.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div className="max-w-[140px] truncate">
+            <div className="max-w-[150px] truncate">
               <p className="font-medium text-white truncate text-sm">{adminInfo.name}</p>
-              <p className="text-[10px] text-white/70 uppercase tracking-wider">{adminInfo.role}</p>
+              <p className="text-[10px] text-white/60 uppercase tracking-widest font-semibold">{adminInfo.role}</p>
             </div>
-          </NavLink>
+          </div>
 
           <button
             onClick={handleSignOut}
-            className="mt-5 w-full flex items-center justify-center gap-3 bg-red-600/90 hover:bg-red-700 
-              text-white py-3 px-4 rounded-xl font-medium transition-all duration-200 shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 cursor-pointer
+              text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-lg text-sm"
           >
-            <FaSignOutAlt className="text-lg" />
-            Log Out
+            <FaSignOutAlt />
+            LOG OUT
           </button>
         </div>
       </div>
 
       {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 lg:hidden z-30 backdrop-blur-sm"
-          onClick={toggleSidebar}
-        />
+        <div className="fixed inset-0 bg-black/50 lg:hidden z-30 backdrop-blur-sm" onClick={toggleSidebar} />
       )}
     </>
   );
 };
 
-const SidebarItem = ({ to, icon, text, onClick, end = false }) => {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-        ${isActive
-          ? "bg-white/15 text-white font-medium shadow-sm border-l-4 border-white"
-          : "text-white/90 hover:bg-white/10 hover:text-white"
-        }`
-      }
-    >
-      <span className="text-xl opacity-90">{icon}</span>
-      <span>{text}</span>
-    </NavLink>
-  );
-};
+const SidebarItem = ({ to, icon, text, onClick, end = false }) => (
+  <NavLink
+    to={to}
+    end={end}
+    onClick={onClick}
+    className={({ isActive }) =>
+      `flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
+      ${isActive 
+        ? "bg-white/15 text-white font-bold border-l-4 border-white shadow-inner" 
+        : "text-white/90 hover:bg-white/10 hover:text-white"}`
+    }
+  >
+    <span className="text-xl opacity-90">{icon}</span>
+    <span className="text-sm font-medium">{text}</span>
+  </NavLink>
+);
 
 export default AdminSidebar;
