@@ -69,7 +69,7 @@ const ManageAdminsPage = () => {
             setShowCreateModal(false);
             setFormData({ name: '', email: '', password: '', role_id: '' });
             loadData();
-        } catch {
+        } catch (err) {
             notify.error(err.response?.data?.message || "Failed to create admin");
         } finally {
             setIsSubmitting(false);
@@ -259,7 +259,7 @@ const ManageAdminsPage = () => {
 
             {/* ====================== CREATE ADMIN MODAL ====================== */}
             {showCreateModal && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
                         <div className="p-6 border-b flex justify-between items-center">
                             <h3 className="text-xl font-bold text-gray-900">Add New Admin</h3>
@@ -346,7 +346,7 @@ const ManageAdminsPage = () => {
 
             {/* ====================== CHANGE PASSWORD MODAL ====================== */}
             {showPasswordModal && selectedAdmin && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-100 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
                         <div className="p-6 border-b flex justify-between items-center">
                             <h3 className="text-xl font-bold">Change Password</h3>
