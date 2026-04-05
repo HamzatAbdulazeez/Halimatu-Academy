@@ -11,10 +11,12 @@ import NotificationPage from "../modules/Pages/adminDashboard/Notification";
 import AdminClassLinksPage from '../modules/Pages/adminDashboard/AdminClassLinksPage';
 import AdminTopicsPage from '../modules/Pages/adminDashboard/AdminTopicsPage';
 import SettingsPage from "../modules/Pages/adminDashboard/Setting";
+import AdminRole from "../modules/Pages/adminDashboard/roles/AdminRoles";
+import RolePermissions from "../modules/Pages/adminDashboard/roles/RolePermissions";
+import ManageAdminsPage from "../modules/Pages/adminDashboard/staff/ManageAdminsPage";
 
 export const adminRoutes = [
   {
-    
     element: <AdminProtectedRoute />,
     children: [
       {
@@ -31,11 +33,17 @@ export const adminRoutes = [
           { path: "settings", element: <SettingsPage /> },
           { path: "course-management/links", element: <AdminClassLinksPage /> },
           { path: "course-management/topics", element: <AdminTopicsPage /> },
+          
+          // --- ROLES & PERMISSIONS SECTION ---
+          { path: "roles", element: <AdminRole /> },
+          { path: "roles/:roleId/permissions", element: <RolePermissions /> }, 
+
+          // --- STAFF SECTION ---
+          { path: "staff", element: <ManageAdminsPage /> },
         ],
       },
     ],
   },
- 
   {
     path: "/admin/*",
     element: <Navigate to="/admin-login" replace />,

@@ -352,3 +352,169 @@ export const deleteUser = async (userId) => {
         throw error;
     }
 };
+
+// ============================================================
+// 🔐 ADMIN ROLES MANAGEMENT
+// ============================================================
+
+export const getAdminRoles = async () => {
+    try {
+        const response = await axiosInstance.get('/admin/roles');
+        return response.data;
+    } catch (error) {
+        console.error("Get Roles Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const getAdminRoleById = async (roleId) => {
+    try {
+        const response = await axiosInstance.get(`/admin/roles/${roleId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Get Role Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const createAdminRole = async (roleName) => {
+    try {
+        const response = await axiosInstance.post('/admin/roles', { name: roleName });
+        return response.data;
+    } catch (error) {
+        console.error("Create Role Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const updateAdminRole = async (roleId, updatedData) => {
+    try {
+        const response = await axiosInstance.put(`/admin/roles/${roleId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error("Update Role Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const deleteAdminRole = async (roleId) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/roles/${roleId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Delete Role Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// ============================================================
+// 🔑 PERMISSIONS MANAGEMENT
+// ============================================================
+
+export const getAllPermissions = async () => {
+    try {
+        const response = await axiosInstance.get('/admin/permissions');
+        return response.data;
+    } catch (error) {
+        console.error("Get Permissions Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const getRolePermissions = async (roleId) => {
+    try {
+        const response = await axiosInstance.get(`/admin/roles/${roleId}/permissions`);
+        return response.data;
+    } catch (error) {
+        console.error("Get Role Permissions Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const assignPermissionsToRole = async (roleId, permissionIds) => {
+    try {
+        // Expects an array of permission IDs
+        const response = await axiosInstance.post(`/admin/roles/${roleId}/permissions`, { 
+            permission_ids: permissionIds 
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Assign Permissions Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// ============================================================
+// 👤 ADMIN USER MANAGEMENT
+// ============================================================
+
+export const createAdmin = async (adminData) => {
+    try {
+        const response = await axiosInstance.post('/admin/admins', adminData);
+        return response.data;
+    } catch (error) {
+        console.error("Create Admin Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const getAdmins = async () => {
+    try {
+        const response = await axiosInstance.get('/admin/admins');
+        return response.data;
+    } catch (error) {
+        console.error("Get Admins Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const getCurrentAdminProfile = async () => {
+    try {
+        const response = await axiosInstance.get('/admin/admins/me');
+        return response.data;
+    } catch (error) {
+        console.error("Get Current Profile Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const updateAdmin = async (adminId, updatedData) => {
+    try {
+        const response = await axiosInstance.put(`/admin/admins/${adminId}`, updatedData);
+        return response.data;
+    } catch (error) {
+        console.error("Update Admin Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const deleteAdmin = async (adminId) => {
+    try {
+        const response = await axiosInstance.delete(`/admin/admins/${adminId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Delete Admin Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const changeAdminPassword = async (adminId, passwordData) => {
+    try {
+        const response = await axiosInstance.post(`/admin/admins/${adminId}/change-password`, passwordData);
+        return response.data;
+    } catch (error) {
+        console.error("Password Change Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+export const toggleAdminStatus = async (adminId) => {
+    try {
+        const response = await axiosInstance.post(`/admin/admins/${adminId}/toggle-status`);
+        return response.data;
+    } catch (error) {
+        console.error("Toggle Status Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+

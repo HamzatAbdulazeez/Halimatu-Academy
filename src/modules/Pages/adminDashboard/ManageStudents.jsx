@@ -44,7 +44,7 @@ const ManageStudents = () => {
       notify.success(`${selectedUser.first_name} has been deleted successfully`);
       setIsDeleteModalOpen(false);
       fetchData();
-    } catch (err) {
+    } catch {
       notify.error("Failed to delete student. Please try again.");
     }
   };
@@ -58,7 +58,7 @@ const ManageStudents = () => {
       notify.success("Student information updated successfully");
       setIsEditModalOpen(false);
       fetchData();
-    } catch (err) {
+    } catch {
       notify.error("Failed to update student information");
     }
   };
@@ -178,7 +178,7 @@ const ManageStudents = () => {
                   <tr key={student.id} className="hover:bg-gray-50/70 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 bg-gradient-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white font-semibold text-xl ">
+                        <div className="w-11 h-11 bg-linear-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white font-semibold text-xl ">
                           {student.first_name?.[0]?.toUpperCase() || 'S'}
                         </div>
                         <div>
@@ -248,7 +248,7 @@ const ManageStudents = () => {
 
             <div className="space-y-6">
               <div className="flex items-center gap-5">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
+                <div className="w-20 h-20 bg-linear-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
                   {selectedUser.first_name?.[0]}
                 </div>
                 <div>

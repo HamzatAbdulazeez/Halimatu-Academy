@@ -77,7 +77,7 @@ const Settings = () => {
       try {
         const data = await getProfile();
         applyProfile(data);
-      } catch (err) {
+      } catch {
         const stored = localStorage.getItem("user");
         if (stored) {
           applyProfile(JSON.parse(stored));
@@ -140,7 +140,7 @@ const Settings = () => {
         }
 
         notify.success("Profile picture updated successfully!");
-      } catch (err) {
+      } catch {
         notify.error("Failed to upload picture. Please try again.");
         // Revert to null or old image on failure
         setProfile((prev) => ({ ...prev, profile_picture: null }));

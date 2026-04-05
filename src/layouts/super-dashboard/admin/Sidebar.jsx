@@ -15,7 +15,10 @@ import {
   FaLink,
   FaListUl,
   FaChevronDown,
+  FaShieldAlt,
 } from "react-icons/fa";
+import { UserCheck } from "lucide-react";
+
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -78,7 +81,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       // Complete cleanup
       localStorage.removeItem("adminToken");
       localStorage.removeItem("adminUser");
-      localStorage.removeItem("token"); // Clean up standard keys too
+      localStorage.removeItem("token"); 
       localStorage.removeItem("user");
       sessionStorage.clear();
 
@@ -155,6 +158,20 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
           <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard />} text="Subscriptions" onClick={handleLinkClick} />
           <SidebarItem to="/admin/certificates" icon={<FaCertificate />} text="Certificates" onClick={handleLinkClick} />
+          <SidebarItem
+            to="/admin/roles"
+            icon={<FaShieldAlt />}
+            text="Roles & Permissions"
+            onClick={handleLinkClick}
+          />
+
+<SidebarItem
+            to="/admin/staff"
+            icon={<UserCheck />}
+            text="Staff Management"
+            onClick={handleLinkClick}
+          />
+          
           <SidebarItem to="/admin/notifications" icon={<FaBell />} text="Notifications" onClick={handleLinkClick} />
           <SidebarItem to="/admin/settings" icon={<FaCog />} text="Settings" onClick={handleLinkClick} />
         </nav>

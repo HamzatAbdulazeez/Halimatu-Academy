@@ -132,7 +132,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               </div>
             )}
 
-            <div className="max-w-[140px] truncate">
+            <div className="max-w-35 truncate">
               <p className="font-medium text-white truncate text-sm">{studentInfo.name}</p>
               <p className="text-[10px] text-white/60 uppercase tracking-widest font-semibold">Student Account</p>
             </div>

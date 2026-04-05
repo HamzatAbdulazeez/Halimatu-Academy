@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-
-// ✅ Moved trigger outside to keep the component clean
-const triggerProfileSync = () => {
-  window.dispatchEvent(new Event("storage"));
-};
-
 const StudentWelcomeDashboard = () => {
   const [user, setUser] = useState(null);
 
