@@ -151,7 +151,7 @@ export default function Header() {
                   )}
                 </div>
 
-                <NavLink to="/knowledge-series" className={linkClasses}>Knowledge Series</NavLink>
+                {/* <NavLink to="/knowledge-series" className={linkClasses}>Knowledge Series</NavLink> */}
                 <NavLink to="/faqs" className={linkClasses}>FAQs</NavLink>
                 <NavLink to="/contact" className={linkClasses}>Contact Us</NavLink>
 

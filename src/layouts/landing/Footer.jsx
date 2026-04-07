@@ -33,7 +33,7 @@ const Footer = () => {
                 </h3>
                 <p className="text-white">{t.footer.subscribeDescription}</p>
               </div>
-              
+
               <div className="w-full md:w-auto">
                 <div className="flex gap-2 max-w-md">
                   <input
@@ -54,11 +54,11 @@ const Footer = () => {
         {/* Main Footer Content */}
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            
+
             {/* About Column */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <h2 className="text-3xl font-bold bg-white bg-clip-text text-transparent">
+                <h2 className="text-2xl font-bold bg-white bg-clip-text text-transparent">
                   {t.footer.aboutTitle}
                 </h2>
                 <p className="text-gray-400 leading-relaxed">
@@ -159,19 +159,9 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/10">
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white">
-              <p className="flex items-center gap-2">
-                {t.footer.copyright(currentYear)}
-              </p>
-              
-              <div className="flex flex-wrap items-center justify-center gap-6">
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.privacyPolicy}</a>
-                <span className="text-gray-600">•</span>
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.termsOfService}</a>
-                <span className="text-gray-600">•</span>
-                <a href="#" className="hover:text-[#004aad] transition-colors duration-300">{t.footer.cookiePolicy}</a>
-              </div>
-            </div>
+            <p className="text-center text-sm flex items-center justify-center gap-2">
+              {t.footer.copyright(currentYear)}
+            </p>
           </div>
         </div>
       </div>

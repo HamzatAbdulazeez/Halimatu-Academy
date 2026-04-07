@@ -314,9 +314,9 @@ export default function HSARegistration() {
   // ─── Success screen ────────────────────────────────────────────────────────
   if (registered) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center p-6">
         <div className="max-w-lg w-full bg-white rounded-2xl p-10 text-center shadow-sm">
-          <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Account Created Successfully!</h1>
@@ -349,7 +349,7 @@ export default function HSARegistration() {
 
   // ─── Main registration form ────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-sm">
 
         {/* Header */}
@@ -403,7 +403,7 @@ export default function HSARegistration() {
             </div>
 
             {/* Middle Name */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Middle Name <span className="text-gray-400 text-xs font-normal">(optional)</span>
               </label>
@@ -415,7 +415,7 @@ export default function HSARegistration() {
                 placeholder="e.g. Umar"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none placeholder-gray-400 focus:border-[#004aad] transition"
               />
-            </div>
+            </div> */}
 
             {/* ── Contact ─────────────────────────────────────────────────────── */}
             <div className="grid md:grid-cols-2 gap-5">

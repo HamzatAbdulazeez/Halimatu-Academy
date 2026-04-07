@@ -22,9 +22,20 @@ const ManageStudents = () => {
   const fetchData = async () => {
     try {
       const [usersRes, statsRes] = await Promise.all([getUsers(), getUserStats()]);
-      setStudents(Array.isArray(usersRes) ? usersRes : usersRes?.data || []);
-      if (statsRes) setStats(statsRes);
-    } catch {
+  
+      const userData = Array.isArray(usersRes) ? usersRes : usersRes?.data || [];
+      setStudents(userData);
+
+      const s = statsRes?.data || statsRes || {};
+      setStats({
+        total:    s.total    ?? s.total_students    ?? userData.length,
+        active:   s.active   ?? s.active_students   ?? 0,
+        inactive: s.inactive ?? s.inactive_students ?? 0,
+        verified: s.verified ?? s.verified_students ?? 0,
+      });
+  
+    } catch (err) {
+      console.error("Fetch error:", err);     
       notify.error("Failed to load students data");
     } finally {
       setLoading(false);

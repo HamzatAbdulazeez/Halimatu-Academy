@@ -14,7 +14,7 @@ export default function NewHome() {
             <NextBanner />
             <TheProgram />
             <IslamicQuote />
-            <LearningPathSection />
+            {/* <LearningPathSection /> */}
             <TestimonialsFAQs />
         </>
     );

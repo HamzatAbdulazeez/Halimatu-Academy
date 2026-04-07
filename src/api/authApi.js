@@ -518,3 +518,60 @@ export const toggleAdminStatus = async (adminId) => {
     }
 };
 
+export const getDashboardStats = async () => {
+    const response = await axiosInstance.get("/admin/dashboard/stats");
+    return response.data?.data || response.data;
+  };
+
+
+  // ── Plans ──
+export const getPlans = async () => {
+    const res = await axiosInstance.get("/admin/plans");
+    return res.data;
+  };
+  
+  export const getPlan = async (planId) => {
+    const res = await axiosInstance.get(`/admin/plans/${planId}`);
+    return res.data;
+  };
+  
+  export const createPlan = async (payload) => {
+    const res = await axiosInstance.post("/admin/plans", payload);
+    return res.data;
+  };
+  
+  export const updatePlan = async (planId, payload) => {
+    const res = await axiosInstance.put(`/admin/plans/${planId}`, payload);
+    return res.data;
+  };
+  
+  export const deletePlan = async (planId) => {
+    const res = await axiosInstance.delete(`/admin/plans/${planId}`);
+    return res.data;
+  };
+  
+  // ── Subscriptions ──
+  export const getSubscriptions = async () => {
+    const res = await axiosInstance.get("/admin/subscriptions");
+    return res.data;
+  };
+  
+  export const getSubscriptionStats = async () => {
+    const res = await axiosInstance.get("/admin/subscriptions/stats");
+    return res.data;
+  };
+  
+  export const getSubscription = async (subscriptionId) => {
+    const res = await axiosInstance.get(`/admin/subscriptions/${subscriptionId}`);
+    return res.data;
+  };
+  
+  export const cancelSubscription = async (subscriptionId) => {
+    const res = await axiosInstance.post(`/admin/subscriptions/${subscriptionId}/cancel`);
+    return res.data;
+  };
+  
+  export const getUserSubscriptions = async (userId) => {
+    const res = await axiosInstance.get(`/admin/users/${userId}/subscriptions`);
+    return res.data;
+  };

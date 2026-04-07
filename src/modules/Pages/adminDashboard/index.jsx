@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Users, BookOpen, Award, Video, UserCheck, Clock, DollarSign, UserX } from 'lucide-react';
-import { getUserStats, getUsers } from "../../../api/authApi";
+import {
+  Users, BookOpen, Award, Video, UserCheck,
+  DollarSign, UserX, TrendingUp, Activity
+} from 'lucide-react';
+import { getDashboardStats, getUsers } from "../../../api/authApi";
 
 const AdminDashboard = () => {
-  const [students, setStudents] = useState([]); 
-  const [statsData, setStatsData] = useState({ active: 0, verified: 0, inactive: 0 });
+  const [students, setStudents] = useState([]);
+  const [statsData, setStatsData] = useState({
+    total_students: 0,
+    active_students: 0,
+    inactive_students: 0,
+    verified_students: 0,
+    total_revenue: "0.00",
+    recent_activity_count: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   const storedAdmin = JSON.parse(
@@ -16,21 +26,21 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [statsRes, usersRes] = await Promise.all([
-          getUserStats(),
+          getDashboardStats(),   // ← now uses the correct endpoint
           getUsers()
         ]);
 
-        // 1. Handle Users Data
         const userData = Array.isArray(usersRes) ? usersRes : usersRes?.data || [];
         setStudents(userData);
 
-        // 2. Handle Stats Data (Added inactive here)
         setStatsData({
-          active: statsRes?.active || 0,
-          verified: statsRes?.verified || 0,
-          inactive: statsRes?.inactive || 0 
+          total_students:        statsRes?.total_students        ?? 0,
+          active_students:       statsRes?.active_students       ?? 0,
+          inactive_students:     statsRes?.inactive_students     ?? 0,
+          verified_students:     statsRes?.verified_students     ?? 0,
+          total_revenue:         statsRes?.total_revenue         ?? "0.00",
+          recent_activity_count: statsRes?.recent_activity_count ?? 0,
         });
-
       } catch (err) {
         console.error("Dashboard sync error:", err);
       } finally {
@@ -41,39 +51,69 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const formatRevenue = (val) => {
+    const num = parseFloat(val);
+    if (isNaN(num)) return "$0";
+    if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
+    if (num >= 1_000)     return `$${(num / 1_000).toFixed(1)}K`;
+    return `$${num.toFixed(2)}`;
+  };
+
   const stats = [
     {
-      title: 'Total Students',
-      value: students.length, 
-      change: '+12%', 
-      icon: Users,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50'
+      title:   'Total Students',
+      value:   statsData.total_students,
+      change:  '+12%',
+      icon:    Users,
+      color:   'text-blue-500',
+      bgColor: 'bg-blue-50',
+      positive: true,
     },
     {
-      title: 'Active Students',
-      value: statsData.active,
-      change: '100%',
-      icon: BookOpen,
-      color: 'text-emerald-500',
-      bgColor: 'bg-emerald-50'
+      title:   'Active Students',
+      value:   statsData.active_students,
+      change:  '+8%',
+      icon:    BookOpen,
+      color:   'text-emerald-500',
+      bgColor: 'bg-emerald-50',
+      positive: true,
     },
     {
-      title: 'Inactive Students',
-      value: statsData.inactive,
-      change: '0%', 
-      icon: UserX,
-      color: 'text-red-500',
-      bgColor: 'bg-red-50'
+      title:   'Inactive Students',
+      value:   statsData.inactive_students,
+      change:  '-3%',
+      icon:    UserX,
+      color:   'text-red-500',
+      bgColor: 'bg-red-50',
+      positive: false,
     },
     {
-      title: 'Verified Users',
-      value: statsData.verified,
-      change: '+18%',
-      icon: Award,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-50'
-    }
+      title:   'Verified Users',
+      value:   statsData.verified_students,
+      change:  '+18%',
+      icon:    Award,
+      color:   'text-orange-500',
+      bgColor: 'bg-orange-50',
+      positive: true,
+    },
+    {
+      title:   'Total Revenue',
+      value:   formatRevenue(statsData.total_revenue),
+      change:  '+22%',
+      icon:    DollarSign,
+      color:   'text-violet-500',
+      bgColor: 'bg-violet-50',
+      positive: true,
+    },
+    {
+      title:   'Recent Activity',
+      value:   statsData.recent_activity_count,
+      change:  'last 30d',
+      icon:    Activity,
+      color:   'text-sky-500',
+      bgColor: 'bg-sky-50',
+      positive: true,
+    },
   ];
 
   const recentEnrollments = [...students]
@@ -83,16 +123,21 @@ const AdminDashboard = () => {
   return (
     <div className="">
       <div className="space-y-6">
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-black mb-2">Welcome Back, {adminName}! 👋</h1>
-            <p className="text-black text-sm">Monitor your academy's growth and student activity</p>
+            <h1 className="text-2xl font-bold text-black mb-2">
+              Welcome Back, {adminName}! 👋
+            </h1>
+            <p className="text-black text-sm">
+              Monitor your academy's growth and student activity
+            </p>
           </div>
         </div>
 
-        {/* Stats Grid - Updated to grid-cols-4 for the new card */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Grid — 6 cards, 3 per row on large screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -101,7 +146,7 @@ const AdminDashboard = () => {
                   <div className={`p-3 ${stat.bgColor} rounded-xl`}>
                     <Icon className={`w-6 h-6 ${stat.color}`} style={{ strokeWidth: 2.5 }} />
                   </div>
-                  <span className={`text-sm font-semibold ${stat.title === 'Inactive Students' ? 'text-red-600' : 'text-green-600'}`}>
+                  <span className={`text-sm font-semibold ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
                     {stat.change}
                   </span>
                 </div>
@@ -114,20 +159,24 @@ const AdminDashboard = () => {
           })}
         </div>
 
+        {/* Recent Enrollments + Live Sessions */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recent Enrollments Table */}
           <div className="lg:col-span-2 bg-white rounded-md p-6 border border-gray-50">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <UserCheck className="w-5 h-5 text-[#004aad]" />
                 Recent Enrollments
               </h2>
-              <a href="/admin/students" className="text-[#004aad] font-semibold text-sm hover:underline">View All</a>
+              <a href="/admin/students" className="text-[#004aad] font-semibold text-sm hover:underline">
+                View All
+              </a>
             </div>
-
             <div className="space-y-3">
               {recentEnrollments.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-[#004aad] rounded-full flex items-center justify-center text-white font-bold">
                       {user.first_name?.[0]}
@@ -146,14 +195,15 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Sessions Placeholder */}
           <div className="bg-white rounded-md p-6 border border-gray-50">
-             <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-6">
               <Video className="w-5 h-5 text-[#004aad]" />
               <h2 className="text-xl font-bold text-gray-900">Live Sessions</h2>
             </div>
             <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl text-center">
-              <p className="text-sm text-blue-800 font-medium">No live sessions currently scheduled.</p>
+              <p className="text-sm text-blue-800 font-medium">
+                No live sessions currently scheduled.
+              </p>
             </div>
           </div>
         </div>
@@ -173,6 +223,7 @@ const AdminDashboard = () => {
             <h3 className="font-semibold text-gray-900">Certificates</h3>
           </div>
         </div>
+
       </div>
     </div>
   );

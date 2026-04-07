@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Eye, EyeOff, Loader2, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { notify } from "../../utils/toast"; // Using your custom toast utility
+import { notify } from "../../utils/toast";
 import { adminLogin } from "../../api/authApi";
 
 const PASSWORD_RULES = [
@@ -32,7 +32,8 @@ export default function AdminLoginPage() {
     }));
 
     const allRulesPassed = passwordRuleResults.every((r) => r.passed);
-    const showChecklist = passwordFocused || (touched.password && loginData.password.length > 0 && !allRulesPassed);
+    const showChecklist =
+        passwordFocused || (touched.password && loginData.password.length > 0 && !allRulesPassed);
 
     const validateField = useCallback((name, value) => {
         if (name === "email") {
@@ -42,7 +43,6 @@ export default function AdminLoginPage() {
         }
         if (name === "password") {
             if (!value) return "Password is required.";
-            // Check rules individually for the error message
             if (value.length < 8) return "Password must be at least 8 characters.";
             if (!/[A-Z]/.test(value)) return "Missing uppercase letter.";
             if (!/[a-z]/.test(value)) return "Missing lowercase letter.";
@@ -76,7 +76,8 @@ export default function AdminLoginPage() {
         setFieldErrors({ email: emailErr, password: passwordErr });
 
         if (emailErr || passwordErr) {
-            notify.error(emailErr || passwordErr);
+            if (emailErr) notify.error(emailErr);
+            if (passwordErr) setTimeout(() => notify.error(passwordErr), 100); // 100ms gap
             return;
         }
 
@@ -98,9 +99,9 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            // === THE FIX: Handle role as an object ===
+            // Handle role as an object or string
             let roleName = "";
-            if (adminUser.role && typeof adminUser.role === 'object') {
+            if (adminUser.role && typeof adminUser.role === "object") {
                 roleName = adminUser.role.name || adminUser.role.slug || "";
             } else {
                 roleName = adminUser.role || "";
@@ -132,8 +133,32 @@ export default function AdminLoginPage() {
             }, 1200);
 
         } catch (err) {
-            const msg = err.response?.data?.message || "Invalid Admin Credentials.";
-            notify.error(msg);
+            // ✅ FIX 2: Handle all possible API error shapes
+            const data = err?.response?.data;
+
+            if (Array.isArray(data?.errors)) {
+                // e.g. { errors: ["Email not found", "Wrong password"] }
+                data.errors.forEach((e) =>
+                    notify.error(typeof e === "string" ? e : e?.message || "An error occurred.")
+                );
+            } else if (Array.isArray(data?.messages)) {
+                // e.g. { messages: ["Invalid email", "Wrong password"] }
+                data.messages.forEach((m) => notify.error(m));
+            } else if (data?.message) {
+                // e.g. { message: "Invalid credentials" }
+                notify.error(data.message);
+            } else if (data?.error) {
+                // e.g. { error: "Unauthorized" }
+                notify.error(data.error);
+            } else if (typeof data === "string" && data.trim()) {
+                // plain string response body
+                notify.error(data);
+            } else if (err?.message) {
+                // network errors like "Network Error" or "timeout"
+                notify.error(err.message);
+            } else {
+                notify.error("Invalid Admin Credentials.");
+            }
         } finally {
             setLoading(false);
         }
@@ -162,6 +187,8 @@ export default function AdminLoginPage() {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6" noValidate>
+
+                    {/* Email Field */}
                     <div>
                         <label className="block text-sm font-medium text-black mb-2">Email</label>
                         <input
@@ -171,11 +198,19 @@ export default function AdminLoginPage() {
                             value={loginData.email}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            className={`w-full p-4 border rounded-md text-sm outline-none transition ${touched.email && fieldErrors.email ? "border-red-500" : "border-gray-300 focus:border-[#004aad]"
-                                }`}
+                            className={`w-full p-4 border rounded-md text-sm outline-none transition ${
+                                touched.email && fieldErrors.email
+                                    ? "border-red-500"
+                                    : "border-gray-300 focus:border-[#004aad]"
+                            }`}
                         />
+                        {/* Inline error message under email */}
+                        {touched.email && fieldErrors.email && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
+                        )}
                     </div>
 
+                    {/* Password Field */}
                     <div>
                         <label className="block text-sm font-medium text-black mb-2">Password</label>
                         <div className="relative">
@@ -186,9 +221,15 @@ export default function AdminLoginPage() {
                                 value={loginData.password}
                                 onChange={handleChange}
                                 onFocus={() => setPasswordFocused(true)}
-                                onBlur={(e) => { setPasswordFocused(false); handleBlur(e); }}
-                                className={`w-full p-4 border rounded-md text-sm outline-none transition ${touched.password && fieldErrors.password ? "border-red-500" : "border-gray-300 focus:border-[#004aad]"
-                                    }`}
+                                onBlur={(e) => {
+                                    setPasswordFocused(false);
+                                    handleBlur(e);
+                                }}
+                                className={`w-full p-4 border rounded-md text-sm outline-none transition ${
+                                    touched.password && fieldErrors.password
+                                        ? "border-red-500"
+                                        : "border-gray-300 focus:border-[#004aad]"
+                                }`}
                             />
                             <button
                                 type="button"
@@ -199,11 +240,26 @@ export default function AdminLoginPage() {
                             </button>
                         </div>
 
+                        {/* Inline error message under password */}
+                        {touched.password && fieldErrors.password && !showChecklist && (
+                            <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
+                        )}
+
+                        {/* Password rules checklist */}
                         {showChecklist && (
                             <ul className="mt-3 space-y-1.5 bg-gray-50 border rounded-md p-3 text-[11px]">
                                 {passwordRuleResults.map((rule) => (
-                                    <li key={rule.id} className={`flex items-center gap-2 ${rule.passed ? "text-green-600" : "text-gray-400"}`}>
-                                        {rule.passed ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                                    <li
+                                        key={rule.id}
+                                        className={`flex items-center gap-2 ${
+                                            rule.passed ? "text-green-600" : "text-gray-400"
+                                        }`}
+                                    >
+                                        {rule.passed ? (
+                                            <CheckCircle2 size={12} />
+                                        ) : (
+                                            <XCircle size={12} />
+                                        )}
                                         {rule.label}
                                     </li>
                                 ))}
@@ -211,22 +267,34 @@ export default function AdminLoginPage() {
                         )}
                     </div>
 
+                    {/* Remember Me */}
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
+                        <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                        />
                         <label>Remember my session</label>
                     </div>
 
+                    {/* Submit Button */}
                     <button
                         type="submit"
                         disabled={loading}
                         className="w-full bg-[#004aad] hover:bg-[#003a8c] text-white py-4 rounded-md font-bold transition flex items-center justify-center gap-2 disabled:opacity-70"
                     >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In to Dashboard"}
+                        {loading ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                            "Sign In to Dashboard"
+                        )}
                     </button>
                 </form>
 
                 <p className="text-center text-xs text-gray-400 mt-6">
-                    <Link to="/login" className="text-[#004aad] font-medium">Student Portal</Link>
+                    <Link to="/login" className="text-[#004aad] font-medium">
+                        Student Portal
+                    </Link>
                 </p>
             </div>
         </div>

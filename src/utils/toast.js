@@ -1,8 +1,24 @@
 import { toast } from "react-toastify";
 
 export const notify = {
-  success: (msg) => toast.success(msg),
-  error: (msg) => toast.error(msg),
-  info: (msg) => toast.info(msg),
-  warning: (msg) => toast.warning(msg),
+  error: (message) =>
+    toast.error(message, {
+      toastId: message, 
+      position: "top-right",
+      autoClose: 4000,
+    }),
+
+  success: (message) =>
+    toast.success(message, {
+      toastId: message,
+      position: "top-right",
+      autoClose: 3000,
+    }),
+
+  info: (message) =>
+    toast.info(message, {
+      toastId: message,
+      position: "top-right",
+      autoClose: 3000,
+    }),
 };
