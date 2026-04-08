@@ -218,6 +218,116 @@ export const removeProfilePicture = async () => {
     }
   };
 
+  // ====================== GET PLANS ======================
+  export const getUserPlans = async () => {
+    try {
+      const response = await axiosInstance.get("/user/plans");
+      return response.data;
+    } catch (error) {
+      console.error("Get User Plans Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== GET SINGLE PLAN ======================
+  export const getUserPlanById = async (planId) => {
+    try {
+      const response = await axiosInstance.get(`/user/plans/${planId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Get User Plan Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== GET MY SUBSCRIPTIONS ======================
+  export const getMySubscriptions = async () => {
+    try {
+      const response = await axiosInstance.get("/user/my-subscriptions");
+      return response.data;
+    } catch (error) {
+      console.error("Get My Subscriptions API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== GET MY ACTIVE SUBSCRIPTION ======================
+  export const getMyActiveSubscription = async () => {
+    try {
+      const response = await axiosInstance.get("/user/my-active-subscription");
+      return response.data;
+    } catch (error) {
+      console.error("Get Active Subscription API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== GET MY SUBSCRIPTION STATUS ======================
+  export const getMySubscriptionStatus = async () => {
+    try {
+      const response = await axiosInstance.get("/user/my-subscription-status");
+      return response.data;
+    } catch (error) {
+      console.error("Get Subscription Status API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== INITIATE SUBSCRIPTION ======================
+  export const initiateSubscription = async (payload) => {
+    try {
+      const response = await axiosInstance.post("/user/subscribe/initiate", payload);
+      return response.data;
+    } catch (error) {
+      console.error("Initiate Subscription API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== VERIFY PAYMENT ======================
+  export const verifyPayment = async (payload) => {
+    try {
+      const response = await axiosInstance.post("/user/subscribe/verify", payload);
+      return response.data;
+    } catch (error) {
+      console.error("Verify Payment API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== ACTIVATE SUBSCRIPTION ======================
+  export const activateSubscription = async (payload) => {
+    try {
+      const response = await axiosInstance.post("/user/subscribe/activate", payload);
+      return response.data;
+    } catch (error) {
+      console.error("Activate Subscription API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== CANCEL SUBSCRIPTION ======================
+  export const cancelSubscriptionForUser = async (subscriptionId) => {
+    try {
+      const response = await axiosInstance.post(`/user/subscriptions/${subscriptionId}/cancel`);
+      return response.data;
+    } catch (error) {
+      console.error("Cancel Subscription API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // ====================== TOGGLE AUTO RENEW ======================
+  export const toggleAutoRenew = async (subscriptionId) => {
+    try {
+      const response = await axiosInstance.post(`/user/subscriptions/${subscriptionId}/toggle-auto-renew`);
+      return response.data;
+    } catch (error) {
+      console.error("Toggle Auto Renew API Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+
 
 
 
@@ -519,20 +629,36 @@ export const toggleAdminStatus = async (adminId) => {
 };
 
 export const getDashboardStats = async () => {
-    const response = await axiosInstance.get("/admin/dashboard/stats");
-    return response.data?.data || response.data;
+    try {
+      const response = await axiosInstance.get("/admin/dashboard/stats");
+      // This covers: { data: { stats } } OR { total_students: ... }
+      return response.data?.data || response.data;
+    } catch (error) {
+      console.error("API Call Failed:", error.response?.data || error.message);
+      throw error;
+    }
   };
 
 
   // ── Plans ──
-export const getPlans = async () => {
-    const res = await axiosInstance.get("/admin/plans");
-    return res.data;
+  export const getAdminPlans = async () => {
+    try {
+      const res = await axiosInstance.get("/admin/plans");
+      return res.data;
+    } catch (error) {
+      console.error("Admin Get Plans Error:", error.response?.data || error.message);
+      throw error;
+    }
   };
   
-  export const getPlan = async (planId) => {
-    const res = await axiosInstance.get(`/admin/plans/${planId}`);
-    return res.data;
+  export const getAdminPlanById = async (planId) => {
+    try {
+      const res = await axiosInstance.get(`/admin/plans/${planId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Admin Get Plan Error:", error.response?.data || error.message);
+      throw error;
+    }
   };
   
   export const createPlan = async (payload) => {

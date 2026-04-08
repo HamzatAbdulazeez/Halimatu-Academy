@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Users, Calendar, Edit, Plus, X, Trash2, BarChart2 } from 'lucide-react';
 import {
-  getPlans, createPlan, updatePlan, deletePlan,
+  getAdminPlans, createPlan, updatePlan, deletePlan,
   getSubscriptions, getSubscriptionStats
 } from "../../../api/authApi";
 import { notify } from "../../../utils/toast";
@@ -36,7 +36,7 @@ const SubscriptionsPage = () => {
     setLoading(true);
     try {
       const [plansRes, subsRes] = await Promise.all([
-        getPlans(),
+        getAdminPlans(),
         getSubscriptions(),
       ]);
       setPlans(Array.isArray(plansRes) ? plansRes : plansRes?.data || []);

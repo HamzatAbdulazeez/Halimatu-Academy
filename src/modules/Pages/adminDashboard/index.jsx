@@ -34,12 +34,12 @@ const AdminDashboard = () => {
         setStudents(userData);
 
         setStatsData({
-          total_students:        statsRes?.total_students        ?? 0,
-          active_students:       statsRes?.active_students       ?? 0,
-          inactive_students:     statsRes?.inactive_students     ?? 0,
-          verified_students:     statsRes?.verified_students     ?? 0,
-          total_revenue:         statsRes?.total_revenue         ?? "0.00",
-          recent_activity_count: statsRes?.recent_activity_count ?? 0,
+          total_students:        statsRes?.users?.total    ?? 0,
+          active_students:       statsRes?.users?.active   ?? 0,
+          inactive_students:     statsRes?.users?.inactive ?? 0,
+          verified_students:     statsRes?.users?.verified ?? 0,
+          total_revenue:         statsRes?.revenue?.total  ?? "0.00",
+          recent_activity_count: statsRes?.users?.total    ?? 0, 
         });
       } catch (err) {
         console.error("Dashboard sync error:", err);
