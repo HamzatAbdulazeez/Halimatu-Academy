@@ -3,6 +3,7 @@ import { Bell, Menu } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../../../api/authApi";
 import { notify } from "../../../utils/toast";
+import { getImageUrl } from "../../../utils/imageHelper";
 
 export default function Navbar({ toggleSidebar }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -29,12 +30,15 @@ export default function Navbar({ toggleSidebar }) {
     return () => window.removeEventListener("storage", loadUserData);
   }, []);
 
-  const profilePic =
+  const rawPic =
     user?.profile_picture ||
     user?.profile?.profile_picture ||
     user?.image ||
     user?.avatar ||
     null;
+
+  // ✅ Wrap the raw path with the utility to handle the /uploads/ prefix
+  const profilePic = getImageUrl(rawPic);
 
   const initials = (
     (user?.first_name?.charAt(0) || user?.name?.charAt(0) || "") +
@@ -72,10 +76,7 @@ export default function Navbar({ toggleSidebar }) {
     <>
       <nav className="bg-white shadow-md p-6 flex items-center justify-between">
         {/* Sidebar Toggle */}
-        <button
-          className="lg:hidden p-2 text-gray-600"
-          onClick={toggleSidebar}
-        >
+        <button className="lg:hidden p-2 text-gray-600" onClick={toggleSidebar}>
           <Menu size={24} />
         </button>
 
@@ -96,12 +97,17 @@ export default function Navbar({ toggleSidebar }) {
 
           {/* Profile Avatar */}
           <div className="relative">
-            {profilePic ? (
+            {/* ✅ Check if rawPic exists, then use the processed profilePic */}
+            {rawPic ? (
               <img
                 src={profilePic}
                 alt="User"
                 className="w-10 h-10 rounded-full cursor-pointer object-cover ring-2 ring-[#004aad]/10 hover:ring-[#004aad]/30 transition"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onError={(e) => {
+                  e.target.onerror = null; 
+                  e.target.src = "https://ui-avatars.com/api/?name=" + initials + "&background=004aad&color=fff";
+                }}
               />
             ) : (
               <div
@@ -112,23 +118,13 @@ export default function Navbar({ toggleSidebar }) {
               </div>
             )}
 
-            {/* Dropdown */}
+            {/* Dropdown ... same as before */}
             {isDropdownOpen && (
               <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsDropdownOpen(false)}
-                ></div>
-
+                <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)}></div>
                 <div className="absolute right-0 mt-3 w-56 bg-white shadow-xl rounded-xl z-50 border border-gray-100 overflow-hidden">
-                  <div className="px-4 py-4 bg-gray-50/50 border-b border-gray-100">
-                    <p className="text-sm font-bold text-gray-800 truncate">
-                      {[user?.first_name, user?.last_name].filter(Boolean).join(" ") || "Student"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">{user?.email || ""}</p>
-                  </div>
-
-                  <ul className="py-2">
+                  {/* ... Dropdown Content ... */}
+                   <ul className="py-2">
                     <Link to="/student/settings" onClick={() => setIsDropdownOpen(false)}>
                       <li className="px-4 py-2.5 hover:bg-indigo-50 hover:text-[#004aad] transition cursor-pointer text-sm font-medium">
                         Settings

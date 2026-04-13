@@ -11,6 +11,7 @@ import {
   FaCreditCard,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { getImageUrl } from "../../../utils/imageHelper";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -120,17 +121,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >
-            {studentInfo.profile_picture ? (
-              <img
-                src={studentInfo.profile_picture}
-                alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
-                {studentInfo.name.charAt(0).toUpperCase()}
-              </div>
-            )}
+           {studentInfo.profile_picture ? (
+  <img
+    src={getImageUrl(studentInfo.profile_picture)}
+    alt="Profile"
+    className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
+    onError={(e) => { e.target.src = 'https://via.placeholder.com/40'; }} // Fallback if 404
+  />
+) : (
+  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
+    {studentInfo.name.charAt(0).toUpperCase()}
+  </div>
+)}
 
             <div className="max-w-35 truncate">
               <p className="font-medium text-white truncate text-sm">{studentInfo.name}</p>

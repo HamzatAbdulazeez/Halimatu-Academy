@@ -3,6 +3,7 @@ import { Eye, EyeOff, Loader2, CheckCircle2, XCircle, ShieldCheck } from "lucide
 import { Link, useNavigate } from "react-router-dom";
 import { notify } from "../../utils/toast";
 import { adminLogin } from "../../api/authApi";
+import { useAuth } from "../../context/AuthContext"; 
 
 const PASSWORD_RULES = [
     { id: "minLength", label: "At least 8 characters", test: (p) => p.length >= 8 },
@@ -16,6 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function AdminLoginPage() {
     const navigate = useNavigate();
+    const { login: authLogin } = useAuth();
 
     const [showPassword, setShowPassword] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
@@ -77,7 +79,7 @@ export default function AdminLoginPage() {
 
         if (emailErr || passwordErr) {
             if (emailErr) notify.error(emailErr);
-            if (passwordErr) setTimeout(() => notify.error(passwordErr), 100); // 100ms gap
+            if (passwordErr) notify.error(passwordErr);
             return;
         }
 
@@ -89,72 +91,53 @@ export default function AdminLoginPage() {
                 password: loginData.password,
             });
 
-            console.log("🔍 API Response Received:", res);
+            console.log("🔍 API Response:", res);
 
-            const accessToken = res?.access_token || res?.token;
-            const adminUser = res?.admin || {};
+            const accessToken = res?.access_token || res?.token || res?.data?.access_token;
+            const adminUser = res?.admin || res?.user || res?.data?.admin || res?.data || {};
 
             if (!accessToken) {
-                notify.error("Authentication failed: No access token.");
+                notify.error("Authentication failed: No access token received.");
                 return;
             }
 
-            // Handle role as an object or string
-            let roleName = "";
-            if (adminUser.role && typeof adminUser.role === "object") {
-                roleName = adminUser.role.name || adminUser.role.slug || "";
-            } else {
-                roleName = adminUser.role || "";
+            // Normalize role
+            let roleName = "Admin";
+            if (adminUser.role) {
+                if (typeof adminUser.role === "object") {
+                    roleName = adminUser.role.name || adminUser.role.slug || "Admin";
+                } else {
+                    roleName = String(adminUser.role);
+                }
             }
 
-            const role = String(roleName).toLowerCase().trim();
-            const allowedRoles = ["admin", "administrator", "superadmin", "super_admin"];
+            // Login using AuthContext
+            authLogin({
+                id: adminUser.id,
+                name: adminUser.name || adminUser.full_name,
+                email: adminUser.email,
+                role: roleName,
+            }, accessToken, rememberMe);
 
-            console.log("🔍 Extracted Role Name:", role);
+            notify.success(`Welcome back, ${adminUser.name || 'Administrator'}!`);
 
-            if (role && !allowedRoles.includes(role)) {
-                notify.error(`Access Denied: Role "${role}" not authorized.`);
-                return;
-            }
-
-            // Storage logic
-            sessionStorage.setItem("adminToken", accessToken);
-            sessionStorage.setItem("adminUser", JSON.stringify(adminUser));
-
-            if (rememberMe) {
-                localStorage.setItem("adminToken", accessToken);
-                localStorage.setItem("adminUser", JSON.stringify(adminUser));
-            }
-
-            notify.success("Welcome, Administrator!");
-
+            // Redirect to admin dashboard
             setTimeout(() => {
-                navigate("/admin");
-            }, 1200);
+                navigate("/admin");     // Change this if your dashboard route is different
+            }, 1000);
 
         } catch (err) {
-            // ✅ FIX 2: Handle all possible API error shapes
             const data = err?.response?.data;
 
             if (Array.isArray(data?.errors)) {
-                // e.g. { errors: ["Email not found", "Wrong password"] }
-                data.errors.forEach((e) =>
-                    notify.error(typeof e === "string" ? e : e?.message || "An error occurred.")
-                );
+                data.errors.forEach((e) => notify.error(typeof e === "string" ? e : e?.message || "Error"));
             } else if (Array.isArray(data?.messages)) {
-                // e.g. { messages: ["Invalid email", "Wrong password"] }
                 data.messages.forEach((m) => notify.error(m));
             } else if (data?.message) {
-                // e.g. { message: "Invalid credentials" }
                 notify.error(data.message);
             } else if (data?.error) {
-                // e.g. { error: "Unauthorized" }
                 notify.error(data.error);
-            } else if (typeof data === "string" && data.trim()) {
-                // plain string response body
-                notify.error(data);
             } else if (err?.message) {
-                // network errors like "Network Error" or "timeout"
                 notify.error(err.message);
             } else {
                 notify.error("Invalid Admin Credentials.");
@@ -166,13 +149,13 @@ export default function AdminLoginPage() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-8">
-            <div className="w-full max-w-md bg-white rounded-lg p-8 shadow-sm">
+            <div className="w-full max-w-md bg-white rounded-lg p-8">
 
                 <div className="flex justify-center mb-6">
                     <Link to="/">
                         <img
                             src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-                            alt="Halimatu Academy Logo"
+                            alt="Academy Logo"
                             className="w-24 h-auto"
                         />
                     </Link>
@@ -204,7 +187,6 @@ export default function AdminLoginPage() {
                                     : "border-gray-300 focus:border-[#004aad]"
                             }`}
                         />
-                        {/* Inline error message under email */}
                         {touched.email && fieldErrors.email && (
                             <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>
                         )}
@@ -240,12 +222,10 @@ export default function AdminLoginPage() {
                             </button>
                         </div>
 
-                        {/* Inline error message under password */}
                         {touched.password && fieldErrors.password && !showChecklist && (
                             <p className="text-red-500 text-xs mt-1">{fieldErrors.password}</p>
                         )}
 
-                        {/* Password rules checklist */}
                         {showChecklist && (
                             <ul className="mt-3 space-y-1.5 bg-gray-50 border rounded-md p-3 text-[11px]">
                                 {passwordRuleResults.map((rule) => (
@@ -281,7 +261,7 @@ export default function AdminLoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#004aad] hover:bg-[#003a8c] text-white py-4 rounded-md font-bold transition flex items-center justify-center gap-2 disabled:opacity-70"
+                        className="w-full bg-[#004aad] hover:bg-[#003a8c] cursor-pointer text-white py-4 rounded-md font-bold transition flex items-center justify-center gap-2 disabled:opacity-70"
                     >
                         {loading ? (
                             <Loader2 className="w-5 h-5 animate-spin" />

@@ -357,7 +357,7 @@ export default function HSARegistration() {
           <Link to="/">
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-              alt="Halimatu Academy Logo"
+              alt="Academy Logo"
               className="w-20 h-auto mx-auto mb-4"
             />
           </Link>
@@ -401,21 +401,6 @@ export default function HSARegistration() {
                 <FieldError field="lastName" />
               </div>
             </div>
-
-            {/* Middle Name */}
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Middle Name <span className="text-gray-400 text-xs font-normal">(optional)</span>
-              </label>
-              <input
-                type="text"
-                name="middleName"
-                value={formData.middleName}
-                onChange={handleChange}
-                placeholder="e.g. Umar"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none placeholder-gray-400 focus:border-[#004aad] transition"
-              />
-            </div> */}
 
             {/* ── Contact ─────────────────────────────────────────────────────── */}
             <div className="grid md:grid-cols-2 gap-5">

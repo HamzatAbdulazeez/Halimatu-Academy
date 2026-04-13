@@ -1,25 +1,38 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-const AdminProtectedRoute = () => {
+const AdminProtectedRoute = ({ allowedRoles = [] }) => {
+  const { user, loading } = useAuth();
   const location = useLocation();
-  
-  // Check both session and local storage
-  const adminToken = sessionStorage.getItem("adminToken") || localStorage.getItem("adminToken");
-  const adminData = JSON.parse(sessionStorage.getItem("adminUser") || localStorage.getItem("adminUser") || "null");
 
-  // Logic: No token? Not an Admin.
-  if (!adminToken) {
-    console.warn("Unauthorized access attempt to /admin. Redirecting to login.");
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-[#004aad] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-gray-600">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return <Navigate to="/admin-login" state={{ from: location }} replace />;
   }
 
-  // Double check role if your API provides it
-  const role = (adminData?.role?.name || adminData?.role || "").toLowerCase();
-  const validAdminRoles = ["admin", "superadmin", "administrator"];
+  if (allowedRoles.length === 0) {
+    return <Outlet />;
+  }
 
-  if (role && !validAdminRoles.includes(role)) {
-    return <Navigate to="/admin-login" replace />;
+  const userRole = typeof user.role === "object"
+    ? (user.role.name || user.role.slug || "").toLowerCase().trim()
+    : String(user.role || "").toLowerCase().trim();
+
+  const allowed = allowedRoles.map(r => r.toLowerCase().trim());
+
+  if (!allowed.includes(userRole)) {
+    return <Navigate to="/admin/unauthorized" replace />;
   }
 
   return <Outlet />;

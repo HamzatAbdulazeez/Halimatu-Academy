@@ -196,30 +196,64 @@ export const uploadProfilePicture = async (file) => {
     try {
       const formData = new FormData();
       formData.append("file", file); 
+      
       const response = await axiosInstance.post("/user/upload-profile-picture", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+  
+      // The backend returns { profile_picture: "/uploads/image.jpg" }
+      const newPath = response.data.profile_picture;
+  
+      // Update Local Storage so the UI updates instantly
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const updatedUser = { ...storedUser, profile_picture: newPath };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      // This triggers the useEffect listener in your Sidebar components
+      window.dispatchEvent(new Event("storage"));
+  
       return response.data;
     } catch (error) {
-      console.error("Upload Profile Picture API Error:", error.response?.data || error.message);
+      console.error("Upload Error:", error.response?.data || error.message);
       throw error;
     }
   };
-
-
+  
   // ====================== REMOVE PROFILE PICTURE ======================
-export const removeProfilePicture = async () => {
+  export const removeProfilePicture = async () => {
     try {
       const response = await axiosInstance.delete("/user/profile-picture");
+  
+      // Clear from Local Storage
+      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const updatedUser = { ...storedUser, profile_picture: null };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      window.dispatchEvent(new Event("storage"));
+  
       return response.data;
     } catch (error) {
-      console.error("Remove Profile Picture API Error:", error.response?.data || error.message);
+      console.error("Remove Error:", error.response?.data || error.message);
       throw error;
     }
   };
 
-  // ====================== GET PLANS ======================
-  export const getUserPlans = async () => {
+// ====================== GET PLANS ======================
+
+// Temporary: Use admin endpoint so student can see all plans (including newly created ones)
+export const getUserPlans = async () => {
+    try {
+      // For now, we call the admin endpoint so you can see the plans you created
+      const response = await axiosInstance.get("/admin/plans");
+      console.log("✅ getUserPlans called → returned from /admin/plans", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Get User Plans Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  export const getUserPlansOriginal = async () => {
     try {
       const response = await axiosInstance.get("/user/plans");
       return response.data;
@@ -228,8 +262,21 @@ export const removeProfilePicture = async () => {
       throw error;
     }
   };
+
+  // ====================== USER/ STUDENT PLANS  ======================
+  export const getPlans = async () => {
+    try {
+      const response = await axiosInstance.get("/user/plans");
+      console.log("✅ getPlans (Student) called successfully", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Get Student Plans Error:", error.response?.data || error.message);
+      throw error;
+    }
+  };
   
   // ====================== GET SINGLE PLAN ======================
+
   export const getUserPlanById = async (planId) => {
     try {
       const response = await axiosInstance.get(`/user/plans/${planId}`);
@@ -631,7 +678,6 @@ export const toggleAdminStatus = async (adminId) => {
 export const getDashboardStats = async () => {
     try {
       const response = await axiosInstance.get("/admin/dashboard/stats");
-      // This covers: { data: { stats } } OR { total_students: ... }
       return response.data?.data || response.data;
     } catch (error) {
       console.error("API Call Failed:", error.response?.data || error.message);
@@ -640,8 +686,9 @@ export const getDashboardStats = async () => {
   };
 
 
-  // ── Plans ──
-  export const getAdminPlans = async () => {
+ // ──Admin Plans ──
+
+export const adminGetPlans = async () => {
     try {
       const res = await axiosInstance.get("/admin/plans");
       return res.data;
@@ -651,7 +698,7 @@ export const getDashboardStats = async () => {
     }
   };
   
-  export const getAdminPlanById = async (planId) => {
+  export const adminGetPlanById = async (planId) => {
     try {
       const res = await axiosInstance.get(`/admin/plans/${planId}`);
       return res.data;
@@ -661,22 +708,41 @@ export const getDashboardStats = async () => {
     }
   };
   
-  export const createPlan = async (payload) => {
-    const res = await axiosInstance.post("/admin/plans", payload);
-    return res.data;
+  export const adminCreatePlan = async (payload) => {
+    try {
+      const res = await axiosInstance.post("/admin/plans", payload);
+      return res.data;
+    } catch (error) {
+      console.error("❌ Admin Create Plan Failed:", {
+        status: error.response?.status,
+        errors: error.response?.data?.errors || error.response?.data,
+        payloadSent: payload
+      });
+      throw error;
+    }
   };
   
-  export const updatePlan = async (planId, payload) => {
-    const res = await axiosInstance.put(`/admin/plans/${planId}`, payload);
-    return res.data;
+  export const adminUpdatePlan = async (planId, payload) => {
+    try {
+      const res = await axiosInstance.put(`/admin/plans/${planId}`, payload);
+      return res.data;
+    } catch (error) {
+      console.error("Admin Update Plan Error:", error.response?.data || error.message);
+      throw error;
+    }
   };
   
-  export const deletePlan = async (planId) => {
-    const res = await axiosInstance.delete(`/admin/plans/${planId}`);
-    return res.data;
+  export const adminDeletePlan = async (planId) => {
+    try {
+      const res = await axiosInstance.delete(`/admin/plans/${planId}`);
+      return res.data;
+    } catch (error) {
+      console.error("Admin Delete Plan Error:", error.response?.data || error.message);
+      throw error;
+    }
   };
   
-  // ── Subscriptions ──
+  // ── Admin Subscriptions ──
   export const getSubscriptions = async () => {
     const res = await axiosInstance.get("/admin/subscriptions");
     return res.data;
@@ -701,3 +767,6 @@ export const getDashboardStats = async () => {
     const res = await axiosInstance.get(`/admin/users/${userId}/subscriptions`);
     return res.data;
   };
+
+
+  

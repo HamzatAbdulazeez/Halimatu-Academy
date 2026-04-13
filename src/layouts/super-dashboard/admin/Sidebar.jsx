@@ -102,7 +102,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <NavLink to="/" onClick={handleLinkClick}>
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-              alt="Halimatu Academy Logo"
+              alt="Academy Logo"
               className="h-20 w-auto object-contain drop-shadow-lg brightness-110"
               draggable="false"
             />
@@ -129,17 +129,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
             <div className={`overflow-hidden transition-all duration-300 ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
               <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
-                <NavLink
-                  to="/admin/course-management/links"
-                  onClick={handleLinkClick}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
-                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
-                  }
-                >
-                  <FaLink className="shrink-0" />
-                  <span>Schedule & Links</span>
-                </NavLink>
+                
 
                 <NavLink
                   to="/admin/course-management/topics"
@@ -150,7 +140,19 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                   }
                 >
                   <FaListUl className="shrink-0" />
-                  <span>Curriculum Topics</span>
+                  <span>Course and Topics</span>
+                </NavLink>
+
+                <NavLink
+                  to="/admin/course-management/links"
+                  onClick={handleLinkClick}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
+                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
+                  }
+                >
+                  <FaLink className="shrink-0" />
+                  <span>Schedule & Links</span>
                 </NavLink>
               </div>
             </div>

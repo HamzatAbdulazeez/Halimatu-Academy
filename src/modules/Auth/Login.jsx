@@ -128,7 +128,7 @@ export default function LoginPage() {
             if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("user", JSON.stringify(user));
 
-            notify.success("Welcome back! Redirecting to your dashboard...");
+            notify.success("Welcome back! Redirecting to your dashboard");
 
             const role = user.role?.toLowerCase() || "student";
             setTimeout(() => {
@@ -253,7 +253,7 @@ export default function LoginPage() {
                     <Link to="/">
                         <img
                             src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-                            alt="Halimatu Academy Logo"
+                            alt="Academy Logo"
                             className="w-24 h-auto"
                         />
                     </Link>
@@ -367,7 +367,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#004aad] text-white py-3 rounded-md font-medium hover:bg-[#003a8c] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="w-full bg-[#004aad] text-white py-3 cursor-pointer rounded-md font-medium hover:bg-[#003a8c] transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
                     </button>

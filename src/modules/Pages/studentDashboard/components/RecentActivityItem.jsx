@@ -2,7 +2,7 @@ import React from 'react';
 
 const RecentActivityItem = ({ activity }) => (
   <div className="flex gap-4 py-4 border-b border-gray-100 last:border-0">
-    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
+    <div className="shrink-0 w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
       {activity.icon}
     </div>
     <div className="flex-1">
