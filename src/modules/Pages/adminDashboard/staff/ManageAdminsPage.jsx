@@ -193,7 +193,7 @@ const ManageAdminsPage = () => {
         </div>
 
         {/* Search/Filter */}
-        <div className="bg-white rounded-md p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md p-6 border border-gray-100">
           <div className="flex-1 relative max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -207,7 +207,7 @@ const ManageAdminsPage = () => {
         </div>
 
         {/* Admins Table */}
-        <div className="bg-white rounded-md overflow-hidden shadow-sm border border-gray-100">
+        <div className="bg-white rounded-md overflow-hidden border border-gray-100">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">

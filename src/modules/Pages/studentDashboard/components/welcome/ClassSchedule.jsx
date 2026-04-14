@@ -1,8 +1,8 @@
 import React from 'react';
 
 const formatTimeUntil = (minutes) => {
-    if (!minutes || minutes < 0) return "Soon";
-    if (minutes < 60) return `${minutes} minutes`;
+    if (!minutes || minutes < 0) return "Starting soon";
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''}`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''}`;
     const days = Math.floor(hours / 24);
@@ -10,84 +10,116 @@ const formatTimeUntil = (minutes) => {
 };
 
 const copyToClipboard = (text) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
-    alert('Meeting link copied to clipboard!');
+    alert('✅ Meeting link copied to clipboard!');
 };
 
-const ClassSchedule = ({ classes, loading }) => {
+const ClassSchedule = ({ classes = [], loading }) => {
     return (
-        <section className="bg-white rounded-md p-6">
+        <section className="bg-white rounded-xl p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">🕐 Upcoming Class Schedule</h2>
+                <h2 className="text-2xl font-bold text-gray-900">🕐 Upcoming Classes</h2>
+                <span className="text-sm text-gray-500">
+                    {loading ? '...' : `${classes.length} scheduled`}
+                </span>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
                 {loading ? (
-                    <p className="text-gray-400 py-10 text-center">Loading schedule...</p>
+                    <p className="text-gray-400 py-12 text-center">Loading your class schedule...</p>
                 ) : classes.length > 0 ? (
-                    classes.map((cls) => (
-                        <div
-                            key={cls.id}
-                            className={`border-l-4 ${cls.isToday
-                                ? 'border-green-500 bg-green-50'
-                                : 'border-blue-500 bg-white'
-                                } border rounded-lg p-5 transition-shadow`}
-                        >
-                            <div className="flex items-start justify-between flex-wrap gap-3">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                                            Scheduled
-                                        </span>
-                                        {cls.isToday && (
-                                            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold animate-pulse">
-                                                📍 Today!
+                    classes.map((cls) => {
+                        const meetingLink = cls.meeting_link || cls.googleMeetLink || cls.link;
+                        const isToday = cls.isToday || false;
+
+                        return (
+                            <div
+                                key={cls.id}
+                                className={`border-l-4 ${
+                                    isToday 
+                                        ? 'border-emerald-500 bg-emerald-50' 
+                                        : 'border-blue-500 bg-white'
+                                } border rounded-xl p-6 hover:shadow-md transition-all`}
+                            >
+                                <div className="flex flex-col lg:flex-row lg:items-start gap-5">
+                                    {/* Left Content */}
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-3 flex-wrap">
+                                            <span className="px-4 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                                Live Class
                                             </span>
+                                            {isToday && (
+                                                <span className="px-4 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold animate-pulse">
+                                                    📍 Today
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                            {cls.title || cls.session_title || "Class Session"}
+                                        </h3>
+
+                                        <p className="text-gray-600 mb-4">
+                                            {cls.course_title || cls.courseTitle || cls.course_name} • {cls.instructor || "Instructor"}
+                                        </p>
+
+                                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-700">
+                                            <div className="flex items-center gap-2">
+                                                📅 <span>{cls.start_date || cls.scheduledDate || "TBD"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                ⏰ <span>{cls.time || cls.scheduledTime || "TBD"}</span>
+                                            </div>
+                                            {cls.duration && (
+                                                <div className="flex items-center gap-2">
+                                                    ⏱️ <span>{cls.duration}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {cls.minutesUntil != null && (
+                                            <p className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-blue-600 bg-blue-50 px-4 py-1.5 rounded-lg">
+                                                ⏳ Starts in {formatTimeUntil(cls.minutesUntil)}
+                                            </p>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                                        {cls.title || cls.session_title}
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-1">
-                                        {cls.course_title || cls.courseTitle || cls.course_name} • {cls.instructor}
-                                    </p>
-                                    <div className="flex items-center gap-4 text-sm text-gray-700 mt-2 flex-wrap">
-                                        <span>📅 {cls.start_date || cls.scheduledDate}</span>
-                                        <span>⏰ {cls.time || cls.scheduledTime}</span>
-                                        {cls.duration && <span>⏱️ {cls.duration}</span>}
-                                    </div>
-                                    {cls.minutesUntil != null && (
-                                        <p className="text-sm text-blue-600 font-medium mt-2">
-                                            Starts in {formatTimeUntil(cls.minutesUntil)}
-                                        </p>
+
+                                    {/* Join Buttons */}
+                                    {meetingLink && (
+                                        <div className="flex flex-col gap-3 lg:min-w-[180px]">
+                                            <a
+                                                href={meetingLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="bg-[#1a73e8] hover:bg-[#185abc] text-white px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                                            >
+                                                Join Google Meet
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7-7 7M5 12h14" />
+                                                </svg>
+                                            </a>
+
+                                            <button
+                                                onClick={() => copyToClipboard(meetingLink)}
+                                                className="border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-xl font-medium transition-colors"
+                                            >
+                                                📋 Copy Link
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
-                                {(cls.meeting_link || cls.googleMeetLink) && (
-                                    <div className="flex flex-col gap-2">
-                                        <a
-                                            href={cls.meeting_link || cls.googleMeetLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="bg-[#053276] text-white px-6 py-2 rounded-lg hover:bg-[#042050] transition-colors font-medium inline-flex items-center justify-center gap-2"
-                                        >
-                                            <span>Join on Google Meet</span>
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                        </a>
-                                        <button
-                                            onClick={() => copyToClipboard(cls.meeting_link || cls.googleMeetLink)}
-                                            className="bg-gray-100 text-gray-700 px-4 py-1 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-                                        >
-                                            Copy Link
-                                        </button>
-                                    </div>
-                                )}
                             </div>
-                        </div>
-                    ))
+                        );
+                    })
                 ) : (
-                    <p className="text-gray-500 py-10 text-center">No upcoming classes scheduled.</p>
+                    <div className="py-12 text-center">
+                        <div className="text-6xl mb-4">🗓️</div>
+                        <p className="text-gray-500 text-lg">No upcoming classes scheduled yet.</p>
+                        <p className="text-sm text-gray-400 mt-2">
+                            New classes will appear here once your instructor schedules them.
+                        </p>
+                    </div>
                 )}
             </div>
         </section>

@@ -1,91 +1,56 @@
+import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useAuth } from "../../../context/AuthContext"; 
 import { logoutUser } from "../../../api/authApi";
 import { notify } from "../../../utils/toast";
-import {
-  FaHome,
-  FaUsers,
-  FaCog,
-  FaBell,
-  FaSignOutAlt,
-  FaUserGraduate,
-  FaCreditCard,
-  FaCertificate,
-  FaBookOpen,
-  FaLink,
-  FaListUl,
-  FaChevronDown,
-  FaShieldAlt,
-} from "react-icons/fa";
-import { UserCheck } from "lucide-react";
 
+import {
+  FaHome, FaUsers, FaCog, FaBell,
+  FaUserGraduate, FaCreditCard, FaCertificate,
+  FaBookOpen, FaLink, FaListUl, FaChevronDown, FaShieldAlt,
+} from "react-icons/fa";
+import { UserCheck, LogOut } from "lucide-react";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const isCourseActive = location.pathname.startsWith("/admin/course");
+
+  const isCourseActive = location.pathname.startsWith("/admin/course-management");
   const [courseOpen, setCourseOpen] = useState(isCourseActive);
 
-  // Maintain Admin Data with persistent state
-  const [adminInfo, setAdminInfo] = useState({
-    name: "Admin User",
-    role: "Super Admin",
-    profile_picture: null,
-  });
+  // 1. Get user role safely
+  const userRole = user?.role 
+    ? (typeof user.role === "object" ? user.role.name : user.role)
+    : "Admin";
 
-  // ✅ Fixed Effect: Listens for updates and uses the correct Admin keys
-  useEffect(() => {
-    const loadAdmin = () => {
-      // Use the specific key you use for Admins (usually "adminUser" or "user")
-      const stored = localStorage.getItem("adminUser") || localStorage.getItem("user");
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
+  const roleName = String(userRole).toLowerCase().trim();
+  const userEmail = user?.email?.toLowerCase().trim();
 
-          // Safeguard against [object Object] and nested name fields
-          const rawName = parsed.name?.name || parsed.name || parsed.first_name || "Admin User";
+  // 2. MASTER PERMISSIONS 
+  // We check for the specific superadmin email OR the role name
+  const isSuperAdmin = 
+    userEmail === "superadmin@halimatu.com" || 
+    roleName === "super admin" || 
+    roleName === "superadmin";
 
-          setAdminInfo({
-            name: String(rawName),
-            role: parsed.role || "Super Admin",
-            profile_picture: parsed.profile_picture || parsed.profile?.profile_picture || null,
-          });
-        } catch (err) {
-          console.error("Failed to parse admin data", err);
-        }
-      }
-    };
-
-    loadAdmin(); // Initial load
-
-    // ✅ This makes the sidebar update INSTANTLY when you change the profile picture in Settings
-    window.addEventListener("storage", loadAdmin);
-    return () => window.removeEventListener("storage", loadAdmin);
-  }, []);
+  const isAdmin = isSuperAdmin || roleName === "admin";
+  const isContentModerator = isSuperAdmin || isAdmin || roleName === "content moderator";
 
   const handleLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (window.innerWidth < 1024) {
-      toggleSidebar();
-    }
+    if (window.innerWidth < 1024) toggleSidebar();
   };
 
   const handleSignOut = async () => {
     try {
       await logoutUser();
-      notify.success("Admin logged out successfully.");
+      notify.success("Logged out successfully");
     } catch {
-      console.warn("API logout failed, clearing local session.");
-      notify.info("Session cleared locally.");
+      notify.info("Session cleared");
     } finally {
-      // Complete cleanup
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("adminUser");
-      localStorage.removeItem("token"); 
-      localStorage.removeItem("user");
+      localStorage.clear();
       sessionStorage.clear();
-
-      if (window.innerWidth < 1024) toggleSidebar();
       navigate("/admin-login");
     }
   };
@@ -97,12 +62,12 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           p-5 flex flex-col transition-transform duration-300 ease-in-out z-40 overflow-y-auto shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:w-72 w-72`}
       >
-        {/* Logo Section */}
+        {/* Logo */}
         <div className="flex justify-center mb-8 shrink-0">
-          <NavLink to="/" onClick={handleLinkClick}>
+          <NavLink to="/admin" onClick={handleLinkClick}>
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-              alt="Academy Logo"
+              alt="Halimatu Academy Logo"
               className="h-20 w-auto object-contain drop-shadow-lg brightness-110"
               draggable="false"
             />
@@ -112,98 +77,72 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
           <SidebarItem to="/admin" icon={<FaHome />} text="Dashboard" onClick={handleLinkClick} end />
+
+          {/* Students & Enrollments */}
           <SidebarItem to="/admin/students" icon={<FaUsers />} text="Manage Students" onClick={handleLinkClick} />
           <SidebarItem to="/admin/enrollments" icon={<FaUserGraduate />} text="Enrollments" onClick={handleLinkClick} />
 
-          {/* Dropdown for Course Management */}
-          <div>
-            <button
-              onClick={() => setCourseOpen((prev) => !prev)}
-              className={`w-full flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
-                ${isCourseActive ? "bg-white/15 text-white border-l-4 border-white" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
-            >
-              <FaBookOpen className="text-xl opacity-90" />
-              <span className="flex-1 text-left text-sm font-medium">Course Management</span>
-              <FaChevronDown className={`text-xs opacity-70 transition-transform duration-300 ${courseOpen ? "rotate-180" : ""}`} />
-            </button>
+          {/* Course Management - Visible to Super Admin, Admin, Content Moderator */}
+          {isContentModerator && (
+            <div>
+              <button
+                onClick={() => setCourseOpen((prev) => !prev)}
+                className={`w-full flex items-center gap-3 py-3.5 px-4 rounded-xl transition-all duration-200
+                  ${isCourseActive ? "bg-white/15 text-white border-l-4 border-white" : "text-white/90 hover:bg-white/10 hover:text-white"}`}
+              >
+                <FaBookOpen className="text-xl opacity-90" />
+                <span className="flex-1 text-left text-sm font-medium">Course Management</span>
+                <FaChevronDown className={`text-xs opacity-70 transition-transform duration-300 ${courseOpen ? "rotate-180" : ""}`} />
+              </button>
 
-            <div className={`overflow-hidden transition-all duration-300 ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
-              <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
-                
-
-                <NavLink
-                  to="/admin/course-management/topics"
-                  onClick={handleLinkClick}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
-                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
-                  }
-                >
-                  <FaListUl className="shrink-0" />
-                  <span>Course and Topics</span>
-                </NavLink>
-
-                <NavLink
-                  to="/admin/course-management/links"
-                  onClick={handleLinkClick}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs transition-all duration-200
-                    ${isActive ? "bg-white/15 text-white font-semibold" : "text-white/75 hover:bg-white/10 hover:text-white"}`
-                  }
-                >
-                  <FaLink className="shrink-0" />
-                  <span>Schedule & Links</span>
-                </NavLink>
+              <div className={`overflow-hidden transition-all duration-300 ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
+                <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
+                  <SidebarItem to="/admin/course-management/topics" icon={<FaListUl />} text="Courses & Topics" onClick={handleLinkClick} />
+                  <SidebarItem to="/admin/course-management/links" icon={<FaLink />} text="Schedule & Links" onClick={handleLinkClick} />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard />} text="Subscriptions" onClick={handleLinkClick} />
           <SidebarItem to="/admin/certificates" icon={<FaCertificate />} text="Certificates" onClick={handleLinkClick} />
-          <SidebarItem
-            to="/admin/roles"
-            icon={<FaShieldAlt />}
-            text="Roles & Permissions"
-            onClick={handleLinkClick}
-          />
 
-<SidebarItem
-            to="/admin/staff"
-            icon={<UserCheck />}
-            text="Staff Management"
-            onClick={handleLinkClick}
-          />
-          
+          {/* Roles & Staff - Visible to Super Admin & Admin */}
+          {isAdmin && (
+            <>
+              <SidebarItem to="/admin/roles" icon={<FaShieldAlt />} text="Roles & Permissions" onClick={handleLinkClick} />
+              <SidebarItem to="/admin/staff" icon={<UserCheck size={20} />} text="Staff Management" onClick={handleLinkClick} />
+            </>
+          )}
+
           <SidebarItem to="/admin/notifications" icon={<FaBell />} text="Notifications" onClick={handleLinkClick} />
-          <SidebarItem to="/admin/settings" icon={<FaCog />} text="Settings" onClick={handleLinkClick} />
+
+          {/* Settings - Strictly Super Admin */}
+          {isSuperAdmin && (
+            <SidebarItem to="/admin/settings" icon={<FaCog />} text="Settings" onClick={handleLinkClick} />
+          )}
         </nav>
 
-        {/* Profile & Logout Section */}
+        {/* Profile & Logout */}
         <div className="mt-auto pt-6 border-t border-white/20 space-y-4">
           <div className="flex items-center gap-3 p-2">
-            {adminInfo.profile_picture ? (
-              <img
-                src={adminInfo.profile_picture}
-                alt="Profile"
-                className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
-                {adminInfo.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div className="max-w-[150px] truncate">
-              <p className="font-medium text-white truncate text-sm">{adminInfo.name}</p>
-              <p className="text-[10px] text-white/60 uppercase tracking-widest font-semibold">{adminInfo.role}</p>
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
+              {user?.name?.charAt(0)?.toUpperCase() || "S"}
+            </div>
+            <div className="max-w-37.5 truncate">
+              <p className="font-medium text-white truncate text-sm">{user?.name || "Super Admin"}</p>
+              <p className="text-[10px] text-white/70 uppercase tracking-widest font-medium">
+                {isSuperAdmin ? "Super Admin" : userRole}
+              </p>
             </div>
           </div>
 
           <button
             onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 cursor-pointer
-              text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-lg text-sm"
+            className="w-full flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 
+              text-white py-3 px-4 rounded-xl font-bold transition-all duration-200 text-sm"
           >
-            <FaSignOutAlt />
+            <LogOut size={18} />
             LOG OUT
           </button>
         </div>

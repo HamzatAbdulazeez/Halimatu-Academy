@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getStudentEnrolledCourses } from '../../../api/courseApi';
-// import { getStudentUpcomingClasses } from '../../../api/courseApi';
+import { 
+    getStudentEnrolledCourses,
+} from '../../../api/courseApi';
 
 import WelcomeHeader from './components/welcome/WelcomeHeader';
 import QuickStats from './components/welcome/QuickStats';
@@ -11,8 +12,10 @@ import RightSideBar from './components/welcome/RightSide';
 const StudentWelcomeDashboard = () => {
     const [user, setUser] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
-    // const [upcomingClasses, setUpcomingClasses] = useState([]);
+    const [upcomingClasses, setUpcomingClasses] = useState([]);
+    
     const [loading, setLoading] = useState(true);
+    const [loadingClasses, setLoadingClasses] = useState(false);
 
     // Load user from localStorage
     useEffect(() => {
@@ -30,7 +33,7 @@ const StudentWelcomeDashboard = () => {
         return () => window.removeEventListener("storage", loadUserData);
     }, []);
 
-    // Fetch courses — classes API stubbed until endpoint is ready
+    // Fetch Enrolled Courses (Main Data)
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -38,13 +41,15 @@ const StudentWelcomeDashboard = () => {
                 const coursesData = await getStudentEnrolledCourses().catch(() => []);
                 setEnrolledCourses(Array.isArray(coursesData) ? coursesData : []);
 
-                // TODO: Uncomment when classes API is ready
+                // Upcoming Classes - Keep commented until API is ready
+                // setLoadingClasses(true);
                 // const classesData = await getStudentUpcomingClasses().catch(() => []);
                 // setUpcomingClasses(Array.isArray(classesData) ? classesData : []);
             } catch (err) {
-                console.error("Failed to fetch student data:", err);
+                console.error("Failed to fetch dashboard data:", err);
             } finally {
                 setLoading(false);
+                setLoadingClasses(false);
             }
         };
 
@@ -65,24 +70,43 @@ const StudentWelcomeDashboard = () => {
     };
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-5">
             <WelcomeHeader user={user} />
 
-            <div>
-                <QuickStats
-                    enrolledCount={enrolledCourses.length}
-                    classesAttended={learningStats.classesAttended}
-                    currentStreak={learningStats.currentStreak}
-                    loading={loading}
-                />
+            {/* Quick Stats */}
+            <QuickStats
+                enrolledCount={enrolledCourses.length}
+                classesAttended={learningStats.classesAttended}
+                currentStreak={learningStats.currentStreak}
+                loading={loading}
+            />
 
-                <div className="grid lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-8">
-                        <EnrolledCourses courses={enrolledCourses} loading={loading} />
-                        {/* <ClassSchedule classes={upcomingClasses} loading={false} /> */}
+            <div className="grid lg:grid-cols-12 gap-8">
+                {/* Main Content */}
+                <div className="lg:col-span-8 space-y-5">
+                    
+                    {/* Prominent Enrolled Courses Section */}
+                    <div>
+                        
+                        <EnrolledCourses 
+                            courses={enrolledCourses} 
+                            loading={loading} 
+                        />
                     </div>
 
-                    <RightSideBar user={user} learningStats={learningStats} />
+                    {/* Upcoming Classes */}
+                    <ClassSchedule 
+                        classes={upcomingClasses} 
+                        loading={loadingClasses} 
+                    />
+                </div>
+
+                {/* Right Sidebar */}
+                <div className="lg:col-span-4">
+                    <RightSideBar 
+                        user={user} 
+                        learningStats={learningStats} 
+                    />
                 </div>
             </div>
         </div>

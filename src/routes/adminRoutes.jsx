@@ -1,4 +1,3 @@
-// routes/adminRoutes.js
 import { Navigate } from "react-router-dom";
 import AdminProtectedRoute from "../components/AdminProtectedRoute";
 import AdminLayout from "../layouts/super-dashboard/admin";
@@ -20,7 +19,7 @@ import Unauthorized from "../modules/Pages/adminDashboard/Unauthorized";
 
 export const adminRoutes = [
   {
-    element: <AdminProtectedRoute />,           // Base protection
+    element: <AdminProtectedRoute />,          
     children: [
       {
         path: "/admin",

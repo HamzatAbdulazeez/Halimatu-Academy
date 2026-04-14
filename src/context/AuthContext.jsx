@@ -6,62 +6,63 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load user from storage on app start
   useEffect(() => {
     const storedUser = localStorage.getItem('adminUser') || sessionStorage.getItem('adminUser');
     const storedToken = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
 
     if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUser(JSON.parse(storedUser));
+      } catch  {
+        localStorage.clear();
+      }
     }
     setLoading(false);
   }, []);
 
   const login = (userData, token, rememberMe = false) => {
+    // Robust Role Extraction
+    const roleData = userData.role || userData.role_name;
+    const roleName = typeof roleData === 'object' ? roleData.name : String(roleData);
+
     const userToStore = {
       ...userData,
-      role: userData.role || userData.role_name || { name: "Admin" }
+      role: roleName 
     };
 
     setUser(userToStore);
-
-    if (rememberMe) {
-      localStorage.setItem('adminUser', JSON.stringify(userToStore));
-      localStorage.setItem('adminToken', token);
-    } else {
-      sessionStorage.setItem('adminUser', JSON.stringify(userToStore));
-      sessionStorage.setItem('adminToken', token);
-    }
+    const storage = rememberMe ? localStorage : sessionStorage;
+    storage.setItem('adminUser', JSON.stringify(userToStore));
+    storage.setItem('adminToken', token);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('adminUser');
-    localStorage.removeItem('adminToken');
-    sessionStorage.removeItem('adminUser');
-    sessionStorage.removeItem('adminToken');
+    localStorage.clear();
+    sessionStorage.clear();
   };
 
+  // The "Everything" Permission Check
   const hasRole = (allowedRoles) => {
-    if (!user?.role) return false;
-    const userRole = typeof user.role === 'object' 
-      ? user.role.name?.toLowerCase() 
-      : String(user.role).toLowerCase();
+    if (!user) return false;
+
+    if (user.email === 'superadmin@halimatu.com') return true;
+
+    const userRoleNormalized = String(user.role).toLowerCase().replace(/\s+/g, '');
     
-    return allowedRoles.map(r => r.toLowerCase()).includes(userRole);
+    return allowedRoles.some(role => {
+      const allowedNormalized = String(role).toLowerCase().replace(/\s+/g, '');
+      return userRoleNormalized === allowedNormalized || userRoleNormalized === 'superadmin';
+    });
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      logout, 
-      loading,
-      hasRole 
-    }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, hasRole }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

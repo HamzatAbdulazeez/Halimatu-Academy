@@ -1,4 +1,3 @@
-// src/components/GoogleTranslate.jsx
 import { useEffect } from "react";
 
 export default function GoogleTranslate() {

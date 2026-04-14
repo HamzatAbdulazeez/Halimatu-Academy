@@ -149,19 +149,59 @@ export const deleteClass = async (classId) => {
     return res.data;
 };
 
-// ─── STUDENT DASHBOARD APIS ─────────────────────────────────────────────────
-
 // Student Dashboard APIs
 export const getStudentEnrolledCourses = async () => {
     const res = await axiosInstance.get('/user/courses');
     return res.data;
 };
 
-// export const getStudentUpcomingClasses = async () => {
-//     const res = await axiosInstance.get('/user/classes'); 
-//     return res.data;
-// };
+export const getCourseDetails = async (course_id) => {
+    const res = await axiosInstance.get(`/user/courses/${course_id}`);
+    return res.data;
+};
 
+export const getCourseProgress = async (course_id) => {
+    const res = await axiosInstance.get(`/user/courses/${course_id}/progress`);
+    return res.data;
+};
+
+// NEW: Update progress manually (e.g., for custom progress percentage, completed classes, etc.)
+export const updateCourseProgress = async (course_id, progressData) => {
+    const res = await axiosInstance.post(`/user/update-progress/${course_id}`, progressData);
+    return res.data;
+};
+
+export const markTopicComplete = async (topic_id, data = { is_completed: true }) => {
+    const res = await axiosInstance.post(`/user/topics/${topic_id}/complete`, data);
+    return res.data;
+};
+
+export const markClassComplete = async (class_id) => {
+    const res = await axiosInstance.post(`/user/classes/${class_id}/complete`);
+    return res.data;
+};
+
+/**
+ * GET /user/my-certificates
+ * Returns an array of all certificates for the logged-in student.
+ */
+export const getMyCertificates = async () => {
+    const response = await axiosInstance.get("/user/my-certificates");
+    return response.data;
+  };
+
+
+  /**
+ * GET /user/my-certificates/:certificate_id
+ * Returns a single certificate by its numeric ID.
+ * @param {number} certificateId
+ */
+export const getMyCertificateById = async (certificateId) => {
+    const response = await axiosInstance.get(
+      `/user/my-certificates/${certificateId}`
+    );
+    return response.data;
+  };
 
 // ─── ENROLLMENTS API ───────────────────────────────────────────────────────
 
