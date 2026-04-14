@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Video, Plus, ChevronRight, Search, Link2, AlertCircle, BookOpen, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';

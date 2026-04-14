@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, Globe, LayoutDashboard } from "lucide-react"; // Added LayoutDashboard
+import { Menu, X, ChevronDown, Globe, LayoutDashboard, UserCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
+
+import PrivateTutorRequestModal from "../../modules/Home/Components/PrivateTutorRequestModal"; 
 
 export default function Header() {
   const { language, setLanguage } = useLanguage();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isStudyOpen, setIsStudyOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [isTutorModalOpen, setIsTutorModalOpen] = useState(false);
 
   // --- AUTH LOGIC ---
   const [authState, setAuthState] = useState({
@@ -19,9 +23,7 @@ export default function Header() {
 
   useEffect(() => {
     const checkAuth = () => {
-      // Check for Admin tokens
       const adminToken = sessionStorage.getItem("adminToken") || localStorage.getItem("adminToken");
-      // Check for Student tokens
       const studentToken = localStorage.getItem("token");
 
       if (adminToken) {
@@ -46,7 +48,6 @@ export default function Header() {
     };
 
     checkAuth();
-    // Listen for storage changes in other tabs
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
@@ -57,7 +58,7 @@ export default function Header() {
     setIsLangOpen(false);
   };
 
-  // Google Translate Logic (Preserved exactly as you had it)
+  // Google Translate Logic
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -99,8 +100,7 @@ export default function Header() {
   };
 
   const linkClasses = ({ isActive }) =>
-    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD]" : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-    }`;
+    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD]" : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"}`;
 
   const mobileLink = "block w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50";
 
@@ -130,7 +130,7 @@ export default function Header() {
                 <NavLink to="/about" className={linkClasses}>About Us</NavLink>
 
                 {/* STUDY PLAN */}
-                <div className="relative shrink-0">
+                {/* <div className="relative shrink-0">
                   <button
                     onClick={() => { setIsStudyOpen(!isStudyOpen); setIsLangOpen(false); }}
                     className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${isStudyOpen ? "bg-gray-200" : "bg-gray-100 hover:bg-gray-200"}`}
@@ -142,29 +142,44 @@ export default function Header() {
                   {isStudyOpen && (
                     <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-xl border border-gray-100 shadow-lg z-50 overflow-hidden">
                       <NavLink to="/curriculum" onClick={() => setIsStudyOpen(false)} className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                        <div className="font-medium">Curriculum</div>
+                        Curriculum
                       </NavLink>
                       <NavLink to="/schedule" onClick={() => setIsStudyOpen(false)} className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                        <div className="font-medium">Schedule</div>
+                        Schedule
                       </NavLink>
                     </div>
                   )}
-                </div>
+                </div> */}
 
-                {/* <NavLink to="/knowledge-series" className={linkClasses}>Knowledge Series</NavLink> */}
                 <NavLink to="/faqs" className={linkClasses}>FAQs</NavLink>
                 <NavLink to="/contact" className={linkClasses}>Contact Us</NavLink>
 
+                {/* Private Tutor Request Button */}
+                <button
+                  onClick={() => setIsTutorModalOpen(true)}
+                  className="flex items-center gap-2 px-5 py-2 text-sm cursor-pointer font-medium bg-[#004aad] text-white rounded-md hover:bg-[#003a8c] transition-all"
+                >
+                  <UserCheck size={18} />
+                  Private Tutor
+                </button>
+
                 {/* LANGUAGE */}
                 <div className="relative shrink-0">
-                  <button onClick={() => { setIsLangOpen(!isLangOpen); setIsStudyOpen(false); }} className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md">
+                  <button 
+                    onClick={() => { setIsLangOpen(!isLangOpen); setIsStudyOpen(false); }} 
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
+                  >
                     <Globe className="h-4 w-4" />
                     {language.toUpperCase()}
                   </button>
                   {isLangOpen && (
                     <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-md shadow z-50">
                       {["en", "ar"].map((lng) => (
-                        <button key={lng} onClick={() => { changeGoogleLanguage(lng); setIsLangOpen(false); }} className="block w-full px-3 py-2 text-sm text-left hover:bg-gray-50">
+                        <button 
+                          key={lng} 
+                          onClick={() => { changeGoogleLanguage(lng); setIsLangOpen(false); }} 
+                          className="block w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
+                        >
                           {lng.toUpperCase()}
                         </button>
                       ))}
@@ -173,7 +188,7 @@ export default function Header() {
                 </div>
               </nav>
 
-              {/* DESKTOP AUTH - CONDITIONAL RENDERING */}
+              {/* DESKTOP AUTH */}
               <div className="hidden lg:flex items-center gap-3 shrink-0">
                 {authState.isLoggedIn ? (
                   <NavLink to={authState.dashboardUrl}>
@@ -207,7 +222,11 @@ export default function Header() {
               <div className="fixed top-0 right-0 h-full w-80 bg-white p-4 shadow-xl">
                 <div className="flex justify-between items-center border-b border-gray-400 pb-3">
                   <NavLink to="/" onClick={closeAll}>
-                    <img src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png" alt="Logo" className="w-20 h-auto" />
+                    <img 
+                      src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png" 
+                      alt="Logo" 
+                      className="w-20 h-auto" 
+                    />
                   </NavLink>
                   <button onClick={closeAll}><X /></button>
                 </div>
@@ -216,7 +235,19 @@ export default function Header() {
                   <NavLink to="/" className={mobileLink} onClick={closeAll}>Home</NavLink>
                   <NavLink to="/about" className={mobileLink} onClick={closeAll}>About Us</NavLink>
 
-                  {/* AUTH MOBILE - CONDITIONAL RENDERING */}
+                  {/* Private Tutor Request in Mobile Menu */}
+                  <button
+                    onClick={() => {
+                      setIsTutorModalOpen(true);
+                      closeAll();
+                    }}
+                    className="w-full text-left px-3 py-3 text-sm font-medium text-[#004aad] hover:bg-gray-50 rounded-md flex items-center gap-2"
+                  >
+                    <UserCheck size={18} />
+                    Apply for Private Tutor
+                  </button>
+
+                  {/* AUTH MOBILE */}
                   <div className="pt-3 space-y-2">
                     {authState.isLoggedIn ? (
                       <NavLink to={authState.dashboardUrl} onClick={closeAll}>
@@ -228,10 +259,10 @@ export default function Header() {
                     ) : (
                       <>
                         <NavLink to="/login" onClick={closeAll}>
-                          <button className="w-full px-4 py-3 border border-gray-400 rounded-md text-sm">Login</button>
+                          <button className="w-full px-4 py-3 border border-gray-400 cursor-pointer rounded-md text-sm mb-4">Login</button>
                         </NavLink>
                         <NavLink to="/register" onClick={closeAll}>
-                          <button className="w-full px-4 py-3 bg-gradient text-white rounded-md text-sm">Register</button>
+                          <button className="w-full px-4 py-3 bg-gradient text-white cursor-pointer rounded-md text-sm">Register</button>
                         </NavLink>
                       </>
                     )}
@@ -242,6 +273,12 @@ export default function Header() {
           )}
         </header>
       </div>
+
+      {/* Private Tutor Modal */}
+      <PrivateTutorRequestModal 
+        isOpen={isTutorModalOpen} 
+        onClose={() => setIsTutorModalOpen(false)} 
+      />
     </>
   );
 }

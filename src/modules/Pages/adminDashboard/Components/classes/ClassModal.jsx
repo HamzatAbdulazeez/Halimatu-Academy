@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Video, Save, X, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import CopyButton from './CopyButton';
@@ -24,7 +25,7 @@ const ClassModal = ({ cls, topicId, onSave, onClose, isNew, loading = false }) =
                 name: cls.name || cls.title || '',
                 meeting_link: cls.meeting_link || cls.meetLink || '',
                 meeting_password: cls.meeting_password || '',
-                start_date: cls.start_date ? cls.start_date.slice(0, 16) : '',   // for datetime-local input
+                start_date: cls.start_date ? cls.start_date.slice(0, 16) : '',  
                 end_date: cls.end_date ? cls.end_date.slice(0, 16) : '',
                 status: cls.status || 'scheduled',
             });
@@ -84,7 +85,7 @@ const ClassModal = ({ cls, topicId, onSave, onClose, isNew, loading = false }) =
             <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-teal-600 to-[#004aad] px-6 py-5 flex items-center justify-between">
+                <div className="bg-linear-to-r from-teal-600 to-[#004aad] px-6 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
                             <Video className="w-5 h-5 text-white" />

@@ -81,7 +81,8 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           {/* Students & Enrollments */}
           <SidebarItem to="/admin/students" icon={<FaUsers />} text="Manage Students" onClick={handleLinkClick} />
           <SidebarItem to="/admin/enrollments" icon={<FaUserGraduate />} text="Enrollments" onClick={handleLinkClick} />
-
+          
+          
           {/* Course Management - Visible to Super Admin, Admin, Content Moderator */}
           {isContentModerator && (
             <div>
@@ -106,6 +107,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
           <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard />} text="Subscriptions" onClick={handleLinkClick} />
           <SidebarItem to="/admin/certificates" icon={<FaCertificate />} text="Certificates" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/tutor-requests" icon={<UserCheck />} text="Tutor Requests" onClick={handleLinkClick} />
 
           {/* Roles & Staff - Visible to Super Admin & Admin */}
           {isAdmin && (

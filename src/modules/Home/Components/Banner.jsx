@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Clock, DollarSign, Laptop, Users, BookOpen } from 'lucide-react';
 import { useLanguage } from "../../../context/LanguageContext";
+import { Link } from "react-router-dom";
 
 const AcademyBanner = () => {
     const { t } = useLanguage(); // dynamic translations
@@ -9,16 +10,14 @@ const AcademyBanner = () => {
     // Use translations for slides
     const slides = t.banner.slides.map(slide => ({
         ...slide,
-        // optional: fallback gradient if not defined
         gradient: slide.gradient || "from-purple-600 to-pink-700"
     }));
     const stats = [
-        { icon: Calendar, title: t.stats?.duration || "4 semesters (2 years)", subtitle: t.stats?.durationLabel || "Program Duration", color: "bg-emerald-500" },
+        { icon: Calendar, title: t.stats?.duration || "2 semesters (1 years)", subtitle: t.stats?.durationLabel || "Program Duration", color: "bg-emerald-500" },
         { icon: Clock, title: t.stats?.semesterLength || "12 weeks", subtitle: t.stats?.semesterLengthLabel || "Semester Length", color: "bg-[#004aad] to-[#101e55]" },
-        { icon: DollarSign, title: t.stats?.cost || "Free", subtitle: t.stats?.costLabel || "Online", color: "bg-purple-500" },
+        { icon: DollarSign, title: t.stats?.cost || "Paid", subtitle: t.stats?.costLabel || "Online", color: "bg-purple-500" },
         { icon: BookOpen, title: t.stats?.perWeek || "Per Week", subtitle: t.stats?.perWeekLabel || "15 Hours", color: "bg-orange-500" },
-        { icon: Users, title: t.stats?.startDate || "18 January", subtitle: t.stats?.startDateLabel || "Start of Next Semester", color: "bg-pink-500" },
-        { icon: Laptop, title: t.stats?.registrationStarts || "44 Days", subtitle: t.stats?.registrationStartsLabel || "Registration starts in", color: "bg-[#101e55] to-[#004aad]" }
+
     ];
 
     // auto-slide
@@ -49,12 +48,16 @@ const AcademyBanner = () => {
                                     <h2 className="text-3xl font-light text-white/90">{slide.subtitle}</h2>
                                     <p className="text-base text-white/90 leading-relaxed">{slide.description}</p>
                                     <div className="flex gap-4 pt-4">
-                                        <button className="px-8 py-3 bg-white text-gray-900 rounded-md hover:bg-gray-100 transition-colors">
-                                            {slide.ctaPrimary}
-                                        </button>
-                                        <button className="hidden md:block px-8 py-3 border border-white text-white rounded-md hover:bg-white/30 transition-colors">
-                                            {slide.ctaSecondary}
-                                        </button>
+                                        <Link to={"/register"} className="hidden md:inline-block">
+                                            <button className="px-8 py-3 bg-white text-gray-900 cursor-pointer rounded-md hover:bg-gray-100 transition-colors">
+                                                {slide.ctaPrimary}
+                                            </button>
+                                        </Link>
+                                        <Link to={"/about"}>
+                                            <button className="hidden md:block px-8 py-3 cursor-pointer border border-white text-white rounded-md hover:bg-white/30 transition-colors">
+                                                {slide.ctaSecondary}
+                                            </button>
+                                        </Link>
                                     </div>
                                 </div>
 
@@ -86,7 +89,7 @@ const AcademyBanner = () => {
 
             {/* Stats Section */}
             <div className="bg-white">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 border-b border-[#004aad] rounded-b-md pt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 border-b border-[#004aad] rounded-b-md pt-4">
                     {stats.map((stat, index) => {
                         const Icon = stat.icon;
                         return (

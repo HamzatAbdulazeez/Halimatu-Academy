@@ -14,10 +14,10 @@ const ProgramSection = () => {
 
   return (
     <div className="bg-[#F9F9F8] p-8" dir={t.dir}>
-      <div className="section Resizer mx-auto space-y-12">
+      <div className="section Resizer mx-auto space-y-10">
         {/* Header Section */}
         <div className="text-center space-y-6 animate-fade-in">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-xl rounded-full border border-[#004aad]">
+          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-xl rounded-md border border-[#004aad]">
             <Star className="w-5 h-5 text-[#004aad] animate-pulse" />
             <span className="text-sm text-[#004aad] tracking-wider uppercase">
               {t.programSection.headerBadge}
@@ -43,7 +43,7 @@ const ProgramSection = () => {
         </div>
 
         {/* Subjects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 gap-8">
           {subjects.map((subject, index) => (
             <div
               key={index}
@@ -100,10 +100,7 @@ const ProgramSection = () => {
                     {subject.description}
                   </p>
 
-                  <button className="flex items-center gap-2 text-[#004aad] underline font-semibold text-sm hover:text-emerald-700 transition-colors group/btn">
-                    <span>{t.programSection.learnMore}</span>
-                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform duration-300" />
-                  </button>
+                 
                 </div>
 
                 {/* Corner Decoration */}

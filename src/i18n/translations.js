@@ -40,18 +40,14 @@ const translations = {
     },
 
     stats: {
-      duration: "4 semesters (2 years)",
+      duration: "2 semesters (1 years)",
       durationLabel: "Program Duration",
-      semesterLength: "12 weeks",
+      semesterLength: "6 months",
       semesterLengthLabel: "Semester Length",
-      cost: "Free",
-      costLabel: "Online",
+      cost: "Paid",
+      costLabel: "Remotely Online",
       perWeek: "Per Week",
       perWeekLabel: "15 Hours",
-      startDate: "18 January",
-      startDateLabel: "Start of Next Semester",
-      registrationStarts: "44 Days",
-      registrationStartsLabel: "Registration starts in"
     },
 
     menu: {
@@ -162,7 +158,6 @@ const translations = {
           location: "Lagos, Nigeria",
           rating: 5,
           text: "HALĪMATU SA'DIYYAH ISlamic Academy has transformed my understanding of Islam. The structured curriculum and knowledgeable instructors made learning accessible and enjoyable.",
-          course: "Year 1 Graduate",
           image: "https://images.pexels.com/photos/8121852/pexels-photo-8121852.jpeg"
         },
         {
@@ -170,8 +165,6 @@ const translations = {
           location: "Abuja, Nigeria",
           rating: 5,
           text: "The flexibility of online learning combined with authentic Islamic knowledge is unmatched. I can study at my own pace while balancing work and family.",
-          course: "Year 2 Student"
-          ,
           image: "https://i0.pickpik.com/photos/43/874/346/arabs-face-orient-arabic-preview.jpg"
         },
         {
@@ -179,8 +172,6 @@ const translations = {
           location: "Ibadan, Nigeria",
           rating: 5,
           text: "The community aspect is incredible. I've connected with Muslims worldwide, and the weekly discussions have deepened my faith.",
-          course: "Year 1 Student"
-          ,
           image: "https://images.pexels.com/photos/5125239/pexels-photo-5125239.jpeg"
         },
         {
@@ -192,50 +183,25 @@ const translations = {
           ,
           image: "https://images.pexels.com/photos/8303314/pexels-photo-8303314.jpeg"
         },
-        {
-          name: "Khadija Ali",
-          location: "Osogbo, Nigeria",
-          rating: 5,
-          text: "Best decision I've made for my Islamic education. The quality of teaching and resources is outstanding.",
-          course: "Year 1 Graduate"
-          ,
-          image: "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvZmw0MDQ3MTY4NDg0MC1pbWFnZS1rdWRpMzRzNS5qcGc.jpg"
-        },
-        {
-          name: "Hassan Khan",
-          location: "Zaria, Nigeria",
-          rating: 5,
-          text: "The teachers are knowledgeable and patient. I've learned so much about the Quran and Hadith in just one year!",
-          course: "Year 1 Student"
-          ,
-          image: "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvZmw0MjM2NTAwNzQ0MS1pbWFnZS1rcHFvcHR4cy5qcGc.jpg"
-        },
-        {
-          name: "Aisha Rahman",
-          location: "Kano, Nigeria",
-          rating: 5,
-          text: "The Arabic language course helped me understand the Quran in its original language. Truly transformative experience!",
-          course: "Year 2 Student"
-          ,
-          image: "https://images.pexels.com/photos/8303314/pexels-photo-8303314.jpeg"
-        }
       ],
       faqs: [
         {
-          question: "Is the program really free?",
-          answer: "Yes! HALĪMATU SA'DIYYAH ISlamic Academy is completely free for all students. We believe Islamic education should be accessible to everyone, regardless of financial circumstances. There are no hidden fees or charges."
+          question: "How do I register for the Academy?", answer: "Registration is part of our enrollment process. To begin, select a subscription plan that fits your goals. Once the registration fee/subscription is processed, you will gain full access to your student dashboard and course materials."
         },
         {
-          question: "What are the language options available?",
-          answer: "We offer the program in multiple languages including English, Arabic, French, Urdu, and Turkish. You can select your preferred language during registration and switch if needed."
+          question: "Why is there a fee for registration and subscriptions?",
+          answer: "The fees allow us to provide a high-quality, ad-free learning environment, support our expert instructors, and maintain the technical infrastructure required for 24/7 global access."
         },
         {
-          question: "How much time do I need to dedicate each week?",
-          answer: "We recommend dedicating approximately 15 hours per week to get the most out of the program. This includes watching lectures, reading materials, participating in forums, and completing assignments. However, the program is flexible and you can study at your own pace."
+          question: "Are certificates included in the subscription?",
+          answer: "Yes! All active subscribers who successfully complete their course modules and pass the required assessments are eligible for a digital Certificate of Completion at no extra cost."
         },
         {
-          question: "Do I need any prerequisites to enroll?",
-          answer: "No prerequisites are required! The program is designed for students of all levels, from beginners to those with some Islamic knowledge. Our curriculum starts with fundamentals and progressively builds your understanding."
+          question: "Can I change my language preference after registering?",
+          answer: "Absolutely. We offer curriculum paths in English, Arabic, French, Urdu, and Turkish. You can update your primary language in your Profile Settings at any time."
+        },
+        {
+          question: "How do I manage my billing and payments?", answer: "As a student, you can view your current plan, download invoices, or upgrade your subscription via the 'Subscriptions' tab in your dashboard."
         }
       ]
     },

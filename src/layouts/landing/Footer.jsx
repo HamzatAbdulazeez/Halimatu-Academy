@@ -23,33 +23,6 @@ const Footer = () => {
       }}></div>
 
       <div className="relative z-10">
-        {/* Newsletter Section */}
-        <div className="border-b border-white/10">
-          <div className="max-w-7xl mx-auto px-4 py-12">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="text-center md:text-left">
-                <h3 className="text-3xl font-bold mb-2 bg-white bg-clip-text text-transparent">
-                  {t.footer.stayUpdated}
-                </h3>
-                <p className="text-white">{t.footer.subscribeDescription}</p>
-              </div>
-
-              <div className="w-full md:w-auto">
-                <div className="flex gap-2 max-w-md">
-                  <input
-                    type="email"
-                    placeholder={t.footer.placeholderEmail}
-                    className="flex-1 px-6 py-3 backdrop-blur-md border border-white rounded-md text-white placeholder-white outline-none transition-all duration-300"
-                  />
-                  <button className="px-6 py-3 bg-[#004aad] rounded-md transition-all duration-300 flex items-center gap-2">
-                    <Send className="w-5 h-5" />
-                    <span className="hidden sm:inline">{t.footer.subscribeButton}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Main Footer Content */}
         <div className="max-w-7xl mx-auto px-4 py-16">
@@ -58,9 +31,12 @@ const Footer = () => {
             {/* About Column */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <h2 className="text-2xl font-bold bg-white bg-clip-text text-transparent">
-                  {t.footer.aboutTitle}
-                </h2>
+                <img
+                  src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
+                  alt="Halimatu Academy Logo"
+                  draggable="false"
+                  className="w-34 h-auto mb-4"
+                />
                 <p className="text-gray-400 leading-relaxed">
                   {t.footer.aboutDescription}
                 </p>

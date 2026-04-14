@@ -15,7 +15,7 @@ const EnrolledCourses = ({ courses, loading }) => {
     const [showProgressModal, setShowProgressModal] = useState(false);
     const [selectedCourseForUpdate, setSelectedCourseForUpdate] = useState(null);
     const [newProgressValue, setNewProgressValue] = useState(0);
-    const [modalLoading, setModalLoading] = useState(false);
+    const [modalLoading] = useState(false);
 
     // Fetch course details + progress
     useEffect(() => {
@@ -40,61 +40,6 @@ const EnrolledCourses = ({ courses, loading }) => {
         fetchAllCoursesData();
     }, [courses]);
 
-    const handleMarkTopicComplete = async (courseId, topicId) => {
-        if (updating[topicId]) return;
-
-
-        setUpdating(prev => ({ ...prev, [topicId]: true }));
-
-        const oldData = courseData[courseId];
-        const currentProgress = oldData?.progress || {};
-        const currentCompletedIds = currentProgress.completed_topic_ids || [];
-
-
-        if (currentCompletedIds.includes(topicId)) {
-            setUpdating(prev => ({ ...prev, [topicId]: false }));
-            return;
-        }
-        const totalTopics = oldData?.details?.topics?.length || 1;
-        const newCompletedCount = (currentProgress.completed_topics || 0) + 1;
-        const optimisticPercent = Math.min(100, Math.round((newCompletedCount / totalTopics) * 100));
-
-        const optimisticProgress = {
-            ...currentProgress,
-            overall_progress: optimisticPercent,
-            completed_topics: newCompletedCount,
-            completed_topic_ids: [...currentCompletedIds, topicId]
-        };
-
-        // 3. Update UI Immediately
-        setCourseData(prev => ({
-            ...prev,
-            [courseId]: { ...prev[courseId], progress: optimisticProgress }
-        }));
-
-        try {
-            // 4. Hit the API
-            await markTopicComplete(topicId, { is_completed: true });
-
-            // 5. Fetch actual calculated progress from server
-            const freshProgress = await getCourseProgress(courseId);
-
-            setCourseData(prev => ({
-                ...prev,
-                [courseId]: { ...prev[courseId], progress: freshProgress }
-            }));
-
-            notify.success("Progress updated!");
-        } catch (err) {
-            console.error("Mark Complete Error:", err);
-
-            // 6. Rollback on failure
-            setCourseData(prev => ({ ...prev, [courseId]: oldData }));
-            notify.error("Failed to sync progress. Please refresh.");
-        } finally {
-            setUpdating(prev => ({ ...prev, [topicId]: false }));
-        }
-    };
 
     // Open Progress Modal
     const openProgressModal = (courseId) => {
@@ -109,7 +54,6 @@ const EnrolledCourses = ({ courses, loading }) => {
         setUpdating(prev => ({ ...prev, [topicId]: true }));
 
         const isReverting = currentStatus === true; // Are we unchecking it?
-        const oldData = courseData[courseId];
 
         try {
             // 1. Call API with the opposite of current status

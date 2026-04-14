@@ -315,7 +315,7 @@ export default function HSARegistration() {
   if (registered) {
     return (
       <div className="min-h-screen bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 flex items-center justify-center p-6">
-        <div className="max-w-lg w-full bg-white rounded-2xl p-10 text-center shadow-sm">
+        <div className="max-w-lg w-full bg-white rounded-2xl p-10 text-center">
           <div className="w-20 h-20 bg-linear-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-white" />
           </div>
@@ -350,7 +350,7 @@ export default function HSARegistration() {
   // ─── Main registration form ────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-sm">
+      <div className="w-full max-w-2xl bg-white rounded-md overflow-hidden">
 
         {/* Header */}
         <div className="bg-[#004aad] text-white px-8 py-10 text-center">

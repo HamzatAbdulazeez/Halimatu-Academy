@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react';
 import { BookOpen, Plus, ChevronRight, Search, Tag, CheckCircle, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -271,7 +272,7 @@ const AdminTopicsPage = () => {
                                 className="border-2 border-dashed border-gray-200 rounded-2xl p-10 flex flex-col items-center justify-center gap-3 hover:border-[#004aad] hover:bg-blue-50/30 transition-all group cursor-pointer"
                             >
                                 <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#004aad]/10 rounded-2xl flex items-center justify-center transition-colors">
-                                    <Plus className="w-7 h-7 text-gray-400 group-hover:text-[#004aad] transition-colors " />
+                                    <Plus className="w-7 h-7 text-gray-400 group-hover:text-[#004aad] transition-colors cursor-pointer" />
                                 </div>
                                 <div className="text-center">
                                     <p className="font-semibold text-gray-500 group-hover:text-[#004aad]">Add New Course</p>

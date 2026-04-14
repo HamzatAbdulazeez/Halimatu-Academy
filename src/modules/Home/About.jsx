@@ -1,6 +1,6 @@
 import BannerSection from './Components/Breadcrumb';
-import { Link } from "react-router-dom";
 import { Target, Eye, Star, Users, BookOpen, Globe, Award, Sparkles, ArrowRight } from 'lucide-react';
+import PrivateTutorRequestCTA from './Components/PrivateTutorRequestCTA';  
 
 const AboutUs = () => {
     const objectives = [
@@ -56,7 +56,7 @@ const AboutUs = () => {
                         <img
                             src="https://res.cloudinary.com/dbmtogyef/image/upload/v1769958019/%D8%B1%D9%85%D8%B6%D8%A7%D9%86_%D9%83%D8%B1%D9%8A%D9%85_-_Ramadan_karim_lujzjv.jpg"
                             alt="Who We Are"
-                            className="rounded-lg h-130 w-full object-cover"
+                            className="rounded-lg h-88 w-full object-cover"
                         />
                     </div>
                     <div>
@@ -69,12 +69,7 @@ const AboutUs = () => {
                         <p className="text-black text-base leading-loose mb-6">
                             Whether you're a beginner seeking to understand the fundamentals of Islam, a student looking to deepen your knowledge of Quran and Hadith, or someone striving to strengthen your faith, HALĪMATU SA'DIYYAH ISlamic Academy is your comprehensive platform for accessible, authentic, and transformative Islamic education.
                         </p>
-                        <Link
-                            to="/contact"
-                            className="px-8 py-3 rounded-full cursor-pointer bg-gradient text-white hover:opacity-90 transition"
-                        >
-                            Learn More
-                        </Link>
+                    
                     </div>
                 </div>
             </div>
@@ -107,12 +102,12 @@ const AboutUs = () => {
                                 </p>
                             </div>
 
-                            <div className="pt-4">
+                            {/* <div className="pt-4">
                                 <button className="inline-flex items-center gap-2 text-[#004aad] text-base cursor-pointer hover:gap-3 transition-all duration-300 group">
                                     <span>Meet Our Scholars</span>
                                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
 
                         <div className="relative" style={{ animation: 'fadeIn 0.8s ease-out 0.2s backwards' }}>
@@ -127,7 +122,7 @@ const AboutUs = () => {
                                         <BookOpen className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <p className="text-lg font-bold text-black">7</p>
+                                        <p className="text-lg font-bold text-black">2</p>
                                         <p className="text-sm text-black">Core Subjects</p>
                                     </div>
                                 </div>
@@ -258,26 +253,7 @@ const AboutUs = () => {
             </div>
 
             {/* CTA Section */}
-            <div className="max-w-7xl mx-auto px-4 pb-24">
-                <div className="relative overflow-hidden bg-[#004aad] rounded-md">
-                    <div className="absolute inset-0 opacity-20" style={{
-                        backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
-                        backgroundSize: '30px 30px'
-                    }}></div>
-
-                    <div className="relative z-10 text-center py-16 px-8">
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                            Ready to Begin Your Journey?
-                        </h2>
-                        <p className="text-base text-white/90 mb-8 max-w-2xl mx-auto">
-                            Join thousands of students worldwide in deepening your understanding of Islam
-                        </p>
-                        <button className="px-8 py-3 bg-white text-[#004aad] rounded-md text-base cursor-pointer hover:scale-105 transition-all duration-300">
-                            Enroll Now
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <PrivateTutorRequestCTA />
             <style jsx>{`
         @keyframes fadeIn {
           from {

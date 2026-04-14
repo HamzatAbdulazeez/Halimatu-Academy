@@ -1,3 +1,5 @@
+/* eslint-disable no-empty */
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { Video, Plus, Pencil, Trash2 } from 'lucide-react';
 import CopyButton from './CopyButton';

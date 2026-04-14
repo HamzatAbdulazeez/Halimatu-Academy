@@ -16,6 +16,7 @@ import AdminRole from "../modules/Pages/adminDashboard/roles/AdminRoles";
 import RolePermissions from "../modules/Pages/adminDashboard/roles/RolePermissions";
 import ManageAdminsPage from "../modules/Pages/adminDashboard/staff/ManageAdminsPage";
 import Unauthorized from "../modules/Pages/adminDashboard/Unauthorized";
+import AdminTutorRequestsPage from "../modules/Pages/adminDashboard/AdminTutorRequestsPage";
 
 export const adminRoutes = [
   {
@@ -32,6 +33,7 @@ export const adminRoutes = [
           { path: "subscriptions", element: <PlanPage /> },
           { path: "certificates", element: <Certificate /> },
           { path: "notifications", element: <NotificationPage /> },
+          { path: "tutor-requests", element: <AdminTutorRequestsPage /> },
 
           // === STAFF & ROLES MANAGEMENT (Super Admin + Admin only) ===
           {

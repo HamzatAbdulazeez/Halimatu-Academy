@@ -1,5 +1,6 @@
 import { Laptop, BookOpen } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
+import { Link } from "react-router-dom";
 
 const ZadAcademyBanner = () => {
   const { t } = useLanguage(); // get translations
@@ -40,11 +41,11 @@ const ZadAcademyBanner = () => {
                 {t.menu.about} {/* About Us badge */}
               </span>
             </div>
-            
+
             <h2 className="text-3xl font-bold text-gray-900 leading-tight">
               {t.about.aboutTitle}
             </h2>
-            
+
             <p className="text-base text-black leading-loose">
               {t.about.aboutDescription}
             </p>
@@ -58,7 +59,7 @@ const ZadAcademyBanner = () => {
                 <h3 className="font-semibold text-gray-900">{t.about.featureCurriculumTitle}</h3>
                 <p className="text-sm text-gray-600">{t.about.featureCurriculumDesc}</p>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                   <Laptop className="w-5 h-5 text-purple-600" />
@@ -69,9 +70,11 @@ const ZadAcademyBanner = () => {
             </div>
 
             <div className="pt-4">
-              <button className="px-8 py-3 bg-gradient cursor-pointer text-white rounded-md hover:scale-105 transition-all">
-                {t.about.ctaDiscover}
-              </button>
+              <Link to={"/about"}>
+                <button className="px-8 py-3 bg-gradient cursor-pointer text-white rounded-md hover:scale-105 transition-all">
+                  {t.about.ctaDiscover}
+                </button>
+              </Link>
             </div>
           </div>
         </div>

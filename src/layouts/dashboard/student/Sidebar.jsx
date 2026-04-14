@@ -97,7 +97,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="relative mb-8">
           <input
             type="text"
-            placeholder="Search courses..."
+            placeholder="Search..."
             className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/10 border border-white/20 
               text-white placeholder-white/60 outline-none focus:bg-white/20 focus:border-white/40 
               transition-all duration-200 text-sm"
@@ -121,18 +121,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             onClick={handleLinkClick}
             className="flex items-center gap-3 hover:bg-white/10 p-3 rounded-xl transition-colors"
           >
-           {studentInfo.profile_picture ? (
-  <img
-    src={getImageUrl(studentInfo.profile_picture)}
-    alt="Profile"
-    className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
-    onError={(e) => { e.target.src = 'https://via.placeholder.com/40'; }} // Fallback if 404
-  />
-) : (
-  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
-    {studentInfo.name.charAt(0).toUpperCase()}
-  </div>
-)}
+            {studentInfo.profile_picture ? (
+              <img
+                src={getImageUrl(studentInfo.profile_picture)}
+                alt="Profile"
+                className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
+                onError={(e) => { e.target.src = 'https://via.placeholder.com/40'; }} // Fallback if 404
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg">
+                {studentInfo.name.charAt(0).toUpperCase()}
+              </div>
+            )}
 
             <div className="max-w-35 truncate">
               <p className="font-medium text-white truncate text-sm">{studentInfo.name}</p>
@@ -145,8 +145,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             disabled={isLoggingOut}
             className={`mt-5 w-full flex items-center justify-center gap-3 
               bg-red-500 hover:bg-red-600 
-              text-white py-3 px-4 rounded-xl font-bold 
-              transition-all duration-200 shadow-lg text-sm
+              text-white py-3 px-4 rounded-md font-bold 
+              transition-all duration-200 text-sm
               ${isLoggingOut ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
           >
             <FaSignOutAlt />

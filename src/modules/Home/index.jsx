@@ -4,6 +4,7 @@ import TheProgram from './Components/TheProgram';
 import IslamicQuote from './Components/IslamicQuote';
 import LearningPathSection from './Components/LearningPathSection';
 import TestimonialsFAQs from './Components/TestimonialsFAQs';  
+import PrivateTutorRequestCTA from './Components/PrivateTutorRequestCTA';  
 
 
 
@@ -13,8 +14,8 @@ export default function NewHome() {
             <Banner />
             <NextBanner />
             <TheProgram />
+            <PrivateTutorRequestCTA />
             <IslamicQuote />
-            {/* <LearningPathSection /> */}
             <TestimonialsFAQs />
         </>
     );

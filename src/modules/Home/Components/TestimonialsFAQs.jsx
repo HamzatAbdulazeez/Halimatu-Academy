@@ -4,14 +4,12 @@ import { useLanguage } from "../../../context/LanguageContext";
 
 const TestimonialsFAQs = () => {
     const { t } = useLanguage();
-
-    const [openFAQ, setOpenFAQ] = useState(0);
     const scrollRef = useRef(null);
     const [isPaused, setIsPaused] = useState(false);
 
     // Use translated arrays directly
     const testimonials = t.testimonialsFAQs.testimonials;
-    const faqs = t.testimonialsFAQs.faqs;
+
 
     // Duplicate for infinite scroll
     const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
@@ -32,13 +30,11 @@ const TestimonialsFAQs = () => {
         return () => clearInterval(intervalId);
     }, [isPaused]);
 
-    const toggleFAQ = (index) => {
-        setOpenFAQ(openFAQ === index ? -1 : index);
-    };
+ 
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 py-20">
-            <div className="Resizer mx-auto space-y-24">
+        <div className="section bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 py-20">
+            <div className="Resizer mx-auto">
 
                 {/* Testimonials Section */}
                 <div className="space-y-12">
@@ -85,7 +81,7 @@ const TestimonialsFAQs = () => {
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-bold text-black text-lg">{testimonial.name}</h4>
-                                            <p className="text-[#004aad] text-sm font-medium">{testimonial.course}</p>
+                                           
                                             <p className="text-[#004aad] text-xs">{testimonial.location}</p>
                                         </div>
                                         <div className="bg-[#004aad] p-2 rounded-full">
@@ -109,65 +105,6 @@ const TestimonialsFAQs = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* FAQs Section */}
-                <div className="space-y-8">
-                    {/* Header */}
-                    <div className="text-center space-y-4" style={{ animation: 'fadeIn 0.8s ease-out 0.2s backwards' }}>
-                        <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/80 backdrop-blur-xl rounded-full border border-[#004aad]">
-                            <span className="text-sm text-[#004aad] tracking-wider uppercase">
-                                {t.testimonialsFAQs.tagFAQs}
-                            </span>
-                        </div>
-
-                        <h2 className="text-xl font-bold bg-black bg-clip-text text-transparent">
-                            {t.testimonialsFAQs.headerFAQs}
-                        </h2>
-
-                        <p className="text-base text-black max-w-2xl mx-auto">
-                            {t.testimonialsFAQs.subheaderFAQs}
-                        </p>
-                    </div>
-
-                    {/* FAQ Accordion */}
-                    <div className="max-w-5xl mx-auto space-y-4">
-                        {faqs.map((faq, index) => (
-                            <div
-                                key={index}
-                                className="bg-white rounded-md transition-all duration-300 overflow-hidden"
-                                style={{ animation: `slideUp 0.5s ease-out ${index * 0.1}s backwards` }}
-                            >
-                                <button
-                                    onClick={() => toggleFAQ(index)}
-                                    className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50 transition-colors duration-200"
-                                >
-                                    <span className="text-lg text-black pr-4">
-                                        {faq.question}
-                                    </span>
-                                    <div className={`shrink-0 p-2 rounded-full bg-[#004aad] transition-transform duration-300 ${openFAQ === index ? 'rotate-180' : ''}`}>
-                                        {openFAQ === index ? (
-                                            <Minus className="w-5 h-5 text-white" />
-                                        ) : (
-                                            <Plus className="w-5 h-5 text-white" />
-                                        )}
-                                    </div>
-                                </button>
-
-                                <div
-                                    className={`transition-all duration-300 ease-in-out ${openFAQ === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    <div className="px-6 pb-6 pt-2">
-                                        <div className="w-full h-px bg-linear-to-r from-transparent via-[#004aad] to-transparent mb-4"></div>
-                                        <p className="text-black leading-loose">
-                                            {faq.answer}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
             </div>
 
             {/* CSS Animations */}
