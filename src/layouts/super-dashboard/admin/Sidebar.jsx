@@ -9,7 +9,7 @@ import {
   FaUserGraduate, FaCreditCard, FaCertificate,
   FaBookOpen, FaLink, FaListUl, FaChevronDown, FaShieldAlt,
 } from "react-icons/fa";
-import { UserCheck, LogOut } from "lucide-react";
+import { UserCheck, LogOut ,  MessageSquare } from "lucide-react";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth();
@@ -76,11 +76,11 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
         {/* Navigation */}
         <nav className="flex-1 space-y-1.5">
-          <SidebarItem to="/admin" icon={<FaHome />} text="Dashboard" onClick={handleLinkClick} end />
+          <SidebarItem to="/admin" icon={<FaHome  size={20} />} text="Dashboard" onClick={handleLinkClick} end />
 
           {/* Students & Enrollments */}
-          <SidebarItem to="/admin/students" icon={<FaUsers />} text="Manage Students" onClick={handleLinkClick} />
-          <SidebarItem to="/admin/enrollments" icon={<FaUserGraduate />} text="Enrollments" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/students" icon={<FaUsers  size={20} />} text="Manage Students" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/enrollments" icon={<FaUserGraduate  size={20} />} text="Enrollments" onClick={handleLinkClick} />
           
           
           {/* Course Management - Visible to Super Admin, Admin, Content Moderator */}
@@ -98,30 +98,31 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
 
               <div className={`overflow-hidden transition-all duration-300 ${courseOpen ? "max-h-40 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
                 <div className="ml-4 pl-4 border-l-2 border-white/20 space-y-1">
-                  <SidebarItem to="/admin/course-management/topics" icon={<FaListUl />} text="Courses & Topics" onClick={handleLinkClick} />
-                  <SidebarItem to="/admin/course-management/links" icon={<FaLink />} text="Schedule & Links" onClick={handleLinkClick} />
+                  <SidebarItem to="/admin/course-management/topics" icon={<FaListUl  size={20} />} text="Courses & Topics" onClick={handleLinkClick} />
+                  <SidebarItem to="/admin/course-management/links" icon={<FaLink   size={20} />} text="Schedule & Links" onClick={handleLinkClick} />
                 </div>
               </div>
             </div>
           )}
 
-          <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard />} text="Subscriptions" onClick={handleLinkClick} />
-          <SidebarItem to="/admin/certificates" icon={<FaCertificate />} text="Certificates" onClick={handleLinkClick} />
-          <SidebarItem to="/admin/tutor-requests" icon={<UserCheck />} text="Tutor Requests" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard  size={20} />} text="Subscriptions" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/certificates" icon={<FaCertificate  size={20} />} text="Certificates" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/tutor-requests" icon={<UserCheck  size={20} />} text="Tutor Requests" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/contact-messages" icon={<MessageSquare  size={20} />} text="Contact Messages" onClick={handleLinkClick} />
 
           {/* Roles & Staff - Visible to Super Admin & Admin */}
           {isAdmin && (
             <>
-              <SidebarItem to="/admin/roles" icon={<FaShieldAlt />} text="Roles & Permissions" onClick={handleLinkClick} />
+              <SidebarItem to="/admin/roles" icon={<FaShieldAlt  size={20} />} text="Roles & Permissions" onClick={handleLinkClick} />
               <SidebarItem to="/admin/staff" icon={<UserCheck size={20} />} text="Staff Management" onClick={handleLinkClick} />
             </>
           )}
 
-          <SidebarItem to="/admin/notifications" icon={<FaBell />} text="Notifications" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/notifications" icon={<FaBell  size={20} />} text="Notifications" onClick={handleLinkClick} />
 
           {/* Settings - Strictly Super Admin */}
           {isSuperAdmin && (
-            <SidebarItem to="/admin/settings" icon={<FaCog />} text="Settings" onClick={handleLinkClick} />
+            <SidebarItem to="/admin/settings" icon={<FaCog  size={20} />} text="Settings" onClick={handleLinkClick} />
           )}
         </nav>
 

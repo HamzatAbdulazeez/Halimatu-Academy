@@ -1,28 +1,76 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare, HelpCircle, UserPlus, FileQuestion, Sparkles, CheckCircle, Globe, Facebook, Twitter, Instagram, Youtube, Linkedin } from 'lucide-react';
 import BannerSection from './Components/Breadcrumb';
+import { notify } from '../../utils/toast';
+
+import { submitContactForm } from '../../api/contactApi';
 
 const ContactUsPage = () => {
     const [formData, setFormData] = useState({
-        name: '',
+        full_name: '',
         email: '',
+        phone: '',
         subject: '',
         category: 'general',
         message: ''
     });
-    const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSubmitted(true);
-        setTimeout(() => setSubmitted(false), 5000);
-    };
+    const [loading, setLoading] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
         });
+        if (errors[e.target.name]) {
+            setErrors(prev => ({ ...prev, [e.target.name]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.full_name.trim()) newErrors.full_name = "Full name is required";
+        if (!formData.email.trim()) newErrors.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Please enter a valid email";
+        if (!formData.subject.trim()) newErrors.subject = "Subject is required";
+        if (!formData.message.trim()) newErrors.message = "Message is required";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            notify.error("Please fill in all required fields");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await submitContactForm(formData);
+
+            notify.success("Your message has been sent successfully! We'll get back to you soon In shāʾ Allāh.");
+
+            setSubmitted(true);
+            setFormData({
+                full_name: '', email: '', phone: '', subject: '', category: 'general', message: ''
+            });
+            setErrors({});
+
+            setTimeout(() => setSubmitted(false), 5000);
+        } catch (err) {
+            const errorMsg = err?.response?.data?.detail?.[0]?.msg ||
+                err?.response?.data?.message ||
+                "Failed to send message. Please try again.";
+            notify.error(errorMsg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const contactInfo = [
@@ -112,7 +160,7 @@ const ContactUsPage = () => {
 
     return (
         <>
-        <BannerSection
+            <BannerSection
                 title="Contact Us"
                 subtitle="We're here to help and answer any questions you may have. Reach out to us and we'll respond as soon as we can."
                 backgroundImage="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1768973061/focused-young-children-studying-religious-texts-in-a-classroom-setting-photo_gwysn1.jpg"
@@ -197,7 +245,7 @@ const ContactUsPage = () => {
                                     </div>
 
                                     {submitted ? (
-                                        <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-[#004aad] rounded-md p-8 text-center space-y-4" style={{ animation: 'fadeIn 0.5s ease-out' }}>
+                                        <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-[#004aad] rounded-3xl p-10 text-center space-y-4">
                                             <div className="inline-flex p-4 bg-emerald-100 rounded-full">
                                                 <CheckCircle className="w-12 h-12 text-emerald-600" />
                                             </div>
@@ -208,7 +256,6 @@ const ContactUsPage = () => {
                                         </div>
                                     ) : (
                                         <form onSubmit={handleSubmit} className="space-y-6">
-                                            {/* Name and Email */}
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 <div>
                                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -216,13 +263,14 @@ const ContactUsPage = () => {
                                                     </label>
                                                     <input
                                                         type="text"
-                                                        name="name"
-                                                        value={formData.name}
+                                                        name="full_name"
+                                                        value={formData.full_name}
                                                         onChange={handleChange}
                                                         required
-                                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300"
+                                                        className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300 ${errors.full_name ? 'border-red-500' : ''}`}
                                                         placeholder="Your name"
                                                     />
+                                                    {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
                                                 </div>
                                                 <div>
                                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -234,46 +282,13 @@ const ContactUsPage = () => {
                                                         value={formData.email}
                                                         onChange={handleChange}
                                                         required
-                                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300"
+                                                        className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300 ${errors.email ? 'border-red-500' : ''}`}
                                                         placeholder="your.email@example.com"
                                                     />
+                                                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                                                 </div>
                                             </div>
 
-                                            {/* Category Selection */}
-                                            <div>
-                                                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                                                    What can we help you with? *
-                                                </label>
-                                                <div className="grid grid-cols-2 gap-3">
-                                                    {categories.map((category) => {
-                                                        const Icon = category.icon;
-                                                        return (
-                                                            <label
-                                                                key={category.value}
-                                                                className={`relative cursor-pointer`}
-                                                            >
-                                                                <input
-                                                                    type="radio"
-                                                                    name="category"
-                                                                    value={category.value}
-                                                                    checked={formData.category === category.value}
-                                                                    onChange={handleChange}
-                                                                    className="peer sr-only"
-                                                                />
-                                                                <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl peer-checked:border-emerald-500 peer-checked:bg-emerald-50 transition-all duration-300 hover:border-[#004aad]">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <Icon className={`w-5 h-5 ${category.color}`} />
-                                                                        <span className="font-medium text-gray-900 text-sm">{category.label}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </label>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-
-                                            {/* Subject */}
                                             <div>
                                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                                                     Subject *
@@ -284,12 +299,39 @@ const ContactUsPage = () => {
                                                     value={formData.subject}
                                                     onChange={handleChange}
                                                     required
-                                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300"
+                                                    className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300 ${errors.subject ? 'border-red-500' : ''}`}
                                                     placeholder="Brief description of your inquiry"
                                                 />
+                                                {errors.subject && <p className="text-red-500 text-xs mt-1">{errors.subject}</p>}
                                             </div>
 
-                                            {/* Message */}
+                                            <div>
+                                                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                                                    What can we help you with? *
+                                                </label>
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    {categories.map((category) => {
+                                                        const Icon = category.icon;
+                                                        return (
+                                                            <label key={category.value} className="cursor-pointer">
+                                                                <input
+                                                                    type="radio"
+                                                                    name="category"
+                                                                    value={category.value}
+                                                                    checked={formData.category === category.value}
+                                                                    onChange={handleChange}
+                                                                    className="peer sr-only"
+                                                                />
+                                                                <div className="p-4 bg-gray-50 border border-gray-200 rounded-md peer-checked:border-[#004aad] peer-checked:bg-[#004aad]/5 transition-all flex items-center gap-3">
+                                                                    <Icon className={`w-5 h-5 ${category.color}`} />
+                                                                    <span className="font-medium text-sm">{category.label}</span>
+                                                                </div>
+                                                            </label>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
                                             <div>
                                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                                                     Message *
@@ -300,18 +342,19 @@ const ContactUsPage = () => {
                                                     onChange={handleChange}
                                                     required
                                                     rows="6"
-                                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300 resize-none"
+                                                    className={`w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:border-[#004aad] focus:bg-white transition-all duration-300 resize-y min-h-35 ${errors.message ? 'border-red-500' : ''}`}
                                                     placeholder="Please provide details about your inquiry..."
-                                                ></textarea>
+                                                />
+                                                {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
                                             </div>
 
-                                            {/* Submit Button */}
                                             <button
                                                 type="submit"
-                                                className="w-full px-8 py-4 bg-[#004aad] text-white rounded-md text-base  hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+                                                disabled={loading}
+                                                className="w-full px-8 py-4 bg-[#004aad] text-white rounded-md text-base hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer"
                                             >
                                                 <Send className="w-5 h-5" />
-                                                Send Message
+                                                {loading ? "Sending Message..." : "Send Message"}
                                             </button>
                                         </form>
                                     )}
