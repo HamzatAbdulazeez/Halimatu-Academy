@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from "../../../../../utils/imageHelper";
 
-const RightSideBar = ({ user, learningStats }) => {
+const RightSideBar = ({ user, activeSubscription }) => {
     const rawPic =
         user?.profile_picture ||
         user?.profile?.profile_picture ||
@@ -29,47 +29,79 @@ const RightSideBar = ({ user, learningStats }) => {
 
     const email = user?.email || "—";
 
+    // Safe subscription display
+    const planName = activeSubscription
+        ? (activeSubscription.plan_name ||
+           activeSubscription.plan?.name ||
+           activeSubscription.name ||
+           'No Active Plan')
+        : 'No Active Plan';
+
+    const isActive = activeSubscription?.is_active ||
+                     activeSubscription?.status === 'active' ||
+                     !!activeSubscription;
+
+    const enrollmentDate = activeSubscription?.created_at || activeSubscription?.start_date || user?.created_at;
+
+    const formattedDate = enrollmentDate
+        ? new Date(enrollmentDate).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        : "—";
+
     return (
         <aside className="space-y-6">
-            {/* Subscription Info */}
-            <section className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">📋 Subscription Details</h2>
+            {/* Subscription Info - Now Dynamic */}
+            <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    📋 Subscription Details
+                </h2>
+
                 <div className="space-y-5">
                     <div className="bg-white rounded-xl p-5">
                         <p className="text-sm text-gray-600 mb-1">Current Plan</p>
-                        <p className="font-bold text-lg text-gray-900">{learningStats.subscriptionType}</p>
-                        <p className="text-xs text-emerald-600 mt-3 flex items-center gap-1">
-                            ✓ Full access to Quranic Studies
-                        </p>
+                        <p className="font-bold text-lg text-gray-900">{planName}</p>
+                        
+                        {isActive && (
+                            <p className="text-xs text-emerald-600 mt-3 flex items-center gap-1">
+                                ✓ Full access to Quranic Studies & more
+                            </p>
+                        )}
                     </div>
 
                     <div className="bg-white rounded-xl p-5">
                         <p className="text-sm text-gray-600 mb-1">Subscription Status</p>
                         <div className="flex items-center gap-2">
-                            <span className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></span>
-                            <p className="font-semibold text-emerald-700">Active</p>
+                            <span className={`w-3 h-3 rounded-full animate-pulse ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                            <p className={`font-semibold ${isActive ? 'text-emerald-700' : 'text-red-600'}`}>
+                                {isActive ? 'Active' : 'Inactive'}
+                            </p>
                         </div>
                         <p className="text-xs text-gray-500 mt-2">
-                            Enrolled since {learningStats.enrollmentDate}
+                            Enrolled since {formattedDate}
                         </p>
                     </div>
 
-                    {/* Upgrade Prompt */}
-                    <div className="bg-linear-to-br from-blue-600 to-indigo-600 text-white rounded-xl p-5">
+                    {/* Upgrade / Manage Button */}
+                    <div className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-xl p-5">
                         <p className="text-sm opacity-90 mb-3">
-                            💡 Want to learn Arabic alongside Quran?
+                            {isActive 
+                                ? 'Want longer access or better savings?' 
+                                : 'Get full access to all courses'}
                         </p>
                         <Link
                             to="/student/subscription"
                             className="block w-full bg-white text-blue-700 hover:bg-blue-50 px-5 py-3 rounded-xl font-semibold text-center transition-all active:scale-95"
                         >
-                            Upgrade Plan →
+                            {isActive ? 'Manage / Upgrade Plan →' : 'Subscribe Now →'}
                         </Link>
                     </div>
                 </div>
             </section>
 
-            {/* Account Info */}
+            {/* Account Info - Unchanged */}
             <section className="bg-white rounded-xl p-6 border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">👤 Account Info</h2>
                 
@@ -81,7 +113,7 @@ const RightSideBar = ({ user, learningStats }) => {
                             className="w-14 h-14 rounded-2xl object-cover ring-2 ring-gray-100"
                         />
                     ) : (
-                        <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white shadow-inner">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white shadow-inner">
                             {initials}
                         </div>
                     )}

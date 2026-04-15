@@ -4,6 +4,11 @@ import {
     getStudentEnrolledCourses,
 } from '../../../api/courseApi';
 
+import { 
+    getMyActiveSubscription,     
+    getMySubscriptionStatus    
+} from '../../../api/plansApi';
+
 import WelcomeHeader from './components/welcome/WelcomeHeader';
 import QuickStats from './components/welcome/QuickStats';
 import EnrolledCourses from './components/welcome/EnrolledCourses';
@@ -13,10 +18,10 @@ import RightSideBar from './components/welcome/RightSide';
 const StudentWelcomeDashboard = () => {
     const [user, setUser] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
-    const [upcomingClasses, setUpcomingClasses] = useState([]);
+    const [activeSubscription, setActiveSubscription] = useState(null);
     
     const [loading, setLoading] = useState(true);
-    const [loadingClasses, setLoadingClasses] = useState(false);
+    const [loadingSubscription, setLoadingSubscription] = useState(true);
 
     // Load user from localStorage
     useEffect(() => {
@@ -34,41 +39,36 @@ const StudentWelcomeDashboard = () => {
         return () => window.removeEventListener("storage", loadUserData);
     }, []);
 
-    // Fetch Enrolled Courses (Main Data)
+    // Fetch Enrolled Courses + Active Subscription
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
+            setLoadingSubscription(true);
+
             try {
+                // Fetch courses
                 const coursesData = await getStudentEnrolledCourses().catch(() => []);
                 setEnrolledCourses(Array.isArray(coursesData) ? coursesData : []);
 
-                // Upcoming Classes - Keep commented until API is ready
-                // setLoadingClasses(true);
-                // const classesData = await getStudentUpcomingClasses().catch(() => []);
-                // setUpcomingClasses(Array.isArray(classesData) ? classesData : []);
+                // Fetch active subscription
+                const subRes = await getMyActiveSubscription().catch(() => null);
+                const subData = subRes?.subscription || 
+                               subRes?.data?.subscription || 
+                               subRes?.data || 
+                               subRes;
+
+                setActiveSubscription(subData && typeof subData === 'object' ? subData : null);
+
             } catch (err) {
                 console.error("Failed to fetch dashboard data:", err);
             } finally {
                 setLoading(false);
-                setLoadingClasses(false);
+                setLoadingSubscription(false);
             }
         };
 
         fetchData();
     }, []);
-
-    const learningStats = {
-        classesAttended: 6,
-        currentStreak: 3,
-        enrollmentDate: user?.created_at
-            ? new Date(user.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            })
-            : "—",
-        subscriptionType: '6 Months - Quranic Studies',
-    };
 
     return (
         <div className="space-y-5">
@@ -77,36 +77,30 @@ const StudentWelcomeDashboard = () => {
             {/* Quick Stats */}
             <QuickStats
                 enrolledCount={enrolledCourses.length}
-                classesAttended={learningStats.classesAttended}
-                currentStreak={learningStats.currentStreak}
+                classesAttended={6}           // You can make this dynamic later
+                currentStreak={3}
                 loading={loading}
             />
 
             <div className="grid lg:grid-cols-12 gap-8">
                 {/* Main Content */}
                 <div className="lg:col-span-8 space-y-5">
-                    
-                    {/* Prominent Enrolled Courses Section */}
-                    <div>
-                        
-                        <EnrolledCourses 
-                            courses={enrolledCourses} 
-                            loading={loading} 
-                        />
-                    </div>
+                    <EnrolledCourses 
+                        courses={enrolledCourses} 
+                        loading={loading} 
+                    />
 
-                    {/* Upcoming Classes */}
                     <ClassSchedule 
-                        classes={upcomingClasses} 
-                        loading={loadingClasses} 
+                        classes={[]} 
+                        loading={false} 
                     />
                 </div>
 
-                {/* Right Sidebar */}
+                {/* Right Sidebar - Now receives real subscription */}
                 <div className="lg:col-span-4">
                     <RightSideBar 
                         user={user} 
-                        learningStats={learningStats} 
+                        activeSubscription={activeSubscription} 
                     />
                 </div>
             </div>

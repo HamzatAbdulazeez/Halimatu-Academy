@@ -55,12 +55,19 @@ const NotificationsPage = () => {
         }
     };
 
+    // Inside the component, after setNotifications(...)
+useEffect(() => {
+    console.log('📋 All Notifications from API:', notifications);
+    console.log('📋 Unread count:', unreadCount);
+    console.log('📋 Filtered:', filteredNotifications);
+}, [notifications]);
+
     const markAllAsRead = async () => {
         try {
             const unreadIds = notifications.filter(n => !n.isRead).map(n => n.id);
             if (unreadIds.length === 0) return;
-
-            await markNotificationsAsRead(unreadIds);
+    
+            await markNotificationsAsRead(unreadIds);   // Pass array of IDs
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             notify.success('All notifications marked as read');
         } catch (err) {

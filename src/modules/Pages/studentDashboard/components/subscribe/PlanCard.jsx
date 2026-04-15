@@ -25,7 +25,7 @@ const PlanCard = ({ plan, isCurrent, isProcessing, isDisabled, onSelectPlan }) =
                     Most popular
                 </span>
             ) : (
-                <div className="h-[21px] mb-4" /> // Spacer
+                <div className="h-5.25 mb-4" />
             )}
 
             {/* Period */}
@@ -52,7 +52,7 @@ const PlanCard = ({ plan, isCurrent, isProcessing, isDisabled, onSelectPlan }) =
             <ul className="space-y-3 flex-1 mb-6">
                 {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3 text-sm text-gray-600">
-                        <span className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0
+                        <span className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0
                             ${isCurrent ? 'bg-[#E1F5EE]' : 'bg-[#E6F1FB]'}`}>
                             <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
                                 <polyline 

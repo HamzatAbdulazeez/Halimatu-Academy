@@ -15,7 +15,7 @@ const BillingHistoryModal = ({ isOpen, subscriptions = [], onClose }) => {
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
                     <div>
                         <h3 className="text-lg font-bold text-gray-900">Billing History</h3>
                         <p className="text-sm text-gray-500">
@@ -39,37 +39,63 @@ const BillingHistoryModal = ({ isOpen, subscriptions = [], onClose }) => {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {subscriptions.map((sub, index) => (
-                                <div 
-                                    key={sub.id || sub._id || index} 
-                                    className="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 bg-[#004aad]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <FaCreditCard className="text-[#004aad]" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-gray-900">
-                                                {sub.plan_name || sub.plan || 'Subscription'}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                {formatDate(sub.created_at || sub.date)}
-                                            </p>
-                                        </div>
-                                    </div>
+                            {subscriptions.map((sub, index) => {
+                                // Safely extract plan name whether plan is object or string
+                                const planName = 
+                                    typeof sub.plan === 'object' && sub.plan !== null 
+                                        ? (sub.plan.name || sub.plan_name || 'Subscription')
+                                        : (sub.plan_name || sub.plan || 'Subscription');
 
-                                    <div className="text-right">
-                                        <p className="font-bold text-gray-900">
-                                            {formatPrice(sub.amount)}
-                                        </p>
-                                        <span className="text-xs px-3 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
-                                            {sub.status || 'paid'}
-                                        </span>
+                                const amount = sub.amount || 
+                                              (sub.plan?.discounted_price || sub.plan?.original_price);
+
+                                return (
+                                    <div 
+                                        key={sub.id || sub._id || index} 
+                                        className="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 bg-[#004aad]/10 rounded-lg flex items-center justify-center shrink-0">
+                                                <FaCreditCard className="text-[#004aad]" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">
+                                                    {planName}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {formatDate(sub.created_at || sub.date || sub.start_date)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="text-right">
+                                            <p className="font-bold text-gray-900">
+                                                {formatPrice(amount)}
+                                            </p>
+                                            <span className={`text-xs px-3 py-0.5 rounded-full font-medium ${
+                                                (sub.status || '').toLowerCase() === 'active' || 
+                                                (sub.status || '').toLowerCase() === 'paid'
+                                                    ? 'bg-emerald-100 text-emerald-700'
+                                                    : 'bg-blue-100 text-blue-700'
+                                            }`}>
+                                                {(sub.status || 'paid').toUpperCase()}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                    <button
+                        onClick={onClose}
+                        className="w-full py-3 bg-[#0C447C] cursor-pointer hover:bg-black text-white rounded-md transition"
+                    >
+                        Close
+                    </button>
                 </div>
             </div>
         </div>

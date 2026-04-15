@@ -12,7 +12,7 @@ import {
   activateSubscription,
   cancelSubscriptionForUser,
   toggleAutoRenew,
-} from '../../../../api/authApi';
+} from '../../../../api/plansApi';
 
 import { notify } from '../../../../utils/toast';
 import { formatDate, formatPrice } from '../subscriptions/utils';
@@ -165,76 +165,113 @@ const StudentSubscriptionPage = () => {
       notify.error('A payment is already in progress. Please wait.');
       return;
     }
+
     processingRef.current = true;
     setProcessingPlanId(selectedPlan.id);
 
+    console.group('🚀 Payment Flow Started');
+    console.log('Selected Plan:', selectedPlan);
+
     try {
+      console.log('1. Calling initiateSubscription...');
       const res = await initiateSubscription({ plan_id: selectedPlan.id });
       const paymentData = res?.data?.data || res?.data || res;
 
+      console.log('Initiate Subscription Response:', res);
+      console.log('Payment Data extracted:', paymentData);
+
       if (!paymentData?.tx_ref) {
-        notify.error('Payment could not be started. Please contact support.');
+        console.error('❌ No tx_ref received from backend');
+        notify.error('Payment could not be started. No transaction reference returned.');
         return;
       }
 
       if (typeof window.FlutterwaveCheckout !== 'function') {
+        console.error('❌ FlutterwaveCheckout not loaded on window');
         notify.error('Payment system not ready. Please refresh the page.');
         return;
       }
 
+      console.log('2. Opening Flutterwave Checkout with tx_ref:', paymentData.tx_ref);
+
       window.FlutterwaveCheckout({
-        public_key: 'FLWPUBK_TEST-39ab6a4a6d75cab56a4e98abcbc5aeb4-X',
+        public_key: 'FLWPUBK_TEST-39ab6a4a6d75cab56a4e98abcbc5aeb4-X', // ← Consider moving to env
         tx_ref: paymentData.tx_ref,
         amount: paymentData.amount,
         currency: paymentData.currency || 'NGN',
         payment_options: 'card, banktransfer, ussd',
-        customer: paymentData.customer || {},
+        customer: paymentData.customer || { email: 'user@example.com' }, // ensure email exists
         customizations: {
           title: 'Halimatu Academy',
           description: `Payment for ${selectedPlan.name}`,
           logo: '',
         },
+
         callback: async (flwResponse) => {
+          console.group('✅ Flutterwave Callback Received');
+          console.log('Full Flutterwave Response:', flwResponse);
+
           if (!['successful', 'completed'].includes(flwResponse?.status)) {
+            console.warn('❌ Payment not successful:', flwResponse?.status);
             notify.error('Payment was not completed.');
             processingRef.current = false;
-            if (mountedRef.current) setProcessingPlanId(null);
+            setProcessingPlanId(null);
+            console.groupEnd();
             return;
           }
 
+          console.log('Payment status is successful. Starting backend activation...');
+
           try {
-            notify.success('Payment received! Activating your subscription...');
+            notify.success('Payment received! Activating subscription...');
 
-            await verifyPayment({
+            // === VERIFY PAYMENT ===
+            console.log('3. Calling verifyPayment...');
+            const verifyRes = await verifyPayment({
               tx_ref: flwResponse.tx_ref,
               transaction_id: flwResponse.transaction_id,
             });
-            await activateSubscription({
+            console.log('Verify Payment Response:', verifyRes);
+
+            // === ACTIVATE SUBSCRIPTION ===
+            console.log('4. Calling activateSubscription...');
+            const activateRes = await activateSubscription({
               tx_ref: flwResponse.tx_ref,
               transaction_id: flwResponse.transaction_id,
             });
+            console.log('Activate Subscription Response:', activateRes);
 
-            // Poll until backend confirms activation (max 20s)
+            // === POLLING ===
+            console.log('5. Starting polling for subscription status...');
             let activated = false;
             for (let i = 0; i < 10; i++) {
               await new Promise(r => setTimeout(r, 2000));
-              try {
-                const status = await getMySubscriptionStatus();
-                const isActive =
-                  status?.data?.is_active ||
-                  status?.is_active ||
-                  status?.data?.status === 'active';
-                if (isActive) { activated = true; break; }
-              } catch {
-                // keep polling on transient errors
+              console.log(`Polling attempt ${i + 1}/10...`);
+
+              const statusRes = await getMySubscriptionStatus();
+              console.log(`Status Response #${i + 1}:`, statusRes);
+
+              const isActive =
+                statusRes?.data?.is_active ||
+                statusRes?.is_active ||
+                statusRes?.data?.status === 'active' ||
+                statusRes?.status === 'active';
+
+              console.log(`Is subscription active? → ${isActive}`);
+
+              if (isActive) {
+                activated = true;
+                console.log('✅ Subscription confirmed active!');
+                break;
               }
             }
 
-            // Full data refresh so CurrentSubscriptionCard shows the new plan
+            // Final refresh
+            console.log('6. Doing full data refresh...');
             await fetchData(false);
 
             if (mountedRef.current) {
-              setJustSubscribed(true);   // show green success banner
+              setJustSubscribed(true);
               notify.success(
                 activated
                   ? '🎉 Subscription activated! You now have full access.'
@@ -242,27 +279,47 @@ const StudentSubscriptionPage = () => {
               );
             }
           } catch (err) {
+            console.group('❌ Activation / Verification Error');
             console.error('[activation error]', err);
+            console.error('Error response (if any):', err?.response?.data);
+            console.error('Status code:', err?.response?.status);
+            console.groupEnd();
+
             notify.error(
-              'Payment successful but activation failed. Contact support with ref: ' +
-                flwResponse.tx_ref
+              `Payment successful but activation failed.\nRef: ${flwResponse.tx_ref}\n` +
+              (err?.response?.data?.message || err?.message || 'Unknown error')
             );
           } finally {
             processingRef.current = false;
-            if (mountedRef.current) setProcessingPlanId(null);
+            setProcessingPlanId(null);
+            console.groupEnd(); // end callback group
           }
         },
+
         onClose: () => {
-          // Release the lock when user closes modal without paying
+          console.log('❌ Flutterwave modal closed by user');
           processingRef.current = false;
-          if (mountedRef.current) setProcessingPlanId(null);
+          setProcessingPlanId(null);
         },
       });
     } catch (err) {
+      console.group('❌ Payment Initiation Error');
       console.error('[payment init error]', err);
-      notify.error(err?.response?.data?.message || 'Failed to start payment. Please try again.');
-      processingRef.current = false;
-      setProcessingPlanId(null);
+      console.error('Error response data:', err?.response?.data);
+      console.error('Status:', err?.response?.status);
+      console.groupEnd();
+
+      notify.error(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to start payment. Please try again.'
+      );
+    } finally {
+      if (!window.FlutterwaveCheckout) {
+        // only reset if checkout never opened
+        processingRef.current = false;
+        setProcessingPlanId(null);
+      }
     }
   }, [fetchData]);
 

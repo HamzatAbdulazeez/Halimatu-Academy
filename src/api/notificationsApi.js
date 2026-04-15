@@ -30,3 +30,8 @@ export const deleteNotification = async (notificationId) => {
     const res = await axiosInstance.delete(`/user/notifications/${notificationId}`);
     return res.data;
 };
+
+export const createNotification = async (notificationData) => {
+    const res = await axiosInstance.post('/user/notifications', notificationData);
+    return res.data;
+};

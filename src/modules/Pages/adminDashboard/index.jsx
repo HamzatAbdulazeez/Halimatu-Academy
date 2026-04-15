@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Users, BookOpen, Award, Video, UserCheck,
-  DollarSign, UserX, TrendingUp, Activity
+ UserX, TrendingUp, Activity
 } from 'lucide-react';
 import { getDashboardStats, getUsers } from "../../../api/authApi";
 
@@ -17,6 +17,27 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  const NairaSign = ({ size = 24, className = "" }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5" 
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M7 3v18" />
+      <path d="M17 3v18" />
+      <path d="M7 18l10-12" />
+      <path d="M5 10h14" />
+      <path d="M5 14h14" />
+    </svg>
+  );
+
   const storedAdmin = JSON.parse(
     sessionStorage.getItem("adminUser") || localStorage.getItem("adminUser") || "{}"
   );
@@ -26,7 +47,7 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const [statsRes, usersRes] = await Promise.all([
-          getDashboardStats(),   // ← now uses the correct endpoint
+          getDashboardStats(),
           getUsers()
         ]);
 
@@ -53,10 +74,22 @@ const AdminDashboard = () => {
 
   const formatRevenue = (val) => {
     const num = parseFloat(val);
-    if (isNaN(num)) return "$0";
-    if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M`;
-    if (num >= 1_000)     return `$${(num / 1_000).toFixed(1)}K`;
-    return `$${num.toFixed(2)}`;
+  
+    // Handle invalid or negative values
+    if (isNaN(num) || num < 0) return "₦0";
+  
+    // For amounts 1 million and above → ₦1.5M
+    if (num >= 1_000_000) {
+      return `₦${(num / 1_000_000).toFixed(1)}M`;
+    }
+  
+    // For amounts 1 thousand and above but less than 1 million → ₦25,000
+    if (num >= 1_000) {
+      return `₦${num.toLocaleString('en-US')}`;
+    }
+  
+    // For small amounts (below 1,000)
+    return `₦${num.toFixed(0)}`;
   };
 
   const stats = [
@@ -100,7 +133,7 @@ const AdminDashboard = () => {
       title:   'Total Revenue',
       value:   formatRevenue(statsData.total_revenue),
       change:  '+22%',
-      icon:    DollarSign,
+      icon:    NairaSign,
       color:   'text-violet-500',
       bgColor: 'bg-violet-50',
       positive: true,
@@ -215,7 +248,7 @@ const AdminDashboard = () => {
             <h3 className="font-semibold text-gray-900">Manage Students</h3>
           </a>
           <div className="bg-white rounded-md p-6 text-center border border-gray-100">
-            <DollarSign className="w-8 h-8 mx-auto mb-3 text-emerald-600" />
+            <NairaSign className="w-8 h-8 mx-auto mb-3 text-emerald-600" />
             <h3 className="font-semibold text-gray-900">Revenue Tracking</h3>
           </div>
           <div className="bg-white rounded-md p-6 text-center border border-gray-100">
