@@ -74,7 +74,6 @@ const AdminDashboard = () => {
 
   const formatRevenue = (val) => {
     const num = parseFloat(val);
-  
     // Handle invalid or negative values
     if (isNaN(num) || num < 0) return "₦0";
   
