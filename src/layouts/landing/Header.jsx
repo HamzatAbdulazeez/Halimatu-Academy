@@ -100,7 +100,7 @@ export default function Header() {
   };
 
   const linkClasses = ({ isActive }) =>
-    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD]" : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"}`;
+    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-lg font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD] font-medium" : "text-gray-700 font-medium hover:text-gray-900 hover:bg-gray-50"}`;
 
   const mobileLink = "block w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50";
 

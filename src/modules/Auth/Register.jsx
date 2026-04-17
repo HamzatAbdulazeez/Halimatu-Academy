@@ -14,7 +14,8 @@ const PASSWORD_RULES = [
 ];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^[+]?[\d\s\-().]{7,20}$/;
+const PHONE_REGEX = /^\+?[1-9]\d{1,14}$/;
+
 
 // ─── Helper: calculate age from DOB string ─────────────────────────────────────
 const calculateAge = (dob) => {
@@ -80,9 +81,16 @@ export default function HSARegistration() {
         if (!value.trim()) return "Email address is required.";
         if (!EMAIL_REGEX.test(value.trim())) return "Please enter a valid email address.";
         return "";
-      case "phone":
-        if (value && !PHONE_REGEX.test(value)) return "Please enter a valid phone number.";
+      case "phone": {
+        if (!value) return "";
+        const cleaned = value.replace(/[\s\-().]/g, '');
+        // Accept: 08XXXXXXXXX, +234XXXXXXXXX, 234XXXXXXXXX
+        const localNG = /^0[7-9][01]\d{8}$/;
+        const intl = /^\+?[1-9]\d{6,14}$/;
+        if (!localNG.test(cleaned) && !intl.test(cleaned))
+          return "Enter a valid number, e.g. 08155302760 or +2348155302760";
         return "";
+      }
       case "dateOfBirth": {
         if (!value) return "Date of birth is required.";
         const age = calculateAge(value);
@@ -172,6 +180,8 @@ export default function HSARegistration() {
         ? "Passwords do not match."
         : "";
 
+
+
     // Mark all as touched
     const allTouched = {};
     Object.keys(INITIAL_ERRORS).forEach((k) => { allTouched[k] = true; });
@@ -197,6 +207,8 @@ export default function HSARegistration() {
       return;
     }
 
+   
+
     setLoading(true);
 
     const registerPayload = {
@@ -204,14 +216,20 @@ export default function HSARegistration() {
       middleName: formData.middleName.trim() || null,
       lastName: formData.lastName.trim(),
       email: formData.email.trim().toLowerCase(),
-      phone: formData.phone.trim() || null,
+      phone: (() => {
+        if (!formData.phone.trim()) return null;
+        const cleaned = formData.phone.trim().replace(/[\s\-().]/g, '');
+        if (/^0[7-9][01]\d{8}$/.test(cleaned)) return '+234' + cleaned.slice(1);
+        return cleaned.startsWith('+') ? cleaned : '+' + cleaned;
+      })(),
       dateOfBirth: formData.dateOfBirth,
-      gender: formData.gender || null,
+     gender: formData.gender || null,
       country: formData.country,
       city: formData.city.trim(),
       password: formData.password,
     };
-
+    
+    console.log("Sending payload:", JSON.stringify(registerPayload, null, 2));
     try {
       const res = await registerUser(registerPayload);
 
@@ -223,39 +241,57 @@ export default function HSARegistration() {
 
     } catch (err) {
       console.error("Registration error:", err);
-
-      // ── No network response ────────────────────────────────────────────────
+    
       if (!err.response) {
+        if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
+          // Server likely registered but timed out on email — treat as success
+          notify.success("Account created! Please check your email for OTP.");
+          setRegistered(true);
+          return;
+        }
         if (err.code === "ERR_NETWORK" || err.message === "Network Error") {
           notify.error("Network error. Please check your internet connection.");
-        } else if (err.code === "ECONNABORTED" || err.message?.includes("timeout")) {
-          notify.error("Request timed out. Please try again.");
         } else {
           notify.error("Unable to reach the server. Please try again later.");
         }
         return;
       }
-
+    
       const status = err.response?.status;
+    
       const serverMessage = err.response?.data?.message
         || err.response?.data?.error
         || err.response?.data?.detail;
-
+    
       switch (status) {
-
         case 400:
           notify.error(serverMessage || "Invalid registration data. Please review your details.");
           break;
-
-        case 409:
-          // Email already registered
-          setFieldErrors((prev) => ({
-            ...prev,
-            email: serverMessage || "This email is already registered. Please log in instead.",
-          }));
-          notify.error(serverMessage || "An account with this email already exists. Please log in.");
+    
+        case 409: {
+          // Only show conflict error if server explicitly said 409
+          // Check if it's email or phone conflict
+          const isPhoneConflict = serverMessage?.toLowerCase().includes("phone");
+          const isEmailConflict = serverMessage?.toLowerCase().includes("email") || !isPhoneConflict;
+    
+          if (isPhoneConflict) {
+            setFieldErrors((prev) => ({
+              ...prev,
+              phone: "This phone number is already registered.",
+            }));
+            notify.error("This phone number is already linked to an account. Please use a different one.");
+          } else if (isEmailConflict) {
+            setFieldErrors((prev) => ({
+              ...prev,
+              email: "This email is already registered. Please log in instead.",
+            }));
+            notify.error("An account with this email already exists. Please log in.");
+          } else {
+            notify.error(serverMessage || "Account already exists. Please log in.");
+          }
           break;
-
+        }
+    
         case 422:
           if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
             err.response.data.errors.forEach((fieldErr) => {
@@ -270,25 +306,23 @@ export default function HSARegistration() {
             notify.error(serverMessage || "Validation failed. Please review your details.");
           }
           break;
-
+    
         case 429:
           notify.error("Too many registration attempts. Please wait a moment and try again.");
           break;
-
+    
         case 500:
           notify.error("Server error. Please try again later or contact support.");
           break;
-
+    
         case 502:
         case 503:
         case 504:
           notify.error("The server is currently unavailable. Please try again shortly.");
           break;
-
+    
         default:
-          notify.error(
-            serverMessage || err.message || "Registration failed. Please try again."
-          );
+          notify.error(serverMessage || err.message || "Registration failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -430,7 +464,7 @@ export default function HSARegistration() {
                   value={formData.phone}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  placeholder="e.g. +234 803 123 4567"
+                  placeholder="e.g. +2348031234567"
                   className={inputClass("phone")}
                 />
                 <FieldError field="phone" />

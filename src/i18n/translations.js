@@ -74,7 +74,7 @@ const translations = {
       ctaDiscover: "Discover Our Story"
     },
     aboutstats: {
-      activeStudents: "100+",
+      activeStudents: "1000+",
       activeStudentsLabel: "Active Students",
       expertScholars: "10+",
       expertScholarsLabel: "Expert Scholars"
