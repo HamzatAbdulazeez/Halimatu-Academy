@@ -269,8 +269,7 @@ export default function HSARegistration() {
           break;
     
         case 409: {
-          // Only show conflict error if server explicitly said 409
-          // Check if it's email or phone conflict
+
           const isPhoneConflict = serverMessage?.toLowerCase().includes("phone");
           const isEmailConflict = serverMessage?.toLowerCase().includes("email") || !isPhoneConflict;
     
