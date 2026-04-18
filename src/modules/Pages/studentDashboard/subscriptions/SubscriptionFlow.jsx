@@ -76,27 +76,38 @@ const StudentSubscriptionPage = () => {
 
     try {
       const plansRes = await getPlans();
-      const raw = plansRes?.data?.plans ?? plansRes?.plans ?? plansRes?.data ?? plansRes ?? [];
+      
+      // 1. IMPROVED EXTRACTION: Handles [array], {data: []}, or {plans: []}
+      let raw = [];
+      if (Array.isArray(plansRes)) {
+        raw = plansRes;
+      } else if (Array.isArray(plansRes?.data)) {
+        raw = plansRes.data;
+      } else if (Array.isArray(plansRes?.plans)) {
+        raw = plansRes.plans;
+      } else if (Array.isArray(plansRes?.data?.plans)) {
+        raw = plansRes.data.plans;
+      }
 
-      const mapped = Array.isArray(raw)
-        ? raw
-            .map(plan => ({
-              id: String(plan.id),   // always string so === comparison is safe
-              name: plan.name || 'Plan',
-              period: plan.type || `${plan.duration_months} Months`,
-              durationMonths: plan.duration_months,
-              price: plan.discounted_price ?? plan.original_price ?? 0,
-              displayPrice: formatPrice(plan.discounted_price ?? plan.original_price),
-              features: Array.isArray(plan.features) ? plan.features : [],
-              popular: plan.sort_order === 1,
-              status: plan.status,
-            }))
-            .filter(p => p.status !== 'inactive')
-        : [];
+      // 2. MAPPING: Converts backend data to your UI format
+      const mapped = raw.map(plan => ({
+          id: String(plan.id || plan._id), 
+          name: plan.name || 'Unnamed Plan',
+          period: plan.type || `${plan.duration_months || 0} Months`,
+          durationMonths: plan.duration_months || 0,
+          price: plan.discounted_price ?? plan.original_price ?? 0,
+          displayPrice: formatPrice(plan.discounted_price ?? plan.original_price),
+          features: Array.isArray(plan.features) ? plan.features : [],
+          popular: Number(plan.sort_order) === 1,
+          status: plan.status || 'active', // Fallback to active if status is missing
+        }))
+        // 3. FILTERING: Only hide if explicitly marked as inactive (case-insensitive)
+        .filter(p => p.status.toLowerCase() !== 'inactive');
 
       if (!mountedRef.current) return;
       setPlans(mapped);
 
+      // 4. FETCH SUBSCRIPTION DETAILS
       const [activeRes, statusRes, allSubsRes] = await Promise.allSettled([
         getMyActiveSubscription(),
         getMySubscriptionStatus(),
@@ -106,11 +117,7 @@ const StudentSubscriptionPage = () => {
       if (!mountedRef.current) return;
 
       if (activeRes.status === 'fulfilled') {
-        const s =
-          activeRes.value?.subscription ??
-          activeRes.value?.data?.subscription ??
-          activeRes.value?.data ??
-          activeRes.value;
+        const s = activeRes.value?.subscription ?? activeRes.value?.data?.subscription ?? activeRes.value?.data ?? activeRes.value;
         setActiveSubscription(s && typeof s === 'object' && s.id ? s : null);
       }
 
@@ -124,13 +131,12 @@ const StudentSubscriptionPage = () => {
         setAllSubscriptions(Array.isArray(list) ? list : []);
       }
 
-      // Always set ready — even on background refresh
-      if (mountedRef.current) setPageState('ready');
+      setPageState('ready');
     } catch (err) {
-      console.error('[fetchData error]', err);
+      console.error('[fetchData error details]:', err);
       if (!mountedRef.current) return;
       if (showLoading) setPageState('error');
-      else notify.error('Failed to refresh. Please try again.');
+      else notify.error('Failed to refresh data.');
     }
   }, []);
 

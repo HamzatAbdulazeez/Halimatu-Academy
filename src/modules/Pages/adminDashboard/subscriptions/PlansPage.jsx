@@ -34,12 +34,11 @@ const SubscriptionsPage = () => {
     description: '', features: [], status: 'active', sort_order: 0,
   };
 
-  // Fetch data
   const fetchAll = async () => {
     setLoading(true);
     try {
       const [plansRes, subsRes] = await Promise.all([
-        adminGetPlans(),           // ← Changed
+        adminGetPlans(),
         getSubscriptions(),
       ]);
       setPlans(Array.isArray(plansRes) ? plansRes : plansRes?.data || []);
@@ -61,7 +60,6 @@ const SubscriptionsPage = () => {
 
   useEffect(() => { fetchAll(); }, []);
 
-  // Modal handlers
   const openCreate = () => { setCurrentPlan({ ...emptyPlan }); setModalOpen(true); };
   const openEdit = (plan) => { setCurrentPlan({ ...plan }); setModalOpen(true); };
   const closeModal = () => { setModalOpen(false); setCurrentPlan(null); };
@@ -74,23 +72,16 @@ const SubscriptionsPage = () => {
     }));
   };
 
-  const handleFeaturesChange = (e) => {
-    const inputValue = String(e.target.value || '');   // Force it to be a string
-  
-    const featuresArray = inputValue
-      .split(/[\n,]+/)                    // Split by newline or comma
-      .map(f => f.trim())
-      .filter(f => f.length > 0);
-  
+  const handleFeaturesChange = (featuresArray) => {
     setCurrentPlan(prev => ({
       ...prev,
       features: featuresArray
     }));
   };
+
   const handleSave = async () => {
     if (!currentPlan) return;
   
-    // Quick client-side check
     if (!currentPlan.name?.trim()) {
       notify.error("Plan name is required");
       return;
@@ -98,59 +89,52 @@ const SubscriptionsPage = () => {
   
     setSaving(true);
   
-    const payload = {
+    // CLEAN DATA BEFORE SENDING TO API
+    const finalPayload = {
+      ...currentPlan,
       name: currentPlan.name?.trim() || '',
-      type: currentPlan.type || 'monthly',
       duration_months: Number(currentPlan.duration_months) || 1,
       original_price: Number(currentPlan.original_price) || 0,
       discounted_price: Number(currentPlan.discounted_price) || 0,
       discount_percentage: Number(currentPlan.discount_percentage) || 0,
       description: currentPlan.description?.trim() || '',
-      features: Array.isArray(currentPlan.features) ? currentPlan.features : [],
       status: currentPlan.status || 'active',
       sort_order: Number(currentPlan.sort_order) || 0,
+      // This cleans up empty lines and spaces only at the moment of saving
+      features: Array.isArray(currentPlan.features) 
+        ? currentPlan.features.map(f => f.trim()).filter(f => f.length > 0) 
+        : [],
     };
   
     try {
       if (currentPlan.id) {
-        await adminUpdatePlan(currentPlan.id, payload);
+        await adminUpdatePlan(currentPlan.id, finalPayload);
         notify.success("Plan updated successfully");
       } else {
-        await adminCreatePlan(payload);
+        await adminCreatePlan(finalPayload);
         notify.success("Plan created successfully");
       }
   
       closeModal();
       fetchAll();
     } catch (err) {
-      console.error("Save error full details:", err);
-  
+      console.error("Save error:", err);
       const errors = err.response?.data?.errors;
-  
       if (errors && Object.keys(errors).length > 0) {
-        // Show the first validation error clearly
         const firstError = Object.values(errors).flat()[0];
         notify.error(`Validation Error: ${firstError}`);
-  
-        // Optional: Log all errors for debugging
-        console.table(errors);
-      } 
-      else if (err.response?.data?.message) {
-        notify.error(err.response.data.message);
-      } 
-      else {
-        notify.error("Failed to save plan. Please check console for details.");
+      } else {
+        notify.error(err.response?.data?.message || "Failed to save plan");
       }
     } finally {
       setSaving(false);
     }
   };
 
-  const confirmDelete = (plan) => { setPlanToDelete(plan); setDeleteModalOpen(true); };
   const handleDelete = async () => {
     if (!planToDelete) return;
     try {
-      await adminDeletePlan(planToDelete.id);               // ← Changed
+      await adminDeletePlan(planToDelete.id);
       notify.success(`"${planToDelete.name}" deleted`);
       setDeleteModalOpen(false);
       setPlanToDelete(null);
@@ -167,63 +151,58 @@ const SubscriptionsPage = () => {
   };
 
   return (
-    <div className="">
-      <div className="space-y-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-1 sm:mb-2">
-              Subscriptions & Plans
-            </h1>
-            <p className="text-gray-600 text-sm sm:text-base">
-              Manage pricing plans and subscription analytics
-            </p>
-          </div>
-          <button
-            onClick={openCreate}
-            className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#004aad] text-white font-medium rounded-lg shadow-sm hover:bg-[#003a8f] transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-            Create Plan
-          </button>
-        </div>
-
-        <SubscriptionStats subStats={subStats} loading={loading} formatPrice={formatPrice} />
-
-        {/* Plans Grid */}
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Current Plans</h2>
-
-          {loading ? (
-            <div className="text-center py-16 text-gray-400">Loading plans...</div>
-          ) : plans.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 bg-white rounded-md border border-gray-100">
-              No plans yet. Create your first plan.
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6">
-              {plans
-                .slice()
-                .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-                .map((plan) => (
-                  <PlanCard
-                    key={plan.id}
-                    plan={plan}
-                    onEdit={openEdit}
-                    onDelete={confirmDelete}
-                    formatPrice={formatPrice}
-                  />
-                ))}
-            </div>
-          )}
+          <h1 className="text-2xl sm:text-3xl font-bold text-black mb-1 sm:mb-2">
+            Subscriptions & Plans
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Manage pricing plans and subscription analytics
+          </p>
         </div>
-
-        <RecentSubscriptionsTable
-          subscriptions={subscriptions}
-          loading={loading}
-          formatPrice={formatPrice}
-        />
+        <button
+          onClick={openCreate}
+          className="px-5 sm:px-6 py-2.5 sm:py-3 bg-[#004aad] text-white font-medium rounded-lg shadow-sm hover:bg-[#003a8f] transition-all flex items-center justify-center gap-2 w-full sm:w-auto"
+        >
+          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+          Create Plan
+        </button>
       </div>
+
+      <SubscriptionStats subStats={subStats} loading={loading} formatPrice={formatPrice} />
+
+      <div>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Current Plans</h2>
+        {loading ? (
+          <div className="text-center py-16 text-gray-400">Loading plans...</div>
+        ) : plans.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 bg-white rounded-md border border-gray-100">
+            No plans yet. Create your first plan.
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {plans
+              .slice()
+              .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+              .map((plan) => (
+                <PlanCard
+                  key={plan.id}
+                  plan={plan}
+                  onEdit={openEdit}
+                  onDelete={(p) => { setPlanToDelete(p); setDeleteModalOpen(true); }}
+                  formatPrice={formatPrice}
+                />
+              ))}
+          </div>
+        )}
+      </div>
+
+      <RecentSubscriptionsTable
+        subscriptions={subscriptions}
+        loading={loading}
+        formatPrice={formatPrice}
+      />
 
       <PlanModal
         isOpen={modalOpen}

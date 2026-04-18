@@ -10,21 +10,48 @@ import {
     deleteNotification,
 } from '../../../api/notificationsApi';
 
+// ─── Map notification type → icon ─────────────────────────────────────────
+const getIcon = (type) => {
+    if (type === 'class-reminder') return <FaCalendarAlt className="text-blue-500" />;
+    if (type === 'achievement')    return <FaTrophy className="text-yellow-500" />;
+    return <FaInfoCircle className="text-gray-400" />;
+};
+
+// ─── Normalize API response to a consistent shape ─────────────────────────
+// Handles snake_case (is_read, created_at) or camelCase from the backend
+const normalizeNotification = (n) => ({
+    ...n,
+    isRead: n.isRead ?? n.is_read ?? false,
+    time: n.time
+        ?? (n.created_at ? new Date(n.created_at).toLocaleString() : 'Unknown time'),
+});
+
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all');
+    const [loading, setLoading]             = useState(true);
+    const [filter, setFilter]               = useState('all');
 
-    // Fetch notifications
+    // ── Fetch notifications ──────────────────────────────────────────────
     useEffect(() => {
         const fetchNotifications = async () => {
             setLoading(true);
             try {
                 const data = await getNotifications({ limit: 50 });
-                setNotifications(data?.notifications || data || []);
+
+                // Support both { notifications: [...] } and plain array responses
+                const raw = data?.notifications ?? data ?? [];
+                const normalized = Array.isArray(raw) ? raw.map(normalizeNotification) : [];
+
+                setNotifications(normalized);
             } catch (err) {
-                console.error(err);
-                notify.error('Failed to load notifications');
+                console.error('Notifications fetch error:', err);
+
+                // Give a helpful message for CORS / network errors
+                if (err?.message === 'Network Error') {
+                    notify.error('Could not reach the server. Please check your connection or contact support.');
+                } else {
+                    notify.error('Failed to load notifications');
+                }
             } finally {
                 setLoading(false);
             }
@@ -33,17 +60,17 @@ const NotificationsPage = () => {
         fetchNotifications();
     }, []);
 
-    // Calculate unread count from actual data (most reliable)
+    // ── Derived state ────────────────────────────────────────────────────
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
-    // Filter notifications
     const filteredNotifications = notifications.filter(notif => {
-        if (filter === 'unread') return !notif.isRead;
-        if (filter === 'reminders') return notif.type === 'class-reminder';
+        if (filter === 'unread')       return !notif.isRead;
+        if (filter === 'reminders')    return notif.type === 'class-reminder';
         if (filter === 'achievements') return notif.type === 'achievement';
         return true;
     });
 
+    // ── Actions ──────────────────────────────────────────────────────────
     const markAsRead = async (id) => {
         try {
             await markNotificationsAsRead([id]);
@@ -55,19 +82,12 @@ const NotificationsPage = () => {
         }
     };
 
-    // Inside the component, after setNotifications(...)
-useEffect(() => {
-    console.log('📋 All Notifications from API:', notifications);
-    console.log('📋 Unread count:', unreadCount);
-    console.log('📋 Filtered:', filteredNotifications);
-}, [notifications]);
-
     const markAllAsRead = async () => {
         try {
             const unreadIds = notifications.filter(n => !n.isRead).map(n => n.id);
             if (unreadIds.length === 0) return;
-    
-            await markNotificationsAsRead(unreadIds);   // Pass array of IDs
+
+            await markNotificationsAsRead(unreadIds);
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             notify.success('All notifications marked as read');
         } catch (err) {
@@ -85,6 +105,7 @@ useEffect(() => {
         }
     };
 
+    // ── Render ───────────────────────────────────────────────────────────
     return (
         <>
             <div className="bg-white px-6 py-4 mb-6">
@@ -92,12 +113,12 @@ useEffect(() => {
                 <p className="text-gray-500">
                     <Link to="/student" className="text-[#004aad] hover:underline">
                         Dashboard
-                    </Link>{" "}
+                    </Link>{' '}
                     &gt; Notifications
                 </p>
             </div>
 
-            <div className="min-h-screen bg-linear-to-br from-slate-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50 py-8 px-4 sm:px-6 lg:px-8">
                 <div className="mx-auto">
 
                     {/* Header */}
@@ -107,7 +128,7 @@ useEffect(() => {
                             <div>
                                 <h2 className="text-2xl font-semibold">Notifications</h2>
                                 <p className="text-gray-600">
-                                    {unreadCount} unread • Stay updated with classes & achievements
+                                    {unreadCount} unread • Stay updated with classes &amp; achievements
                                 </p>
                             </div>
                         </div>
@@ -115,7 +136,7 @@ useEffect(() => {
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllAsRead}
-                                className="px-5 py-2.5 bg-[#004aad] hover:bg-[#003a8c] text-white rounded-lg font-medium transition flex items-center gapmd"
+                                className="px-5 py-2.5 bg-[#004aad] hover:bg-[#003a8c] text-white rounded-lg font-medium transition flex items-center gap-2"
                             >
                                 <FaCheckCircle size={16} />
                                 Mark All as Read
@@ -123,16 +144,17 @@ useEffect(() => {
                         )}
                     </div>
 
-                    {/* Filters - Your Original Design */}
+                    {/* Filters */}
                     <div className="flex flex-wrap gap-2 mb-6">
                         {['All', 'Unread', 'Reminders', 'Achievements'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setFilter(tab.toLowerCase())}
-                                className={`px-4 py-2 rounded-md text-sm cursor-pointer font-medium transition ${filter === tab.toLowerCase()
-                                    ? 'bg-[#004aad] text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
+                                className={`px-4 py-2 rounded-md text-sm cursor-pointer font-medium transition ${
+                                    filter === tab.toLowerCase()
+                                        ? 'bg-[#004aad] text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
                             >
                                 {tab}
                                 {tab === 'Unread' && unreadCount > 0 && (
@@ -165,12 +187,14 @@ useEffect(() => {
                                 <div
                                     key={notif.id}
                                     onClick={() => !notif.isRead && markAsRead(notif.id)}
-                                    className={`group bg-white rounded-lg border-l-4 ${notif.isRead ? 'border-gray-300' : 'border-[#004aad]'
-                                        } p-5 hover:shadow-md transition-all cursor-pointer relative`}
+                                    className={`group bg-white rounded-lg border-l-4 ${
+                                        notif.isRead ? 'border-gray-300' : 'border-[#004aad]'
+                                    } p-5 hover:shadow-md transition-all cursor-pointer relative`}
                                 >
                                     <div className="flex items-start gap-4">
+                                        {/* Icon — mapped from type, not from API data */}
                                         <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-                                            {notif.icon}
+                                            {getIcon(notif.type)}
                                         </div>
 
                                         <div className="flex-1">
@@ -205,17 +229,17 @@ useEffect(() => {
                                             </div>
                                         </div>
 
-                                        {!notif.isRead && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    markAsRead(notif.id);
-                                                }}
-                                                className="text-gray-400 hover:text-gray-600"
-                                            >
-                                                <FaTimes size={18} />
-                                            </button>
-                                        )}
+                                        {/* Delete button — visible on hover */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(notif.id);
+                                            }}
+                                            className="text-gray-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
+                                            title="Delete notification"
+                                        >
+                                            <FaTimes size={18} />
+                                        </button>
                                     </div>
                                 </div>
                             ))}

@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  timeout: 60000, 
+  timeout: 15000, 
 });
 
 // Request Interceptor - Smart Token Handling

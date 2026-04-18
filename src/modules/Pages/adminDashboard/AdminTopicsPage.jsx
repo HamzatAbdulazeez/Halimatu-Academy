@@ -189,7 +189,6 @@ const AdminTopicsPage = () => {
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-1">What You Will Learn</h1>
                         <p className="text-gray-400 text-sm flex items-center gap-1">
-                            <Link to="/admin" className="text-[#004aad] hover:underline">Dashboard</Link>
                             <ChevronRight className="w-3 h-3" />
                             <span>Course Management</span>
                             <ChevronRight className="w-3 h-3" />
