@@ -67,6 +67,13 @@ export const deleteCourse = async (courseId) => {
     return res.data;
 };
 
+export const assignCourseToPlan = async (courseId, planId) => {
+    const res = await axiosInstance.put(
+        `/admin/courses/${courseId}/assign-plan?plan_id=${planId}`
+    );
+    return res.data;
+};
+
 // ─── TOPICS ───────────────────────────────────────────────────────────────────
 
 export const getCourseTopics = async (courseId) => {

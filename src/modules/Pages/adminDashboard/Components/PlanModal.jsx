@@ -125,27 +125,32 @@ const PlanModal = ({
 
                     {/* Features - Improved */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Features
-                        </label>
-                        <p className="text-xs text-gray-500 mb-2">
-                            Enter one feature per line or separate with commas
-                        </p>
-                        <textarea
-                            value={Array.isArray(currentPlan.features) ? currentPlan.features.join('\n') : ''}
-                            onChange={(e) => {
-                                // Smart splitting: handles commas, new lines, and extra spaces
-                                const featuresArray = e.target.value
-                                    .split(/[\n,]+/)           // Split by new line OR comma
-                                    .map(f => f.trim())        // Remove extra spaces
-                                    .filter(Boolean);          // Remove empty entries
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Features
+  </label>
+  
+  <p className="text-xs text-gray-500 mb-2">
+    Enter one feature per line (press Enter). You can also separate with commas.
+  </p>
 
-                                onFeaturesChange({ target: { value: featuresArray } });
-                            }}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:border-[#004aad] min-h-120px resize-y"
-                            placeholder="Full access to Quran recitation&#10;Live weekly classes&#10;Progress tracking dashboard&#10;Certificate of completion"
-                        />
-                    </div>
+  <textarea
+    value={Array.isArray(currentPlan.features) ? currentPlan.features.join('\n') : ''}
+    onChange={(e) => {
+      const value = e.target.value;
+
+      // Split by new lines OR commas, then clean each feature
+      const featuresArray = value
+        .split(/[\n,]+/)                    // Allow Enter key + commas
+        .map(f => f.trim())                 // Remove extra spaces
+        .filter(f => f.length > 0);         // Remove empty entries
+
+      onFeaturesChange(featuresArray);
+    }}
+    className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none focus:border-[#004aad] min-h-[120px] resize-y"
+    placeholder="Full access to Quran recitation&#10;Live weekly classes&#10;Progress tracking dashboard&#10;Certificate of completion"
+    rows={5}
+  />
+</div>
 
                     {/* Status + Sort Order */}
                     <div className="grid grid-cols-2 gap-4">

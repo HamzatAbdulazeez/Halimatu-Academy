@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback } from 'react';
-import { Video, Plus, ChevronRight, Search, Link2, AlertCircle, BookOpen, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Video, Plus, ChevronRight, Search, Link2, AlertCircle, BookOpen, ChevronDown, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import {
@@ -8,18 +7,21 @@ import {
     createClass,
     updateClass,
     deleteClass,
+    assignCourseToPlan,
     getImageUrl,
 } from '../../../api/courseApi';
+
+import { adminGetPlans } from '../../../api/adminplans';
 import { notify } from '../../../utils/toast';
 
 import ClassModal from './Components/classes/ClassModal';
 import ClassesTable from './Components/classes/ClassesTable';
 import Badge from './Components/shared/Badge';
 import DeleteModal from './Components/shared/DeleteModal';
-import Toast from './Components/shared/Toast';
 
 const AdminClassLinksPage = () => {
     const [courses, setCourses] = useState([]);
+    const [plans, setPlans] = useState([]);           // ← New: Store subscription plans
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
@@ -27,70 +29,59 @@ const AdminClassLinksPage = () => {
 
     const [classModal, setClassModal] = useState(null);
     const [deleteModal, setDeleteModal] = useState(null);
+    const [assignPlanModal, setAssignPlanModal] = useState(null); // { courseId, courseName }
+
     const [modalLoading, setModalLoading] = useState(false);
 
-    const [savedToast, setSavedToast] = useState(null);
-
-    const showToast = useCallback((msg) => {
-        setSavedToast(msg);
-        setTimeout(() => setSavedToast(null), 3000);
-    }, []);
-
-    // Fetch courses with topics and classes
+    // Fetch Courses + Plans
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchAll = async () => {
             try {
-                const data = await getAllCoursesWithTopics();
-                setCourses(data || []);
+                const [coursesData, plansData] = await Promise.all([
+                    getAllCoursesWithTopics(),
+                    adminGetPlans().catch(() => [])
+                ]);
+
+                setCourses(Array.isArray(coursesData) ? coursesData : []);
+                setPlans(Array.isArray(plansData) ? plansData : []);
             } catch (err) {
                 console.error(err);
-                notify.error('Failed to load courses and classes');
+                notify.error('Failed to load data');
             } finally {
                 setLoading(false);
             }
         };
-        fetchData();
+        fetchAll();
     }, []);
 
-    // Save Class (Create or Update)
+    // Save Class
     const handleSaveClass = async (topicId, form, isNew) => {
+        if (!topicId) return notify.error("Topic ID is missing");
+
         setModalLoading(true);
         try {
             if (isNew) {
                 const created = await createClass(topicId, form);
-                setCourses(prev =>
-                    prev.map(course =>
-                        course.topics?.some(t => t.id === topicId)
-                            ? {
-                                  ...course,
-                                  topics: course.topics.map(topic =>
-                                      topic.id === topicId
-                                          ? { ...topic, classes: [...(topic.classes ?? []), created] }
-                                          : topic
-                                  ),
-                              }
-                            : course
-                    )
-                );
-                showToast('✅ Class added successfully!');
+                setCourses(prev => prev.map(course => ({
+                    ...course,
+                    topics: course.topics?.map(topic =>
+                        topic.id === topicId
+                            ? { ...topic, classes: [...(topic.classes ?? []), created] }
+                            : topic
+                    ) || [],
+                })));
+                notify.success('Class added successfully!');
             } else {
                 const updated = await updateClass(form.id, form);
-                setCourses(prev =>
-                    prev.map(course => ({
-                        ...course,
-                        topics: course.topics?.map(topic =>
-                            topic.id === topicId
-                                ? {
-                                      ...topic,
-                                      classes: topic.classes.map(cl =>
-                                          cl.id === form.id ? updated : cl
-                                      ),
-                                  }
-                                : topic
-                        ) || [],
-                    }))
-                );
-                showToast('✅ Class updated successfully!');
+                setCourses(prev => prev.map(course => ({
+                    ...course,
+                    topics: course.topics?.map(topic =>
+                        topic.id === topicId
+                            ? { ...topic, classes: topic.classes?.map(cl => cl.id === form.id ? updated : cl) || [] }
+                            : topic
+                    ) || [],
+                })));
+                notify.success('Class updated successfully!');
             }
             setClassModal(null);
         } catch (err) {
@@ -109,17 +100,15 @@ const AdminClassLinksPage = () => {
         setModalLoading(true);
         try {
             await deleteClass(cls.id);
-            setCourses(prev =>
-                prev.map(course => ({
-                    ...course,
-                    topics: course.topics?.map(topic =>
-                        topic.id === topicId
-                            ? { ...topic, classes: topic.classes.filter(cl => cl.id !== cls.id) }
-                            : topic
-                    ) || [],
-                }))
-            );
-            showToast('🗑️ Class deleted successfully.');
+            setCourses(prev => prev.map(course => ({
+                ...course,
+                topics: course.topics?.map(topic =>
+                    topic.id === topicId
+                        ? { ...topic, classes: topic.classes?.filter(cl => cl.id !== cls.id) || [] }
+                        : topic
+                ) || [],
+            })));
+            notify.success('Class deleted successfully.');
             setDeleteModal(null);
         } catch (err) {
             console.error(err);
@@ -129,20 +118,38 @@ const AdminClassLinksPage = () => {
         }
     };
 
-    // FIXED STATS - Now correctly counts meeting_link
+    // Assign Course to Plan
+    const handleAssignPlan = async (courseId, planId) => {
+        if (!planId) return notify.error("Please select a plan");
+
+        setModalLoading(true);
+        try {
+            await assignCourseToPlan(courseId, planId);
+            notify.success("Course assigned to plan successfully! Existing subscribers enrolled.");
+            setAssignPlanModal(null);
+        } catch (err) {
+            console.error(err);
+            notify.error("Failed to assign course to plan");
+        } finally {
+            setModalLoading(false);
+        }
+    };
+
+    // Stats
     const totalClasses = courses.reduce((acc, course) => {
         return acc + (course.topics?.reduce((a, topic) => a + (topic.classes?.length ?? 0), 0) ?? 0);
     }, 0);
 
     const linkedClasses = courses.reduce((acc, course) => {
         return acc + (course.topics?.reduce((a, topic) => {
-            return a + (topic.classes?.filter(cls => cls.meeting_link || cls.meetLink).length ?? 0);
+            return a + (topic.classes?.filter(cls => 
+                cls.meeting_link || cls.meetLink || cls.meetingLink
+            ).length ?? 0);
         }, 0) ?? 0);
     }, 0);
 
     const unlinkedClasses = totalClasses - linkedClasses;
 
-    // Filter courses
     const filteredCourses = courses.filter(course => {
         const term = search.toLowerCase().trim();
         if (!term) return true;
@@ -206,7 +213,7 @@ const AdminClassLinksPage = () => {
                         </div>
                     </div>
 
-                    {/* Main Content */}
+                    {/* Courses List */}
                     {loading ? (
                         <div className="bg-white rounded-2xl py-20 text-center">
                             <div className="w-9 h-9 border-4 border-[#004aad] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -240,6 +247,15 @@ const AdminClassLinksPage = () => {
                                                 <h3 className="font-semibold text-xl text-gray-900 truncate">{courseName}</h3>
                                                 <p className="text-gray-500 text-sm">{course.instructor || 'No instructor'}</p>
                                             </div>
+
+                                            {/* Assign to Plan Button */}
+                                            <button
+                                                onClick={() => setAssignPlanModal({ courseId: course.id, courseName })}
+                                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#004aad] to-[#003a8c] text-white rounded-xl text-sm font-medium hover:brightness-110 transition-all"
+                                            >
+                                                <Award className="w-4 h-4" />
+                                                Assign to Plan
+                                            </button>
                                         </div>
 
                                         {/* Topics */}
@@ -248,7 +264,7 @@ const AdminClassLinksPage = () => {
                                                 const isExpanded = expanded.courseId === course.id && expanded.topicId === topic.id;
                                                 const classCount = topic.classes?.length ?? 0;
                                                 const linkedCount = topic.classes?.filter(cls => 
-                                                    cls.meeting_link || cls.meetLink
+                                                    cls.meeting_link || cls.meetLink || cls.meetingLink
                                                 ).length ?? 0;
 
                                                 return (
@@ -260,7 +276,7 @@ const AdminClassLinksPage = () => {
                                                             <div className="flex items-center gap-3">
                                                                 <BookOpen className="w-5 h-5 text-gray-400" />
                                                                 <div>
-                                                                    <p className="font-medium text-gray-900">{topic.title || 'Untitled Topic'}</p>
+                                                                    <p className="font-medium text-gray-900">{topic.title || topic.name || 'Untitled Topic'}</p>
                                                                     <p className="text-sm text-gray-400">
                                                                         {classCount} class{classCount !== 1 ? 'es' : ''} • {linkedCount} with link
                                                                     </p>
@@ -273,7 +289,7 @@ const AdminClassLinksPage = () => {
                                                                         e.stopPropagation();
                                                                         setClassModal({ cls: null, topicId: topic.id, isNew: true });
                                                                     }}
-                                                                    className="flex items-center gap-2 px-4 py-2 bg-[#004aad] hover:bg-[#003a8c] text-white rounded-md text-sm font-medium  cursor-pointer transition-colors"
+                                                                    className="flex items-center gap-2 px-4 py-2 bg-[#004aad] hover:bg-[#003a8c] text-white rounded-md text-sm font-medium transition-colors"
                                                                 >
                                                                     <Plus className="w-4 h-4" /> Add Class
                                                                 </button>
@@ -332,14 +348,50 @@ const AdminClassLinksPage = () => {
             {deleteModal && (
                 <DeleteModal
                     title="Delete Class?"
-                    message={`Delete "${deleteModal.cls.title || deleteModal.cls.name}"?`}
+                    message={`Delete "${deleteModal.cls.title || deleteModal.cls.name}"? Students will lose access.`}
                     onConfirm={handleDeleteClass}
                     onClose={() => setDeleteModal(null)}
                     loading={modalLoading}
                 />
             )}
 
-            <Toast message={savedToast} />
+            {/* Assign Plan Modal - Dynamic from your API */}
+            {assignPlanModal && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-3xl max-w-md w-full p-8">
+                        <h2 className="text-2xl font-bold mb-2">Assign to Subscription Plan</h2>
+                        <p className="text-gray-600 mb-6">
+                            Assign <strong>{assignPlanModal.courseName}</strong> to a plan.<br />
+                            Existing subscribers will be enrolled automatically.
+                        </p>
+
+                        <div className="mb-8">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Select Plan</label>
+                            <select 
+                                className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:border-[#004aad] focus:outline-none"
+                                onChange={(e) => handleAssignPlan(assignPlanModal.courseId, e.target.value)}
+                                defaultValue=""
+                            >
+                                <option value="">-- Choose Plan --</option>
+                                {plans.map(plan => (
+                                    <option key={plan.id} value={plan.id}>
+                                        {plan.name || plan.title} - ₦{plan.price?.toLocaleString() || '0'}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setAssignPlanModal(null)}
+                                className="flex-1 py-3 border border-gray-300 rounded-2xl font-medium hover:bg-gray-50"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

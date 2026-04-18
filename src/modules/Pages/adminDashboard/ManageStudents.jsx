@@ -1,39 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Search, Eye, Edit, Trash2, CheckCircle, XCircle, Clock, 
-  MoreHorizontal, X 
+  Search, Eye, Trash2, CheckCircle, XCircle, Clock , X
 } from 'lucide-react';
-import { getUsers, getUserStats, deleteUser, updateUser } from "../../../api/authApi"; 
+import { getUsers, getUserStats, deleteUser } from "../../../api/authApi"; 
 import { notify } from "../../../utils/toast";
 
 const ManageStudents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [students, setStudents] = useState([]);
-  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, verified: 0 });
+  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, suspended: 0 });
   const [loading, setLoading] = useState(true);
 
-  // Modal States
   const [selectedUser, setSelectedUser] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const fetchData = async () => {
     try {
-      const [usersRes, statsRes] = await Promise.all([getUsers(), getUserStats()]);
-  
+      const [usersRes, statsRes] = await Promise.all([
+        getUsers(), 
+        getUserStats().catch(() => ({}))
+      ]);
+
       const userData = Array.isArray(usersRes) ? usersRes : usersRes?.data || [];
       setStudents(userData);
 
       const s = statsRes?.data || statsRes || {};
       setStats({
-        total:    s.total    ?? s.total_students    ?? userData.length,
-        active:   s.active   ?? s.active_students   ?? 0,
-        inactive: s.inactive ?? s.inactive_students ?? 0,
-        verified: s.verified ?? s.verified_students ?? 0,
+        total: s.total ?? userData.length,
+        active: s.active ?? 0,
+        inactive: s.inactive ?? 0,
+        suspended: s.suspended ?? 0,
       });
-  
     } catch (err) {
       console.error("Fetch error:", err);     
       notify.error("Failed to load students data");
@@ -46,7 +45,11 @@ const ManageStudents = () => {
     fetchData();
   }, []);
 
-  // --- ACTION HANDLERS ---
+  // Status change is not allowed by server → show message only
+  const handleStatusClick = () => {
+    notify.error("Update not allowed by server. Please contact administrator.");
+  };
+
   const handleDelete = async () => {
     if (!selectedUser) return;
     
@@ -60,20 +63,6 @@ const ManageStudents = () => {
     }
   };
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    if (!selectedUser) return;
-
-    try {
-      await updateUser(selectedUser.id, selectedUser);
-      notify.success("Student information updated successfully");
-      setIsEditModalOpen(false);
-      fetchData();
-    } catch {
-      notify.error("Failed to update student information");
-    }
-  };
-
   const filteredStudents = students.filter(student => {
     const fullName = `${student.first_name || ''} ${student.last_name || ''}`.toLowerCase();
     const matchesSearch = fullName.includes(searchTerm.toLowerCase()) || 
@@ -84,25 +73,20 @@ const ManageStudents = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Status badge styling
   const getStatusBadge = (status) => {
     switch (status?.toLowerCase()) {
-      case 'active':
-        return 'bg-green-100 text-green-700 border border-green-200';
-      case 'inactive':
-        return 'bg-gray-100 text-gray-700 border border-gray-200';
-      case 'suspended':
-        return 'bg-red-100 text-red-700 border border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border border-gray-200';
+      case 'active':    return 'bg-green-100 text-green-700 border border-green-200';
+      case 'inactive':  return 'bg-gray-100 text-gray-700 border border-gray-200';
+      case 'suspended': return 'bg-red-100 text-red-700 border border-red-200';
+      default:          return 'bg-gray-100 text-gray-700 border border-gray-200';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
-      case 'active': return <CheckCircle size={14} />;
-      case 'suspended': return <XCircle size={14} />;
-      default: return <Clock size={14} />;
+      case 'active':    return <CheckCircle size={14} className="text-green-600" />;
+      case 'suspended': return <XCircle size={14} className="text-red-600" />;
+      default:          return <Clock size={14} className="text-gray-500" />;
     }
   };
 
@@ -122,9 +106,9 @@ const ManageStudents = () => {
           { label: "Total Students", value: stats.total, color: "text-gray-900" },
           { label: "Active", value: stats.active, color: "text-green-600" },
           { label: "Inactive", value: stats.inactive, color: "text-gray-600" },
-          { label: "Verified", value: stats.verified, color: "text-blue-600" },
+          { label: "Suspended", value: stats.suspended, color: "text-red-600" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white rounded-2xl p-6  border border-gray-100 hover:shadow-md transition-shadow">
+          <div key={i} className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-md transition-shadow">
             <p className="text-black text-sm font-medium">{stat.label}</p>
             <p className={`text-4xl font-semibold mt-3 ${stat.color}`}>{stat.value}</p>
           </div>
@@ -132,7 +116,7 @@ const ManageStudents = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl p-6  border border-gray-100">
+      <div className="bg-white rounded-2xl p-6 border border-gray-100">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -159,7 +143,7 @@ const ManageStudents = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl  border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -189,7 +173,7 @@ const ManageStudents = () => {
                   <tr key={student.id} className="hover:bg-gray-50/70 transition-colors group">
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 bg-linear-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white font-semibold text-xl ">
+                        <div className="w-11 h-11 bg-gradient-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white font-semibold text-xl">
                           {student.first_name?.[0]?.toUpperCase() || 'S'}
                         </div>
                         <div>
@@ -206,32 +190,51 @@ const ManageStudents = () => {
                     <td className="px-6 py-5">
                       <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium ${getStatusBadge(student.status)}`}>
                         {getStatusIcon(student.status)}
-                        <span className="capitalize">{student.status}</span>
+                        <span className="capitalize">{student.status || 'Active'}</span>
                       </span>
                     </td>
 
                     <td className="px-6 py-5 text-right">
-                      <div className="flex items-center gap-1 justify-end">
+                      <div className="flex items-center gap-2 justify-end">
+                        {/* Disabled Status Toggle */}
+                        <div className="flex gap-1 bg-gray-100 rounded-xl p-1 opacity-75">
+                          <button
+                            onClick={handleStatusClick}
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-xs font-medium bg-green-600 text-white cursor-not-allowed"
+                          >
+                            Active
+                          </button>
+                          <button
+                            onClick={handleStatusClick}
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-xs font-medium bg-gray-600 text-white cursor-not-allowed"
+                          >
+                            Inactive
+                          </button>
+                          <button
+                            onClick={handleStatusClick}
+                            disabled
+                            className="px-3 py-1.5 rounded-xl text-xs font-medium bg-red-600 text-white cursor-not-allowed"
+                          >
+                            Suspend
+                          </button>
+                        </div>
+
                         <button
                           onClick={() => { setSelectedUser(student); setIsViewModalOpen(true); }}
-                          className="p-3 text-blue-600 hover:bg-blue-50 rounded-xl transition-all hover:scale-105"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                           title="View Details"
                         >
-                          <Eye size={20} />
+                          <Eye size={18} />
                         </button>
-                        <button
-                          onClick={() => { setSelectedUser(student); setIsEditModalOpen(true); }}
-                          className="p-3 text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all hover:scale-105"
-                          title="Edit Student"
-                        >
-                          <Edit size={20} />
-                        </button>
+
                         <button
                           onClick={() => { setSelectedUser(student); setIsDeleteModalOpen(true); }}
-                          className="p-3 text-red-600 hover:bg-red-50 rounded-xl transition-all hover:scale-105"
-                          title="Delete Student"
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                          title="Delete"
                         >
-                          <Trash2 size={20} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </td>
@@ -259,7 +262,7 @@ const ManageStudents = () => {
 
             <div className="space-y-6">
               <div className="flex items-center gap-5">
-                <div className="w-20 h-20 bg-linear-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
+                <div className="w-20 h-20 bg-gradient-to-br from-[#004aad] to-blue-700 rounded-2xl flex items-center justify-center text-white text-4xl font-bold">
                   {selectedUser.first_name?.[0]}
                 </div>
                 <div>
@@ -281,61 +284,6 @@ const ManageStudents = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal - Improved */}
-      {isEditModalOpen && selectedUser && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl">
-            <div className="flex justify-between mb-6">
-              <h2 className="text-2xl font-bold">Edit Student</h2>
-              <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X size={24} />
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdate} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#004aad] focus:ring-1 focus:ring-[#004aad] outline-none"
-                  value={selectedUser.first_name || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, first_name: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:border-[#004aad] focus:ring-1 focus:ring-[#004aad] outline-none"
-                  value={selectedUser.status || 'active'}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, status: e.target.value })}
-                >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                  <option value="suspended">Suspended</option>
-                </select>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="flex-1 py-3.5 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3.5 bg-[#004aad] hover:bg-[#003a8f] text-white rounded-xl font-semibold transition-colors"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

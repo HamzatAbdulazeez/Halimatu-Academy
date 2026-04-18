@@ -7,7 +7,7 @@ import {
   adminDeletePlan,
   getSubscriptions,
   getSubscriptionStats
-} from "../../../../api/authApi";
+} from "../../../../api/adminplans";
 import { notify } from "../../../../utils/toast";
 
 import PlanCard from '../Components/PlanCard';
