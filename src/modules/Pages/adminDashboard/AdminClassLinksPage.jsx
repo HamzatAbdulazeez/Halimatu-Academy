@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Video, Plus, ChevronRight, Search, Link2, AlertCircle, BookOpen, ChevronDown, Award } from 'lucide-react';
+import { Video, Plus, ChevronRight, Search, Link2, AlertCircle, BookOpen, ChevronDown, Award, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import {
@@ -21,7 +21,7 @@ import DeleteModal from './Components/shared/DeleteModal';
 
 const AdminClassLinksPage = () => {
     const [courses, setCourses] = useState([]);
-    const [plans, setPlans] = useState([]);           // ← New: Store subscription plans
+    const [plans, setPlans] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
 
@@ -38,7 +38,7 @@ const AdminClassLinksPage = () => {
         const fetchAll = async () => {
             try {
                 const [coursesData, plansData] = await Promise.all([
-                    getAllCoursesWithTopics(),
+                    getAllCoursesWithTopics().catch(() => []),
                     adminGetPlans().catch(() => [])
                 ]);
 
@@ -54,7 +54,7 @@ const AdminClassLinksPage = () => {
         fetchAll();
     }, []);
 
-    // Save Class
+    // Save Class (unchanged)
     const handleSaveClass = async (topicId, form, isNew) => {
         if (!topicId) return notify.error("Topic ID is missing");
 
@@ -92,7 +92,7 @@ const AdminClassLinksPage = () => {
         }
     };
 
-    // Delete Class
+    // Delete Class (unchanged)
     const handleDeleteClass = async () => {
         if (!deleteModal) return;
         const { cls, topicId } = deleteModal;
@@ -126,6 +126,11 @@ const AdminClassLinksPage = () => {
         try {
             await assignCourseToPlan(courseId, planId);
             notify.success("Course assigned to plan successfully! Existing subscribers enrolled.");
+
+            // Refresh courses to update "already assigned" indicators
+            const refreshed = await getAllCoursesWithTopics().catch(() => courses);
+            setCourses(Array.isArray(refreshed) ? refreshed : courses);
+
             setAssignPlanModal(null);
         } catch (err) {
             console.error(err);
@@ -168,7 +173,7 @@ const AdminClassLinksPage = () => {
     return (
         <>
             {/* Breadcrumb */}
-            <div className="bg-white px-6 py-4 border-b border-gray-100">
+            <div className="bg-white px-4 sm:px-6 py-4 border-b border-gray-100">
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">Class Schedule & Links</h1>
                 <p className="text-gray-400 text-sm flex items-center gap-1">
                     <Link to="/admin" className="text-[#004aad] hover:underline">Dashboard</Link>
@@ -178,21 +183,21 @@ const AdminClassLinksPage = () => {
             </div>
 
             <div className="bg-gray-50 min-h-screen pb-16">
-                <div className="mx-auto px-4 py-8 space-y-6">
+                <div className="mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
 
-                    {/* Stats Cards */}
+                    {/* Stats Cards - Responsive */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {[
                             { label: 'Total Classes', value: totalClasses, icon: Video, color: 'text-[#004aad]', bg: 'bg-blue-50' },
                             { label: 'Links Set', value: linkedClasses, icon: Link2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                             { label: 'Missing Links', value: unlinkedClasses, icon: AlertCircle, color: 'text-amber-600', bg: 'bg-amber-50' },
                         ].map(({ label, value, icon: Icon, color, bg }) => (
-                            <div key={label} className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center gap-5">
-                                <div className={`w-14 h-14 ${bg} rounded-2xl flex items-center justify-center`}>
-                                    <Icon className={`w-7 h-7 ${color}`} />
+                            <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 flex items-center gap-4 sm:gap-5">
+                                <div className={`w-12 h-12 sm:w-14 sm:h-14 ${bg} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                                    <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${color}`} />
                                 </div>
                                 <div>
-                                    <div className="text-4xl font-bold text-gray-900">{value}</div>
+                                    <div className="text-3xl sm:text-4xl font-bold text-gray-900">{value}</div>
                                     <div className="text-sm text-gray-500 mt-1">{label}</div>
                                 </div>
                             </div>
@@ -223,42 +228,58 @@ const AdminClassLinksPage = () => {
                         <div className="space-y-6">
                             {filteredCourses.map((course) => {
                                 const courseName = course.title || course.name || 'Untitled Course';
+                                const assignedPlans = course.plans || course.assignedPlans || []; // Adjust property name if different
 
                                 return (
                                     <div key={course.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
 
-                                        {/* Course Header */}
-                                        <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-                                            <div className="w-16 h-16 rounded-2xl overflow-hidden border border-gray-100 bg-gray-100 shrink-0">
+                                        {/* Course Header - Fully Responsive */}
+                                        <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 sm:items-center border-b border-gray-100">
+                                            {/* Image */}
+                                            <div className="w-full sm:w-16 sm:h-16 rounded-2xl overflow-hidden border border-gray-100 bg-gray-100 shrink-0">
                                                 <img
                                                     src={getImageUrl(course.image)}
                                                     alt={courseName}
-                                                    className="w-full h-full object-cover"
+                                                    className="w-full h-48 sm:h-full object-cover"
                                                     loading="lazy"
                                                     onError={(e) => e.currentTarget.style.display = 'none'}
                                                 />
                                             </div>
 
+                                            {/* Content */}
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-3">
+                                                <div className="flex flex-wrap items-center gap-2 mb-3">
                                                     <Badge text={course.category || 'General'} color="blue" />
                                                     <Badge text={`${course.duration_months || 0} months`} color="gray" />
                                                 </div>
-                                                <h3 className="font-semibold text-xl text-gray-900 truncate">{courseName}</h3>
+                                                <h3 className="font-semibold text-xl text-gray-900">{courseName}</h3>
                                                 <p className="text-gray-500 text-sm">{course.instructor || 'No instructor'}</p>
+
+                                                {/* Already Assigned Plans Indicator */}
+                                                {assignedPlans.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1.5 mt-3">
+                                                        <span className="text-xs text-gray-500 self-center mr-1">Attached to:</span>
+                                                        {assignedPlans.map(plan => (
+                                                            <div key={plan.id} className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                                                                <CheckCircle className="w-3 h-3" />
+                                                                {plan.name || plan.title}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
 
-                                            {/* Assign to Plan Button */}
+                                            {/* Assign Button - Stays on right on larger screens */}
                                             <button
                                                 onClick={() => setAssignPlanModal({ courseId: course.id, courseName })}
-                                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#004aad] to-[#003a8c] text-white rounded-xl text-sm font-medium hover:brightness-110 transition-all"
+                                                className="flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 w-full sm:w-auto bg-gradient-to-r from-[#004aad] to-[#003a8c] text-white rounded-xl text-sm font-medium hover:brightness-110 transition-all"
                                             >
                                                 <Award className="w-4 h-4" />
                                                 Assign to Plan
                                             </button>
                                         </div>
 
-                                        {/* Topics */}
+                                        {/* Topics Section */}
                                         <div className="divide-y divide-gray-100">
                                             {(course.topics || []).map((topic) => {
                                                 const isExpanded = expanded.courseId === course.id && expanded.topicId === topic.id;
@@ -298,7 +319,7 @@ const AdminClassLinksPage = () => {
                                                         </div>
 
                                                         {isExpanded && (
-                                                            <div className="px-5 pb-5">
+                                                            <div className="px-4 sm:px-5 pb-5">
                                                                 <ClassesTable
                                                                     classes={topic.classes ?? []}
                                                                     topicId={topic.id}
@@ -333,7 +354,7 @@ const AdminClassLinksPage = () => {
                 </div>
             </div>
 
-            {/* Modals */}
+            {/* Modals - unchanged */}
             {classModal && (
                 <ClassModal
                     cls={classModal.cls}
@@ -355,7 +376,7 @@ const AdminClassLinksPage = () => {
                 />
             )}
 
-            {/* Assign Plan Modal - Dynamic from your API */}
+            {/* Assign Plan Modal */}
             {assignPlanModal && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-3xl max-w-md w-full p-8">
@@ -371,6 +392,7 @@ const AdminClassLinksPage = () => {
                                 className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:border-[#004aad] focus:outline-none"
                                 onChange={(e) => handleAssignPlan(assignPlanModal.courseId, e.target.value)}
                                 defaultValue=""
+                                disabled={modalLoading}
                             >
                                 <option value="">-- Choose Plan --</option>
                                 {plans.map(plan => (
@@ -385,10 +407,13 @@ const AdminClassLinksPage = () => {
                             <button
                                 onClick={() => setAssignPlanModal(null)}
                                 className="flex-1 py-3 border border-gray-300 rounded-2xl font-medium hover:bg-gray-50"
+                                disabled={modalLoading}
                             >
                                 Cancel
                             </button>
                         </div>
+
+                        {modalLoading && <p className="text-center text-sm text-gray-500 mt-4">Attaching course...</p>}
                     </div>
                 </div>
             )}

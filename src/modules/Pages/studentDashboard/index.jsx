@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
     getStudentEnrolledCourses,
+    getUpcomingClasses  
 } from '../../../api/courseApi';
 
 import { 
-    getMyActiveSubscription,     
-    getMySubscriptionStatus    
+    getMyActiveSubscription    
 } from '../../../api/plansApi';
 
 import WelcomeHeader from './components/welcome/WelcomeHeader';
@@ -18,17 +18,21 @@ import RightSideBar from './components/welcome/RightSide';
 const StudentWelcomeDashboard = () => {
     const [user, setUser] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
+    const [upcomingClasses, setUpcomingClasses] = useState([]);
     const [activeSubscription, setActiveSubscription] = useState(null);
     
     const [loading, setLoading] = useState(true);
     const [loadingSubscription, setLoadingSubscription] = useState(true);
+    const [loadingClasses, setLoadingClasses] = useState(true);
 
     // Load user from localStorage
     useEffect(() => {
         const loadUserData = () => {
             try {
                 const stored = localStorage.getItem("user");
-                if (stored) setUser(JSON.parse(stored));
+                if (stored) {
+                    setUser(JSON.parse(stored));
+                }
             } catch (err) {
                 console.error("Failed to parse user from localStorage:", err);
             }
@@ -39,18 +43,23 @@ const StudentWelcomeDashboard = () => {
         return () => window.removeEventListener("storage", loadUserData);
     }, []);
 
-    // Fetch Enrolled Courses + Active Subscription
+    // Fetch all dashboard data
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchDashboardData = async () => {
             setLoading(true);
             setLoadingSubscription(true);
+            setLoadingClasses(true);
 
             try {
-                // Fetch courses
+                // 1. Fetch enrolled courses (always fetch since user is subscribed)
                 const coursesData = await getStudentEnrolledCourses().catch(() => []);
                 setEnrolledCourses(Array.isArray(coursesData) ? coursesData : []);
 
-                // Fetch active subscription
+                // 2. Fetch upcoming classes (always fetch)
+                const classesData = await getUpcomingClasses().catch(() => []);
+                setUpcomingClasses(Array.isArray(classesData) ? classesData : []);
+
+                // 3. Fetch active subscription (for RightSideBar display only)
                 const subRes = await getMyActiveSubscription().catch(() => null);
                 const subData = subRes?.subscription || 
                                subRes?.data?.subscription || 
@@ -64,10 +73,11 @@ const StudentWelcomeDashboard = () => {
             } finally {
                 setLoading(false);
                 setLoadingSubscription(false);
+                setLoadingClasses(false);
             }
         };
 
-        fetchData();
+        fetchDashboardData();
     }, []);
 
     return (
@@ -77,8 +87,8 @@ const StudentWelcomeDashboard = () => {
             {/* Quick Stats */}
             <QuickStats
                 enrolledCount={enrolledCourses.length}
-                classesAttended={6}           // You can make this dynamic later
-                currentStreak={3}
+                classesAttended={6}        // TODO: Make this dynamic later
+                currentStreak={3}          // TODO: Make this dynamic later
                 loading={loading}
             />
 
@@ -91,16 +101,17 @@ const StudentWelcomeDashboard = () => {
                     />
 
                     <ClassSchedule 
-                        classes={[]} 
-                        loading={false} 
+                        classes={upcomingClasses}
+                        loading={loadingClasses}
                     />
                 </div>
 
-                {/* Right Sidebar - Now receives real subscription */}
+                {/* Right Sidebar */}
                 <div className="lg:col-span-4">
                     <RightSideBar 
                         user={user} 
                         activeSubscription={activeSubscription} 
+                        loading={loadingSubscription}
                     />
                 </div>
             </div>

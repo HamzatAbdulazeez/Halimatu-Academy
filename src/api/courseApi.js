@@ -178,6 +178,16 @@ export const updateCourseProgress = async (course_id, progressData) => {
     return res.data;
 };
 
+export const getUpcomingClasses = async () => {
+    try {
+        const res = await axiosInstance.get('/user/upcoming-classes');
+        return res.data;
+    } catch (error) {
+        console.error('Failed to fetch upcoming classes:', error);
+        return [];
+    }
+};
+
 export const markTopicComplete = async (topic_id, data = { is_completed: true }) => {
     const res = await axiosInstance.post(`/user/topics/${topic_id}/complete`, data);
     return res.data;

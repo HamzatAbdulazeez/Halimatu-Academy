@@ -1,40 +1,42 @@
-import { useState, } from "react";
+import { useState } from "react";
 import Sidebar from "../student/Sidebar";
 import Navbar from "../student/Navbar";
-import { Outlet,  } from "react-router-dom";
-
+import { Outlet } from "react-router-dom";
+import { useSubscription, SubscriptionWall } from "../../../components/SubscriptionGuard";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const { isSubscribed } = useSubscription();
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar Overlay for Mobile & Tablet */}
+
+      {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/30 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
-        ></div>
+        />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — passes isSubscribed so it renders locked/unlocked nav */}
       <Sidebar
         isOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        isSubscribed={isSubscribed}
         className={`fixed left-0 top-0 h-full bg-white z-50 w-64 transition-transform duration-300 transform
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0 lg:relative lg:block`}
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:relative lg:block`}
       />
 
-      {/* Main Content Area */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col w-full overflow-hidden">
         <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <main className="flex-1 bg-gray-100 h-full overflow-y-auto px-4 sm:px-6 py-6">
-          <Outlet />
+          {isSubscribed ? <Outlet /> : <SubscriptionWall />}
         </main>
       </div>
-    </div>
 
+    </div>
   );
 }

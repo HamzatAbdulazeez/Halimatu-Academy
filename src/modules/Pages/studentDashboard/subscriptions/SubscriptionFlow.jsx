@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaExclamationCircle, FaShieldAlt, FaSync, FaCheckCircle } from 'react-icons/fa';
 
 import {
@@ -22,7 +22,6 @@ import PlanCard from '../components/subscribe/PlanCard';
 import BillingHistoryModal from '../components/subscribe/BillingHistoryModal';
 import CancelSubscriptionModal from '../components/subscribe/CancelSubscriptionModal';
 
-// Success banner shown immediately after payment completes
 const SuccessBanner = ({ planLabel, onDismiss }) => (
   <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 mb-8 flex items-start gap-4">
     <FaCheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={24} />
@@ -42,30 +41,26 @@ const SuccessBanner = ({ planLabel, onDismiss }) => (
 );
 
 const StudentSubscriptionPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showBillingHistory, setShowBillingHistory] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [isTogglingRenew, setIsTogglingRenew] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Tracks which plan id is being processed — null means none active
   const [processingPlanId, setProcessingPlanId] = useState(null);
-
-  // Show the green success banner after a successful payment
   const [justSubscribed, setJustSubscribed] = useState(false);
 
   const [plans, setPlans] = useState([]);
   const [activeSubscription, setActiveSubscription] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [allSubscriptions, setAllSubscriptions] = useState([]);
-
   const [pageState, setPageState] = useState('loading');
 
-  // Ref lock prevents same-tick double payment initiation
   const processingRef = useRef(false);
-
-  // Track mounted state to avoid setState after unmount
   const mountedRef = useRef(true);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
@@ -76,8 +71,7 @@ const StudentSubscriptionPage = () => {
 
     try {
       const plansRes = await getPlans();
-      
-      // 1. IMPROVED EXTRACTION: Handles [array], {data: []}, or {plans: []}
+
       let raw = [];
       if (Array.isArray(plansRes)) {
         raw = plansRes;
@@ -89,9 +83,9 @@ const StudentSubscriptionPage = () => {
         raw = plansRes.data.plans;
       }
 
-      // 2. MAPPING: Converts backend data to your UI format
-      const mapped = raw.map(plan => ({
-          id: String(plan.id || plan._id), 
+      const mapped = raw
+        .map(plan => ({
+          id: String(plan.id || plan._id),
           name: plan.name || 'Unnamed Plan',
           period: plan.type || `${plan.duration_months || 0} Months`,
           durationMonths: plan.duration_months || 0,
@@ -99,15 +93,13 @@ const StudentSubscriptionPage = () => {
           displayPrice: formatPrice(plan.discounted_price ?? plan.original_price),
           features: Array.isArray(plan.features) ? plan.features : [],
           popular: Number(plan.sort_order) === 1,
-          status: plan.status || 'active', // Fallback to active if status is missing
+          status: plan.status || 'active',
         }))
-        // 3. FILTERING: Only hide if explicitly marked as inactive (case-insensitive)
         .filter(p => p.status.toLowerCase() !== 'inactive');
 
       if (!mountedRef.current) return;
       setPlans(mapped);
 
-      // 4. FETCH SUBSCRIPTION DETAILS
       const [activeRes, statusRes, allSubsRes] = await Promise.allSettled([
         getMyActiveSubscription(),
         getMySubscriptionStatus(),
@@ -117,7 +109,11 @@ const StudentSubscriptionPage = () => {
       if (!mountedRef.current) return;
 
       if (activeRes.status === 'fulfilled') {
-        const s = activeRes.value?.subscription ?? activeRes.value?.data?.subscription ?? activeRes.value?.data ?? activeRes.value;
+        const s =
+          activeRes.value?.subscription ??
+          activeRes.value?.data?.subscription ??
+          activeRes.value?.data ??
+          activeRes.value;
         setActiveSubscription(s && typeof s === 'object' && s.id ? s : null);
       }
 
@@ -133,7 +129,7 @@ const StudentSubscriptionPage = () => {
 
       setPageState('ready');
     } catch (err) {
-      console.error('[fetchData error details]:', err);
+      console.error('[fetchData error]:', err);
       if (!mountedRef.current) return;
       if (showLoading) setPageState('error');
       else notify.error('Failed to refresh data.');
@@ -166,6 +162,20 @@ const StudentSubscriptionPage = () => {
     }
   };
 
+  // Called after confirmed activation — navigates back to wherever the user came from
+  const handlePaymentSuccess = useCallback((activatedPlanLabel) => {
+    const from = location.state?.from;
+    if (from && from !== '/student/subscription') {
+      // Give the toast a moment to show before navigating away
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 2000);
+    } else {
+      // Already on subscription page — just show the banner
+      setJustSubscribed(true);
+    }
+  }, [location.state?.from, navigate]);
+
   const handlePaymentRedirect = useCallback(async (selectedPlan) => {
     if (processingRef.current) {
       notify.error('A payment is already in progress. Please wait.');
@@ -189,24 +199,28 @@ const StudentSubscriptionPage = () => {
       if (!paymentData?.tx_ref) {
         console.error('❌ No tx_ref received from backend');
         notify.error('Payment could not be started. No transaction reference returned.');
+        processingRef.current = false;
+        setProcessingPlanId(null);
         return;
       }
 
       if (typeof window.FlutterwaveCheckout !== 'function') {
         console.error('❌ FlutterwaveCheckout not loaded on window');
         notify.error('Payment system not ready. Please refresh the page.');
+        processingRef.current = false;
+        setProcessingPlanId(null);
         return;
       }
 
       console.log('2. Opening Flutterwave Checkout with tx_ref:', paymentData.tx_ref);
 
       window.FlutterwaveCheckout({
-        public_key: 'FLWPUBK_TEST-39ab6a4a6d75cab56a4e98abcbc5aeb4-X', // ← Consider moving to env
+        public_key: 'FLWPUBK_TEST-39ab6a4a6d75cab56a4e98abcbc5aeb4-X',
         tx_ref: paymentData.tx_ref,
         amount: paymentData.amount,
         currency: paymentData.currency || 'NGN',
         payment_options: 'card, banktransfer, ussd',
-        customer: paymentData.customer || { email: 'user@example.com' }, // ensure email exists
+        customer: paymentData.customer || { email: 'user@example.com' },
         customizations: {
           title: 'Halimatu Academy',
           description: `Payment for ${selectedPlan.name}`,
@@ -231,7 +245,6 @@ const StudentSubscriptionPage = () => {
           try {
             notify.success('Payment received! Activating subscription...');
 
-            // === VERIFY PAYMENT ===
             console.log('3. Calling verifyPayment...');
             const verifyRes = await verifyPayment({
               tx_ref: flwResponse.tx_ref,
@@ -239,7 +252,6 @@ const StudentSubscriptionPage = () => {
             });
             console.log('Verify Payment Response:', verifyRes);
 
-            // === ACTIVATE SUBSCRIPTION ===
             console.log('4. Calling activateSubscription...');
             const activateRes = await activateSubscription({
               tx_ref: flwResponse.tx_ref,
@@ -247,8 +259,7 @@ const StudentSubscriptionPage = () => {
             });
             console.log('Activate Subscription Response:', activateRes);
 
-            // === POLLING ===
-            console.log('5. Starting polling for subscription status...');
+            console.log('5. Polling for subscription status...');
             let activated = false;
             for (let i = 0; i < 10; i++) {
               await new Promise(r => setTimeout(r, 2000));
@@ -272,22 +283,22 @@ const StudentSubscriptionPage = () => {
               }
             }
 
-            // Final refresh
             console.log('6. Doing full data refresh...');
             await fetchData(false);
 
             if (mountedRef.current) {
-              setJustSubscribed(true);
               notify.success(
                 activated
                   ? '🎉 Subscription activated! You now have full access.'
                   : 'Payment successful! Your subscription will activate shortly.'
               );
+              // Navigate back or show banner
+              handlePaymentSuccess(selectedPlan.name);
             }
           } catch (err) {
             console.group('❌ Activation / Verification Error');
             console.error('[activation error]', err);
-            console.error('Error response (if any):', err?.response?.data);
+            console.error('Error response:', err?.response?.data);
             console.error('Status code:', err?.response?.status);
             console.groupEnd();
 
@@ -298,7 +309,7 @@ const StudentSubscriptionPage = () => {
           } finally {
             processingRef.current = false;
             setProcessingPlanId(null);
-            console.groupEnd(); // end callback group
+            console.groupEnd();
           }
         },
 
@@ -320,14 +331,11 @@ const StudentSubscriptionPage = () => {
         err?.message ||
         'Failed to start payment. Please try again.'
       );
-    } finally {
-      if (!window.FlutterwaveCheckout) {
-        // only reset if checkout never opened
-        processingRef.current = false;
-        setProcessingPlanId(null);
-      }
+      // Always reset if FlutterwaveCheckout never opened
+      processingRef.current = false;
+      setProcessingPlanId(null);
     }
-  }, [fetchData]);
+  }, [fetchData, handlePaymentSuccess]);
 
   const handleCancel = async () => {
     const id = activeSubscription?.id || activeSubscription?._id;
@@ -349,7 +357,6 @@ const StudentSubscriptionPage = () => {
   const handleToggleAutoRenew = async () => {
     const id = activeSubscription?.id || activeSubscription?._id;
     if (!id) return;
-    // Capture BEFORE the API call — state won't have updated yet after fetch
     const currentAutoRenew = activeSubscription?.auto_renew ?? true;
     setIsTogglingRenew(true);
     try {
@@ -363,7 +370,6 @@ const StudentSubscriptionPage = () => {
     }
   };
 
-  // Derived values — all IDs coerced to string for reliable ===
   const isSubscribed = !!(
     subscriptionStatus?.is_active ||
     subscriptionStatus?.status === 'active' ||
@@ -416,10 +422,9 @@ const StudentSubscriptionPage = () => {
         </p>
       </div>
 
-      <div className="bg-gray-50 min-h-screen ">
+      <div className="bg-gray-50 min-h-screen">
         <div className="mx-auto px-4 py-8 space-y-6">
 
-          {/* Green success banner — shown right after payment */}
           {justSubscribed && (
             <SuccessBanner planLabel={planLabel} onDismiss={() => setJustSubscribed(false)} />
           )}
