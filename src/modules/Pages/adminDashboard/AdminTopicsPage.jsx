@@ -12,6 +12,7 @@ import {
     deleteTopic,
     getCourseTopics,
 } from '../../../api/courseApi';
+import axiosInstance from '../../../api/axiosInstance';
 import { notify } from '../../../utils/toast';
 
 import TopicsModal from './Components/topics/TopicsModal';
@@ -69,6 +70,36 @@ const AdminTopicsPage = () => {
         fetchCourses();
     }, []);
 
+    // ── Publish / Unpublish toggle ────────────────────────────────────────────
+    const handleTogglePublish = async (courseId, newStatus) => {
+        try {
+            // Use PUT with status field — same as updateCourse but just status
+            const res = await axiosInstance.put(
+                `/admin/courses/${courseId}`,
+                { status: newStatus },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            // Update local state immediately
+            setCourses(prev =>
+                prev.map(c =>
+                    c.id === courseId
+                        ? { ...c, status: res.data?.status || newStatus }
+                        : c
+                )
+            );
+
+            showToast(
+                newStatus === 'published'
+                    ? '✅ Course published! Students can now see it.'
+                    : '📦 Course unpublished.'
+            );
+        } catch (err) {
+            console.error('Toggle publish error:', err?.response?.data || err);
+            notify.error('Failed to update course status.');
+        }
+    };
+
     // Save Topics
     const handleSaveTopics = async (courseId, newTopics) => {
         setModalLoading(true);
@@ -76,7 +107,6 @@ const AdminTopicsPage = () => {
             const course = courses.find(c => c.id === courseId);
             const oldTopics = course?.whatYouLearn ?? [];
 
-            // Delete removed topics
             const newIds = new Set(newTopics.filter(t => t.id).map(t => t.id));
             const toDelete = oldTopics.filter(t => t.id && !newIds.has(t.id));
 
@@ -84,7 +114,6 @@ const AdminTopicsPage = () => {
                 await deleteTopic(topic.id);
             }
 
-            // Create new topics
             const created = [];
             for (const item of newTopics) {
                 if (item.id) {
@@ -97,7 +126,6 @@ const AdminTopicsPage = () => {
                 created.push(newTopic);
             }
 
-            // Refresh topics from server
             const freshTopics = await getCourseTopics(courseId).catch(() => created);
 
             setCourses(prev =>
@@ -210,9 +238,9 @@ const AdminTopicsPage = () => {
                     {/* Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {[
-                            { label: 'Total Courses', value: courses.length, icon: BookOpen, color: 'text-[#004aad]', bg: 'bg-blue-50' },
-                            { label: 'Total Topics', value: totalTopics, icon: Tag, color: 'text-purple-600', bg: 'bg-purple-50' },
-                            { label: 'Avg Topics / Course', value: courses.length ? Math.round(totalTopics / courses.length) : 0, icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                            { label: 'Total Courses',      value: courses.length,                                                          icon: BookOpen,    color: 'text-[#004aad]',   bg: 'bg-blue-50' },
+                            { label: 'Published',          value: courses.filter(c => c.status === 'published').length,                    icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                            { label: 'Avg Topics / Course',value: courses.length ? Math.round(totalTopics / courses.length) : 0,           icon: Tag,         color: 'text-purple-600',  bg: 'bg-purple-50' },
                         ].map(({ label, value, icon: Icon, color, bg }) => (
                             <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4">
                                 <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center shrink-0`}>
@@ -244,7 +272,8 @@ const AdminTopicsPage = () => {
                     <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
                         <Eye className="w-5 h-5 text-[#004aad] shrink-0 mt-0.5" />
                         <p className="text-sm text-blue-800">
-                            Topics set here appear on the student's <strong>Enrolled Courses</strong> page under "What you will learn".
+                            <strong>Important:</strong> Courses must be <strong>Published</strong> and <strong>assigned to a plan</strong> before students can see them.
+                            Use the publish button on each card, then go to <strong>Class Schedule & Links</strong> to assign to a plan.
                         </p>
                     </div>
 
@@ -262,6 +291,7 @@ const AdminTopicsPage = () => {
                                     onEdit={() => setCourseModal({ course, isNew: false })}
                                     onDelete={() => setDeleteModal(course)}
                                     onManageTopics={() => setTopicsModal(course)}
+                                    onTogglePublish={handleTogglePublish}
                                 />
                             ))}
 

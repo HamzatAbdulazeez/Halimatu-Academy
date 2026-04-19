@@ -1,12 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { 
+import axiosInstance from '../../../api/axiosInstance'; // adjust if needed
+import {
     getStudentEnrolledCourses,
-    getUpcomingClasses  
+    getUpcomingClasses
 } from '../../../api/courseApi';
-
-import { 
-    getMyActiveSubscription    
+import {
+    getMyActiveSubscription
 } from '../../../api/plansApi';
 
 import WelcomeHeader from './components/welcome/WelcomeHeader';
@@ -15,102 +15,128 @@ import EnrolledCourses from './components/welcome/EnrolledCourses';
 import ClassSchedule from './components/welcome/ClassSchedule';
 import RightSideBar from './components/welcome/RightSide';
 
-const StudentWelcomeDashboard = () => {
-    const [user, setUser] = useState(null);
-    const [enrolledCourses, setEnrolledCourses] = useState([]);
-    const [upcomingClasses, setUpcomingClasses] = useState([]);
-    const [activeSubscription, setActiveSubscription] = useState(null);
-    
-    const [loading, setLoading] = useState(true);
-    const [loadingSubscription, setLoadingSubscription] = useState(true);
-    const [loadingClasses, setLoadingClasses] = useState(true);
+// ─── helpers ──────────────────────────────────────────────────────────────────
+const readUserFromStorage = () => {
+    try {
+        const raw = localStorage.getItem('user');
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+};
 
-    // Load user from localStorage
+// Unwrap whatever shape the API returns into a plain array
+const toArray = (value) => {
+    if (Array.isArray(value))               return value;
+    if (Array.isArray(value?.data))         return value.data;
+    if (Array.isArray(value?.courses))      return value.courses;
+    if (Array.isArray(value?.classes))      return value.classes;
+    if (Array.isArray(value?.upcoming_classes)) return value.upcoming_classes;
+    if (Array.isArray(value?.results))      return value.results;
+    return [];
+};
+
+// ─── component ────────────────────────────────────────────────────────────────
+const StudentWelcomeDashboard = () => {
+
+    // ── user ──────────────────────────────────────────────────────────────────
+    const [user, setUser] = useState(readUserFromStorage);
+
     useEffect(() => {
-        const loadUserData = () => {
+        let alive = true;
+        axiosInstance.get('/user/me')
+            .then(res => {
+                if (!alive) return;
+                const full = { ...readUserFromStorage(), ...res.data };
+                setUser(full);
+                localStorage.setItem('user', JSON.stringify(full));
+            })
+            .catch(err => console.error('/user/me failed:', err));
+        return () => { alive = false; };
+    }, []);
+
+    // ── dashboard data ────────────────────────────────────────────────────────
+    const [enrolledCourses,    setEnrolledCourses]    = useState([]);
+    const [upcomingClasses,    setUpcomingClasses]    = useState([]);
+    const [activeSubscription, setActiveSubscription] = useState(null);
+
+    const [loading,             setLoading]             = useState(true);
+    const [loadingClasses,      setLoadingClasses]      = useState(true);
+    const [loadingSubscription, setLoadingSubscription] = useState(true);
+
+    useEffect(() => {
+        let alive = true;
+
+        const run = async () => {
+            // ── courses ───────────────────────────────────────────────────────
             try {
-                const stored = localStorage.getItem("user");
-                if (stored) {
-                    setUser(JSON.parse(stored));
+                const res = await getStudentEnrolledCourses();
+                if (alive) setEnrolledCourses(toArray(res));
+            } catch (err) {
+                console.error('courses fetch failed:', err);
+                if (alive) setEnrolledCourses([]);
+            } finally {
+                if (alive) setLoading(false);
+            }
+
+            // ── upcoming classes ──────────────────────────────────────────────
+            try {
+                const res = await getUpcomingClasses();
+                if (alive) setUpcomingClasses(toArray(res));
+            } catch (err) {
+                console.error('classes fetch failed:', err);
+                if (alive) setUpcomingClasses([]);
+            } finally {
+                if (alive) setLoadingClasses(false);
+            }
+
+            // ── subscription ──────────────────────────────────────────────────
+            try {
+                const res = await getMyActiveSubscription();
+                if (alive) {
+                    const sub = res?.subscription ?? res?.data?.subscription ?? res?.data ?? res;
+                    setActiveSubscription(sub && typeof sub === 'object' ? sub : null);
                 }
             } catch (err) {
-                console.error("Failed to parse user from localStorage:", err);
-            }
-        };
-
-        loadUserData();
-        window.addEventListener("storage", loadUserData);
-        return () => window.removeEventListener("storage", loadUserData);
-    }, []);
-
-    // Fetch all dashboard data
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            setLoading(true);
-            setLoadingSubscription(true);
-            setLoadingClasses(true);
-
-            try {
-                // 1. Fetch enrolled courses (always fetch since user is subscribed)
-                const coursesData = await getStudentEnrolledCourses().catch(() => []);
-                setEnrolledCourses(Array.isArray(coursesData) ? coursesData : []);
-
-                // 2. Fetch upcoming classes (always fetch)
-                const classesData = await getUpcomingClasses().catch(() => []);
-                setUpcomingClasses(Array.isArray(classesData) ? classesData : []);
-
-                // 3. Fetch active subscription (for RightSideBar display only)
-                const subRes = await getMyActiveSubscription().catch(() => null);
-                const subData = subRes?.subscription || 
-                               subRes?.data?.subscription || 
-                               subRes?.data || 
-                               subRes;
-
-                setActiveSubscription(subData && typeof subData === 'object' ? subData : null);
-
-            } catch (err) {
-                console.error("Failed to fetch dashboard data:", err);
+                console.error('subscription fetch failed:', err);
+                if (alive) setActiveSubscription(null);
             } finally {
-                setLoading(false);
-                setLoadingSubscription(false);
-                setLoadingClasses(false);
+                if (alive) setLoadingSubscription(false);
             }
         };
 
-        fetchDashboardData();
+        run();
+        return () => { alive = false; };
     }, []);
 
+    // ── render ────────────────────────────────────────────────────────────────
     return (
         <div className="space-y-5">
             <WelcomeHeader user={user} />
 
-            {/* Quick Stats */}
             <QuickStats
                 enrolledCount={enrolledCourses.length}
-                classesAttended={6}        // TODO: Make this dynamic later
-                currentStreak={3}          // TODO: Make this dynamic later
+                classesAttended={6}
+                currentStreak={3}
                 loading={loading}
             />
 
             <div className="grid lg:grid-cols-12 gap-8">
-                {/* Main Content */}
                 <div className="lg:col-span-8 space-y-5">
-                    <EnrolledCourses 
-                        courses={enrolledCourses} 
-                        loading={loading} 
+                    <EnrolledCourses
+                        courses={enrolledCourses}
+                        loading={loading}
                     />
-
-                    <ClassSchedule 
+                    <ClassSchedule
                         classes={upcomingClasses}
                         loading={loadingClasses}
                     />
                 </div>
 
-                {/* Right Sidebar */}
                 <div className="lg:col-span-4">
-                    <RightSideBar 
-                        user={user} 
-                        activeSubscription={activeSubscription} 
+                    <RightSideBar
+                        user={user}
+                        activeSubscription={activeSubscription}
                         loading={loadingSubscription}
                     />
                 </div>

@@ -423,12 +423,17 @@ const StudentSubscriptionPage = () => {
       </div>
 
       <div className="bg-gray-50 min-h-screen">
-        <div className="mx-auto px-4 py-8 space-y-6">
+        <div className="mx-auto px-4 sm:px-6 py-8 space-y-8">
 
+          {/* Success Banner */}
           {justSubscribed && (
-            <SuccessBanner planLabel={planLabel} onDismiss={() => setJustSubscribed(false)} />
+            <SuccessBanner
+              planLabel={planLabel}
+              onDismiss={() => setJustSubscribed(false)}
+            />
           )}
 
+          {/* Current Subscription Card */}
           <CurrentSubscriptionCard
             isSubscribed={isSubscribed}
             planLabel={planLabel}
@@ -441,12 +446,13 @@ const StudentSubscriptionPage = () => {
             onShowHistory={() => setShowBillingHistory(true)}
           />
 
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-1">
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
+            <div className="flex-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 {isSubscribed ? 'Your Plan & Upgrades' : 'Choose Your Plan'}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-[15px] leading-relaxed">
                 {isSubscribed
                   ? 'You are subscribed. Switch to a longer plan any time for better savings.'
                   : 'Select a plan to get full access to all features'}
@@ -456,22 +462,23 @@ const StudentSubscriptionPage = () => {
             <button
               onClick={handleRefreshPlans}
               disabled={isRefreshing}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 hover:border-[#004aad] rounded-xl font-medium text-gray-700 hover:text-[#004aad] transition disabled:opacity-70"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-gray-300 hover:border-[#004aad] rounded-xl font-medium text-gray-700 hover:text-[#004aad] transition-all disabled:opacity-70 w-full sm:w-auto whitespace-nowrap"
             >
               <FaSync className={isRefreshing ? 'animate-spin' : ''} />
               Refresh Plans
             </button>
           </div>
 
+          {/* Plans Section */}
           {plans.length === 0 ? (
-            <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-16 text-center">
+            <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 sm:p-16 text-center">
               <p className="text-gray-500 text-lg">No plans available at the moment.</p>
               <p className="text-sm text-gray-400 mt-2">
                 Make sure your plans are set to &quot;Active&quot; in the Admin panel
               </p>
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
               {plans.map((plan) => (
                 <PlanCard
                   key={plan.id}
@@ -485,13 +492,14 @@ const StudentSubscriptionPage = () => {
             </div>
           )}
 
-          <div className="mt-16 text-center text-xs text-gray-400 flex flex-wrap justify-center gap-6">
+          {/* Footer Info */}
+          <div className="mt-16 pt-8 text-center text-xs text-gray-400 flex flex-wrap justify-center gap-x-4 gap-y-2">
             <span className="flex items-center gap-1">
               <FaShieldAlt className="text-[#004aad]" /> Secured by Flutterwave
             </span>
-            <span>·</span>
+            <span className="hidden sm:inline">·</span>
             <span>256-bit SSL Encryption</span>
-            <span>·</span>
+            <span className="hidden sm:inline">·</span>
             <span>Cancel anytime</span>
           </div>
         </div>
