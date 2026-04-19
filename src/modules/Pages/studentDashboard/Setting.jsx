@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-import { getProfile, updateProfile, changePassword, uploadProfilePicture } from "../../../api/authApi";
+import { getUserProfile, updateUserProfile, changeUserPassword, uploadUserProfilePicture } from "../../../api/setting";
 import { notify } from "../../../utils/toast";
 
 const Settings = () => {
@@ -75,7 +75,7 @@ const Settings = () => {
       };
 
       try {
-        const data = await getProfile();
+        const data = await getUserProfile();
         applyProfile(data);
       } catch {
         const stored = localStorage.getItem("user");
@@ -108,7 +108,7 @@ const Settings = () => {
 
       setPictureLoading(true);
       try {
-        const data = await uploadProfilePicture(file);
+        const data = await uploadUserProfilePicture(file);
 
 
         const serverUrl =
@@ -156,7 +156,7 @@ const Settings = () => {
     e.preventDefault();
     setSubmitLoading(true);
     try {
-      await updateProfile(profile);
+      await updateUserProfile(profile);
       syncLocalStorage(profile);
       notify.success("Profile updated successfully!");
       setFetchError("");
@@ -177,7 +177,7 @@ const Settings = () => {
 
     setSubmitLoading(true);
     try {
-      await changePassword({
+      await changeUserPassword({
         current_password: currentPassword,
         new_password: password,
         confirm_password: confirmPassword,

@@ -11,47 +11,42 @@ import {
     createTopic,
     deleteTopic,
     getCourseTopics,
+    assignCourseToPlan,
 } from '../../../api/courseApi';
-import axiosInstance from '../../../api/axiosInstance';
+import { adminGetPlans } from '../../../api/adminplans';
 import { notify } from '../../../utils/toast';
 
 import TopicsModal from './Components/topics/TopicsModal';
 import CourseModal from './Components/topics/CourseModal';
 import CourseCard from './Components/topics/CourseCard';
 import DeleteModal from './Components/shared/DeleteModal';
-import Toast from './Components/shared/Toast';
 
 const AdminTopicsPage = () => {
-    const [courses, setCourses] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState('');
-
-    const [topicsModal, setTopicsModal] = useState(null);
-    const [courseModal, setCourseModal] = useState(null);
-    const [deleteModal, setDeleteModal] = useState(null);
+    const [courses,      setCourses]      = useState([]);
+    const [plans,        setPlans]        = useState([]);
+    const [loading,      setLoading]      = useState(true);
+    const [search,       setSearch]       = useState('');
+    const [topicsModal,  setTopicsModal]  = useState(null);
+    const [courseModal,  setCourseModal]  = useState(null);
+    const [deleteModal,  setDeleteModal]  = useState(null);
     const [modalLoading, setModalLoading] = useState(false);
-    const [savedToast, setSavedToast] = useState(null);
 
-    const showToast = useCallback((msg) => {
-        setSavedToast(msg);
-        setTimeout(() => setSavedToast(null), 3000);
-    }, []);
-
-    // Fetch courses + topics
+    // Fetch courses + topics + plans
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchAll = async () => {
             try {
-                const data = await getAllCourses();
-                const list = Array.isArray(data) ? data.filter(Boolean) : [];
+                const [coursesData, plansData] = await Promise.all([
+                    getAllCourses(),
+                    adminGetPlans().catch(() => []),
+                ]);
+
+                const list = Array.isArray(coursesData) ? coursesData.filter(Boolean) : [];
 
                 const withTopics = await Promise.all(
                     list.map(async (course) => {
                         try {
                             const topics = await getCourseTopics(course.id);
-                            return {
-                                ...course,
-                                whatYouLearn: Array.isArray(topics) ? topics : [],
-                            };
+                            return { ...course, whatYouLearn: Array.isArray(topics) ? topics : [] };
                         } catch {
                             return { ...course, whatYouLearn: [] };
                         }
@@ -59,6 +54,7 @@ const AdminTopicsPage = () => {
                 );
 
                 setCourses(withTopics);
+                setPlans(Array.isArray(plansData) ? plansData : []);
             } catch (err) {
                 console.error(err);
                 notify.error('Failed to load courses');
@@ -66,33 +62,40 @@ const AdminTopicsPage = () => {
                 setLoading(false);
             }
         };
-
-        fetchCourses();
+        fetchAll();
     }, []);
 
-    // ── Publish / Unpublish toggle ────────────────────────────────────────────
+    // ── Publish / Unpublish ────────────────────────────────────────────────────
+    // Must send ALL fields as multipart — backend ignores partial updates
     const handleTogglePublish = async (courseId, newStatus) => {
-        try {
-            // Use PUT with status field — same as updateCourse but just status
-            const res = await axiosInstance.put(
-                `/admin/courses/${courseId}`,
-                { status: newStatus },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
+        const course = courses.find(c => c.id === courseId);
+        if (!course) return;
 
-            // Update local state immediately
+        try {
+            const updated = await updateCourse(courseId, {
+                id:              course.id,
+                title:           course.title           || '',
+                instructor:      course.instructor      || '',
+                category:        course.category        || 'Quranic Studies',
+                duration_months: course.duration_months || 0,
+                price:           course.price           || 0,
+                description:     course.description     || '',
+                image:           course.image           || '',
+                status:          newStatus,
+                imageFile:       null,
+            });
+
             setCourses(prev =>
-                prev.map(c =>
-                    c.id === courseId
-                        ? { ...c, status: res.data?.status || newStatus }
-                        : c
+                prev.map(c => c.id === courseId
+                    ? { ...c, status: updated?.status || newStatus }
+                    : c
                 )
             );
 
-            showToast(
+            notify.success(
                 newStatus === 'published'
-                    ? '✅ Course published! Students can now see it.'
-                    : '📦 Course unpublished.'
+                    ? 'Course published! Students can now see it.'
+                    : 'Course unpublished.'
             );
         } catch (err) {
             console.error('Toggle publish error:', err?.response?.data || err);
@@ -100,44 +103,35 @@ const AdminTopicsPage = () => {
         }
     };
 
-    // Save Topics
+    // ── Save Topics ────────────────────────────────────────────────────────────
     const handleSaveTopics = async (courseId, newTopics) => {
         setModalLoading(true);
         try {
-            const course = courses.find(c => c.id === courseId);
+            const course    = courses.find(c => c.id === courseId);
             const oldTopics = course?.whatYouLearn ?? [];
+            const newIds    = new Set(newTopics.filter(t => t.id).map(t => t.id));
+            const toDelete  = oldTopics.filter(t => t.id && !newIds.has(t.id));
 
-            const newIds = new Set(newTopics.filter(t => t.id).map(t => t.id));
-            const toDelete = oldTopics.filter(t => t.id && !newIds.has(t.id));
-
-            for (const topic of toDelete) {
-                await deleteTopic(topic.id);
-            }
+            for (const topic of toDelete) await deleteTopic(topic.id);
 
             const created = [];
             for (const item of newTopics) {
-                if (item.id) {
-                    created.push(item);
-                    continue;
-                }
+                if (item.id) { created.push(item); continue; }
                 const title = (item.title ?? '').trim();
                 if (!title) continue;
-                const newTopic = await createTopic(courseId, title);
-                created.push(newTopic);
+                created.push(await createTopic(courseId, title));
             }
 
             const freshTopics = await getCourseTopics(courseId).catch(() => created);
-
             setCourses(prev =>
-                prev.map(c =>
-                    c.id === courseId
-                        ? { ...c, whatYouLearn: Array.isArray(freshTopics) ? freshTopics : created }
-                        : c
+                prev.map(c => c.id === courseId
+                    ? { ...c, whatYouLearn: Array.isArray(freshTopics) ? freshTopics : created }
+                    : c
                 )
             );
 
             setTopicsModal(null);
-            showToast('✅ Topics updated successfully!');
+            notify.success('Topics updated successfully!');
         } catch (err) {
             console.error(err);
             notify.error('Failed to update topics');
@@ -146,7 +140,7 @@ const AdminTopicsPage = () => {
         }
     };
 
-    // Save Course (Create or Update)
+    // ── Save Course ────────────────────────────────────────────────────────────
     const handleSaveCourse = async (form) => {
         const isNew = courseModal?.isNew || false;
         setModalLoading(true);
@@ -157,30 +151,61 @@ const AdminTopicsPage = () => {
             if (isNew) {
                 savedCourse = await createCourse(form);
                 setCourses(prev => [...prev, { ...savedCourse, whatYouLearn: [] }]);
-                showToast('✅ Course created successfully!');
+
+                // Assign to plan right after creation if selected
+                if (form.plan_id) {
+                    try {
+                        await assignCourseToPlan(savedCourse.id, form.plan_id);
+                        notify.success('Course created and assigned to plan! Subscribers enrolled.');
+                    } catch (planErr) {
+                        const msg = planErr?.response?.data?.message || planErr?.response?.data?.detail || '';
+                        if (msg.toLowerCase().includes('already')) {
+                            notify.success('Course created! Plan was already assigned.');
+                        } else {
+                            notify.error('Course created but failed to assign to plan. Please assign manually.');
+                        }
+                    }
+                } else {
+                    notify.success('Course created successfully!');
+                }
             } else {
                 savedCourse = await updateCourse(form.id, form);
                 setCourses(prev =>
-                    prev.map(c =>
-                        c.id === form.id
-                            ? { ...c, ...savedCourse, whatYouLearn: c.whatYouLearn || [] }
-                            : c
+                    prev.map(c => c.id === form.id
+                        ? { ...c, ...savedCourse, whatYouLearn: c.whatYouLearn || [] }
+                        : c
                     )
                 );
-                showToast('✅ Course updated successfully!');
+
+                // Assign to plan if selected
+                if (form.plan_id) {
+                    try {
+                        await assignCourseToPlan(form.id, form.plan_id);
+                    } catch (planErr) {
+                        const msg = planErr?.response?.data?.message || planErr?.response?.data?.detail || '';
+                        if (!msg.toLowerCase().includes('already')) {
+                            console.error('Plan assign error:', planErr);
+                        }
+                    }
+                }
+
+                notify.success('Course updated successfully!');
             }
 
             setCourseModal(null);
         } catch (err) {
             console.error('Course Save Error:', err?.response?.data || err);
             const errorMsg = err?.response?.data?.message || 'Something went wrong';
-            notify.error(isNew ? `Failed to create course: ${errorMsg}` : `Failed to update course: ${errorMsg}`);
+            notify.error(isNew
+                ? `Failed to create course: ${errorMsg}`
+                : `Failed to update course: ${errorMsg}`
+            );
         } finally {
             setModalLoading(false);
         }
     };
 
-    // Delete Course
+    // ── Delete Course ──────────────────────────────────────────────────────────
     const handleDeleteCourse = async () => {
         if (!deleteModal) return;
         setModalLoading(true);
@@ -188,7 +213,7 @@ const AdminTopicsPage = () => {
             await deleteCourse(deleteModal.id);
             setCourses(prev => prev.filter(c => c.id !== deleteModal.id));
             setDeleteModal(null);
-            showToast('🗑️ Course deleted successfully.');
+            notify.success('Course deleted successfully.');
         } catch (err) {
             console.error(err);
             notify.error('Failed to delete course');
@@ -198,9 +223,8 @@ const AdminTopicsPage = () => {
     };
 
     const totalTopics = courses.reduce((a, c) => a + (c.whatYouLearn?.length ?? 0), 0);
-
-    const q = search.toLowerCase().trim();
-    const filtered = courses.filter(c => {
+    const q           = search.toLowerCase().trim();
+    const filtered    = courses.filter(c => {
         if (!c) return false;
         return (
             (c.title || c.name || '').toLowerCase().includes(q) ||
@@ -215,12 +239,10 @@ const AdminTopicsPage = () => {
             <div className="bg-white px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">What You Will Learn</h1>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">Course Management</h1>
                         <p className="text-gray-400 text-sm flex items-center gap-1">
                             <ChevronRight className="w-3 h-3" />
-                            <span>Course Management</span>
-                            <ChevronRight className="w-3 h-3" />
-                            What You Will Learn
+                            <span>Courses & Topics</span>
                         </p>
                     </div>
                     <button
@@ -238,9 +260,9 @@ const AdminTopicsPage = () => {
                     {/* Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {[
-                            { label: 'Total Courses',      value: courses.length,                                                          icon: BookOpen,    color: 'text-[#004aad]',   bg: 'bg-blue-50' },
-                            { label: 'Published',          value: courses.filter(c => c.status === 'published').length,                    icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                            { label: 'Avg Topics / Course',value: courses.length ? Math.round(totalTopics / courses.length) : 0,           icon: Tag,         color: 'text-purple-600',  bg: 'bg-purple-50' },
+                            { label: 'Total Courses',       value: courses.length,                                                icon: BookOpen,    color: 'text-[#004aad]',   bg: 'bg-blue-50'    },
+                            { label: 'Published',           value: courses.filter(c => c.status === 'published').length,          icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                            { label: 'Avg Topics / Course', value: courses.length ? Math.round(totalTopics / courses.length) : 0, icon: Tag,         color: 'text-purple-600',  bg: 'bg-purple-50'  },
                         ].map(({ label, value, icon: Icon, color, bg }) => (
                             <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 flex items-center gap-4">
                                 <div className={`w-12 h-12 ${bg} rounded-2xl flex items-center justify-center shrink-0`}>
@@ -272,8 +294,7 @@ const AdminTopicsPage = () => {
                     <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
                         <Eye className="w-5 h-5 text-[#004aad] shrink-0 mt-0.5" />
                         <p className="text-sm text-blue-800">
-                            <strong>Important:</strong> Courses must be <strong>Published</strong> and <strong>assigned to a plan</strong> before students can see them.
-                            Use the publish button on each card, then go to <strong>Class Schedule & Links</strong> to assign to a plan.
+                            <strong>Tip:</strong> Set status to <strong>Published</strong> and assign to a plan when creating a course — students subscribed to that plan will be enrolled automatically.
                         </p>
                     </div>
 
@@ -295,17 +316,16 @@ const AdminTopicsPage = () => {
                                 />
                             ))}
 
-                            {/* Add New Course Button Card */}
                             <button
                                 onClick={() => setCourseModal({ course: null, isNew: true })}
                                 className="border-2 border-dashed border-gray-200 rounded-2xl p-10 flex flex-col items-center justify-center gap-3 hover:border-[#004aad] hover:bg-blue-50/30 transition-all group cursor-pointer"
                             >
                                 <div className="w-14 h-14 bg-gray-100 group-hover:bg-[#004aad]/10 rounded-2xl flex items-center justify-center transition-colors">
-                                    <Plus className="w-7 h-7 text-gray-400 group-hover:text-[#004aad] transition-colors cursor-pointer" />
+                                    <Plus className="w-7 h-7 text-gray-400 group-hover:text-[#004aad] transition-colors" />
                                 </div>
                                 <div className="text-center">
                                     <p className="font-semibold text-gray-500 group-hover:text-[#004aad]">Add New Course</p>
-                                    <p className="text-xs text-gray-400 mt-1">Click to add a new course with topics</p>
+                                    <p className="text-xs text-gray-400 mt-1">Create and publish a course for your students</p>
                                 </div>
                             </button>
 
@@ -320,7 +340,6 @@ const AdminTopicsPage = () => {
                 </div>
             </div>
 
-            {/* Modals */}
             {topicsModal && (
                 <TopicsModal
                     course={topicsModal}
@@ -337,6 +356,7 @@ const AdminTopicsPage = () => {
                     onSave={handleSaveCourse}
                     onClose={() => setCourseModal(null)}
                     loading={modalLoading}
+                    plans={plans}
                 />
             )}
 
@@ -349,8 +369,6 @@ const AdminTopicsPage = () => {
                     loading={modalLoading}
                 />
             )}
-
-            <Toast message={savedToast} />
         </>
     );
 };

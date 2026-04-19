@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { BookOpen, Save, X, Image, Tag, AlertCircle, Upload, Link } from 'lucide-react';
+import { BookOpen, Save, X, Image, Tag, AlertCircle, Upload, Link, Award } from 'lucide-react';
 import { getImageUrl } from '../../../../../api/courseApi';
 
 const CATEGORIES = [
@@ -19,9 +19,10 @@ const EMPTY_COURSE = {
     description:     '',
     image:           '',
     imageFile:       null,
+    plan_id:         '',   // ← new
 };
 
-const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
+const CourseModal = ({ course, onSave, onClose, isNew, loading = false, plans = [] }) => {
     const [form, setForm] = useState(() => {
         if (isNew || !course) return { ...EMPTY_COURSE };
         return {
@@ -35,12 +36,13 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
             description:     course.description     ?? '',
             image:           course.image           ?? '',
             imageFile:       null,
+            plan_id:         course.plan_id         ?? '',   // ← new
         };
     });
 
-    const [previewUrl, setPreviewUrl]         = useState(null);
+    const [previewUrl, setPreviewUrl]               = useState(null);
     const [imagePreviewError, setImagePreviewError] = useState(false);
-    const [imageMode, setImageMode]           = useState('upload'); 
+    const [imageMode, setImageMode]                 = useState('upload');
     const fileInputRef = useRef(null);
 
     const set = (key, val) => {
@@ -52,14 +54,11 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
         const file = e.target.files?.[0];
         if (!file) return;
         set('imageFile', file);
-        const url = URL.createObjectURL(file);
-        setPreviewUrl(url);
+        setPreviewUrl(URL.createObjectURL(file));
         setImagePreviewError(false);
     };
-    
-    const displayImage = previewUrl
-        || (form.image ? getImageUrl(form.image) : '');
 
+    const displayImage = previewUrl || (form.image ? getImageUrl(form.image) : '');
     const isValid = form.title.trim().length > 0 && form.instructor.trim().length > 0;
 
     return (
@@ -89,40 +88,28 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                 {/* Body */}
                 <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
 
-                    {/* Image section */}
+                    {/* ── Image section (unchanged) ── */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
                             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
                                 <Image className="w-4 h-4" /> Course Image
                             </label>
-                            {/* Toggle upload vs URL */}
                             <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
-                                <button
-                                    type="button"
-                                    onClick={() => setImageMode('upload')}
-                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${imageMode === 'upload' ? 'bg-white text-[#004aad] shadow-sm' : 'text-gray-500'}`}
-                                >
+                                <button type="button" onClick={() => setImageMode('upload')}
+                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${imageMode === 'upload' ? 'bg-white text-[#004aad] shadow-sm' : 'text-gray-500'}`}>
                                     <Upload className="w-3 h-3" /> Upload
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setImageMode('url')}
-                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${imageMode === 'url' ? 'bg-white text-[#004aad] shadow-sm' : 'text-gray-500'}`}
-                                >
+                                <button type="button" onClick={() => setImageMode('url')}
+                                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${imageMode === 'url' ? 'bg-white text-[#004aad] shadow-sm' : 'text-gray-500'}`}>
                                     <Link className="w-3 h-3" /> URL
                                 </button>
                             </div>
                         </div>
 
-                        {/* Preview */}
                         {displayImage && !imagePreviewError ? (
                             <div className="relative w-full h-40 rounded-md overflow-hidden border border-gray-200 mb-3">
-                                <img
-                                    src={displayImage}
-                                    alt="Preview"
-                                    className="w-full h-full object-cover"
-                                    onError={() => setImagePreviewError(true)}
-                                />
+                                <img src={displayImage} alt="Preview" className="w-full h-full object-cover"
+                                    onError={() => setImagePreviewError(true)} />
                                 <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs px-2 py-1 rounded-lg font-medium">
                                     ✓ {previewUrl ? 'New image' : 'Current image'}
                                 </div>
@@ -138,21 +125,12 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                             </div>
                         )}
 
-                        {/* Upload mode */}
                         {imageMode === 'upload' && (
                             <>
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleFileChange}
-                                    className="hidden"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 hover:border-[#004aad] transition-colors w-full justify-center"
-                                >
+                                <input ref={fileInputRef} type="file" accept="image/*"
+                                    onChange={handleFileChange} className="hidden" />
+                                <button type="button" onClick={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 hover:border-[#004aad] transition-colors w-full justify-center">
                                     <Upload className="w-4 h-4" />
                                     {form.imageFile ? 'Change Image' : 'Choose Image File'}
                                 </button>
@@ -162,15 +140,11 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                             </>
                         )}
 
-                        {/* URL mode */}
                         {imageMode === 'url' && (
-                            <input
-                                type="text"
-                                value={form.image}
+                            <input type="text" value={form.image}
                                 onChange={e => set('image', e.target.value)}
                                 placeholder="https://example.com/image.jpg"
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad]"
-                            />
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-[#004aad]" />
                         )}
                     </div>
 
@@ -179,13 +153,10 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                             Course Title <span className="text-red-400">*</span>
                         </label>
-                        <input
-                            type="text"
-                            value={form.title}
+                        <input type="text" value={form.title}
                             onChange={e => set('title', e.target.value)}
                             placeholder="e.g. Quranic Studies - Complete Foundation"
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm outline-none focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad]"
-                        />
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm outline-none focus:outline-none focus:border-[#004aad]" />
                     </div>
 
                     {/* Instructor */}
@@ -193,24 +164,18 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                             Instructor Name <span className="text-red-400">*</span>
                         </label>
-                        <input
-                            type="text"
-                            value={form.instructor}
+                        <input type="text" value={form.instructor}
                             onChange={e => set('instructor', e.target.value)}
                             placeholder="e.g. Ustadha Halimatu Academy"
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad]"
-                        />
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad]" />
                     </div>
 
                     {/* Category + Duration */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category</label>
-                            <select
-                                value={form.category}
-                                onChange={e => set('category', e.target.value)}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad] bg-white"
-                            >
+                            <select value={form.category} onChange={e => set('category', e.target.value)}
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad] bg-white">
                                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
                         </div>
@@ -218,14 +183,10 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                 Duration <span className="text-gray-400 font-normal">(months)</span>
                             </label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={form.duration_months}
+                            <input type="number" min="0" value={form.duration_months}
                                 onChange={e => set('duration_months', e.target.value)}
                                 placeholder="e.g. 12"
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad]"
-                            />
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad]" />
                         </div>
                     </div>
 
@@ -235,22 +196,15 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                                 Price <span className="text-gray-400 font-normal">(₦)</span>
                             </label>
-                            <input
-                                type="number"
-                                min="0"
-                                value={form.price}
+                            <input type="number" min="0" value={form.price}
                                 onChange={e => set('price', e.target.value)}
                                 placeholder="0"
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad]"
-                            />
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad]" />
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1.5">Status</label>
-                            <select
-                                value={form.status}
-                                onChange={e => set('status', e.target.value)}
-                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad] bg-white capitalize"
-                            >
+                            <select value={form.status} onChange={e => set('status', e.target.value)}
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad] bg-white capitalize">
                                 {STATUS_OPTIONS.map(s => (
                                     <option key={s} value={s} className="capitalize">{s}</option>
                                 ))}
@@ -258,16 +212,46 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
                         </div>
                     </div>
 
+                    {/* ── Subscription Plan ── */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                            <Award className="w-4 h-4 text-[#004aad]" />
+                            Assign to Subscription Plan
+                        </label>
+                        {plans.length > 0 ? (
+                            <select
+                                value={form.plan_id}
+                                onChange={e => set('plan_id', e.target.value)}
+                                className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad] bg-white"
+                            >
+                                <option value="">-- No plan (assign later) --</option>
+                                {plans.map(plan => (
+                                    <option key={plan.id} value={plan.id}>
+                                        {plan.name || plan.title} — ₦{(plan.discounted_price || plan.original_price || 0).toLocaleString()}
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <div className="w-full px-4 py-2.5 border border-dashed border-gray-200 rounded-md text-sm text-gray-400 text-center">
+                                No plans available
+                            </div>
+                        )}
+                        {form.plan_id && (
+                            <p className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1">
+                                <Award className="w-3 h-3" />
+                                Course will be accessible to subscribers on this plan
+                            </p>
+                        )}
+                    </div>
+
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1.5">Course Description</label>
-                        <textarea
-                            value={form.description}
+                        <textarea value={form.description}
                             onChange={e => set('description', e.target.value)}
                             placeholder="Write a brief description of what this course covers..."
                             rows={3}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-0 focus:ring-[#004aad]/30 focus:border-[#004aad] resize-none"
-                        />
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#004aad] resize-none" />
                         <p className="text-xs text-gray-400 mt-1">{form.description.length} characters</p>
                     </div>
 
@@ -282,18 +266,12 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false }) => {
 
                 {/* Footer */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
-                    <button
-                        onClick={onClose}
-                        disabled={loading}
-                        className="px-4 py-2 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm disabled:opacity-50"
-                    >
+                    <button onClick={onClose} disabled={loading}
+                        className="px-4 py-2 border border-gray-200 rounded-md text-gray-600 hover:bg-gray-100 transition-colors text-sm disabled:opacity-50">
                         Cancel
                     </button>
-                    <button
-                        onClick={() => isValid && onSave(form)}
-                        disabled={!isValid || loading}
-                        className="px-5 py-2 bg-[#004aad] text-white rounded-md hover:bg-[#003a8c] transition-colors text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
-                    >
+                    <button onClick={() => isValid && onSave(form)} disabled={!isValid || loading}
+                        className="px-5 py-2 bg-[#004aad] text-white rounded-md hover:bg-[#003a8c] transition-colors text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5">
                         <Save className="w-4 h-4" />
                         {loading ? 'Saving...' : isNew ? 'Add Course' : 'Save Changes'}
                     </button>

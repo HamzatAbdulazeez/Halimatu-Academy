@@ -8,6 +8,7 @@ export const getImageUrl = (path) => {
     return `${IMAGE_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
 };
 
+
 const buildCourseFormData = (form) => {
     const fd = new FormData();
     fd.append('title',           String(form.title        ?? '').trim());
@@ -16,10 +17,9 @@ const buildCourseFormData = (form) => {
     fd.append('status',          form.status               ?? 'draft');
     fd.append('instructor',      String(form.instructor   ?? '').trim());
     fd.append('duration_months', Number(form.duration_months) || 0);
+
     if (form.imageFile instanceof File) {
         fd.append('image', form.imageFile);
-    } else if (form.image) {
-        fd.append('image', String(form.image).trim());
     }
     return fd;
 };
@@ -68,8 +68,25 @@ export const deleteCourse = async (courseId) => {
 };
 
 export const assignCourseToPlan = async (courseId, planId) => {
-    const res = await axiosInstance.put(
-        `/admin/courses/${courseId}/assign-plan?plan_id=${planId}`
+    const res = await axiosInstance.post(
+        `/admin/courses/${courseId}/add-plan?plan_id=${Number(planId)}`
+    );
+    return res.data;
+};
+
+// Assign multiple plans to a course at once
+export const assignPlansToCourse = async (courseId, planIds = []) => {
+    const res = await axiosInstance.post(
+        `/admin/courses/${courseId}/assign-plans`,
+        { plan_ids: planIds.map(Number) }
+    );
+    return res.data;
+};
+
+// Remove a plan from a course
+export const removePlanFromCourse = async (courseId, planId) => {
+    const res = await axiosInstance.delete(
+        `/admin/courses/${courseId}/remove-plan/${Number(planId)}`
     );
     return res.data;
 };
@@ -178,11 +195,17 @@ export const updateCourseProgress = async (course_id, progressData) => {
     return res.data;
 };
 
-export const getUpcomingClasses = async () => {
+
+export const getUpcomingClasses = async (limit = 10) => {
     try {
-        const res = await axiosInstance.get('/user/upcoming-classes');
-        return res.data;
+        const res = await axiosInstance.get('/user/upcoming-classes', {
+            params: { limit },
+        });
+        // API returns a plain array
+        return Array.isArray(res.data) ? res.data : [];
     } catch (error) {
+        // 401 means no enrolled courses yet — not a real error
+        if (error.response?.status === 401) return [];
         console.error('Failed to fetch upcoming classes:', error);
         return [];
     }
