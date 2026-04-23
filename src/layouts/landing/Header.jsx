@@ -1,283 +1,462 @@
-import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown, Globe, LayoutDashboard, UserCheck } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
-import { useLanguage } from "../../context/LanguageContext";
+import { Menu, X, Globe, ChevronDown, UserCheck } from "lucide-react";
+import PrivateTutorRequestModal from "../../modules/Home/Components/PrivateTutorRequestModal";
 
-import PrivateTutorRequestModal from "../../modules/Home/Components/PrivateTutorRequestModal"; 
+const GOLD      = "#F5C518";
+const GOLD_DARK = "#C9A000";
+const NAVY      = "#0A1628";
+const WHITE     = "#ffffff";
 
-export default function Header() {
-  const { language, setLanguage } = useLanguage();
+const STORAGE_KEY = "hs_academy_lang";
+const links = [
+  { label: "Home",       type: "route", to: "/"        },
+  { label: "About Us",   type: "route", to: "/about"   },
+  { label: "Courses",    type: "hash",  href: "#courses"  },
+  { label: "Features",   type: "hash",  href: "#features" },
+  { label: "FAQs",       type: "hash",  href: "#faqs"     },
+  { label: "Contact Us", type: "route", to: "/contact" },
+];
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [isStudyOpen, setIsStudyOpen] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
-  const [isTutorModalOpen, setIsTutorModalOpen] = useState(false);
+/* ── Google Translate cookie helpers ── */
+function setGTCookie(lng) {
+  const val = `/en/${lng}`;
+  document.cookie = `googtrans=${val};path=/`;
+  document.cookie = `googtrans=${val};domain=${window.location.hostname};path=/`;
+}
+function clearGTCookie() {
+  const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+  document.cookie = `googtrans=;expires=${past};path=/`;
+  document.cookie = `googtrans=;expires=${past};domain=${window.location.hostname};path=/`;
+}
+function getSaved() {
+  return localStorage.getItem(STORAGE_KEY) || "en";
+}
 
-  // --- AUTH LOGIC ---
-  const [authState, setAuthState] = useState({
-    isLoggedIn: false,
-    isAdmin: false,
-    dashboardUrl: "/login"
-  });
+/* ── Shared link styles ── */
+const desktopLinkStyle = {
+  color: "rgba(255,255,255,0.85)",
+  textDecoration: "none",
+  fontSize: 15,
+  fontWeight: 400,
+  letterSpacing: 0.3,
+  transition: "color 0.2s",
+  whiteSpace: "nowrap",
+};
+const mobileLinkStyle = {
+  display: "block",
+  color: WHITE,
+  textDecoration: "none",
+  padding: "13px 0",
+  fontSize: 15,
+  borderBottom: "1px solid rgba(255,255,255,0.08)",
+  background: "none",
+  border: "none",
+  width: "100%",
+  textAlign: "left",
+  cursor: "pointer",
+};
 
+export default function Navbar() {
+  const [open,         setOpen]       = useState(false);
+  const [scrolled,     setScrolled]   = useState(false);
+  const [langOpen,     setLangOpen]   = useState(false);
+  const [currentLang,  setLang]       = useState(getSaved);
+  const [tutorModal,   setTutorModal] = useState(false);
+  const gtLoaded = useRef(false);
+
+  /* ── Scroll shadow ── */
   useEffect(() => {
-    const checkAuth = () => {
-      const adminToken = sessionStorage.getItem("adminToken") || localStorage.getItem("adminToken");
-      const studentToken = localStorage.getItem("token");
-
-      if (adminToken) {
-        setAuthState({
-          isLoggedIn: true,
-          isAdmin: true,
-          dashboardUrl: "/admin"
-        });
-      } else if (studentToken) {
-        setAuthState({
-          isLoggedIn: true,
-          isAdmin: false,
-          dashboardUrl: "/student"
-        });
-      } else {
-        setAuthState({
-          isLoggedIn: false,
-          isAdmin: false,
-          dashboardUrl: "/login"
-        });
-      }
-    };
-
-    checkAuth();
-    window.addEventListener('storage', checkAuth);
-    return () => window.removeEventListener('storage', checkAuth);
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const closeAll = () => {
-    setIsMenuOpen(false);
-    setIsStudyOpen(false);
-    setIsLangOpen(false);
-  };
-
-  // Google Translate Logic
+  /* ── Google Translate bootstrap ── */
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.innerHTML = `
-      .goog-te-banner-frame { display: none !important; }
-      .goog-te-gadget { display: none !important; }
-      body { top: 0 !important; position: static !important; }
-      .skiptranslate { display: none !important; }
+      .goog-te-banner-frame,
+      .goog-te-balloon-frame,
+      .goog-te-ftab-float,
+      #goog-gt-tt,
+      .goog-te-menu-value,
+      .goog-te-gadget,
+      .goog-logo-link { display: none !important; }
+      body            { top: 0 !important; position: static !important; }
+      .skiptranslate  { display: none !important; }
       iframe.skiptranslate { display: none !important; }
     `;
     document.head.appendChild(style);
 
-    if (!document.getElementById('google-translate-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.body.appendChild(script);
+    const saved = getSaved();
+    if (saved !== "en") setGTCookie(saved);
+    else clearGTCookie();
+
+    if (!document.getElementById("google-translate-script")) {
+      window.googleTranslateElementInit = () => {
+        new window.google.translate.TranslateElement(
+          { pageLanguage: "en", includedLanguages: "en,ar", autoDisplay: false },
+          "google_translate_element"
+        );
+        gtLoaded.current = true;
+      };
+      const s = document.createElement("script");
+      s.id    = "google-translate-script";
+      s.src   = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      s.async = true;
+      document.body.appendChild(s);
+    } else {
+      gtLoaded.current = true;
     }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    window.googleTranslateElementInit = () => {
-      new window.google.translate.TranslateElement({
-        pageLanguage: "en",
-        includedLanguages: "en,ar",
-        layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-        autoDisplay: false,
-      }, "google_translate_element");
-    };
-  }, []);
-
-  const changeGoogleLanguage = (lng) => {
-    setLanguage(lng);
-    setTimeout(() => {
-      const select = document.querySelector('.goog-te-combo');
-      if (select) {
-        select.value = lng === 'en' ? '' : lng;
-        select.dispatchEvent(new Event('change'));
-      }
-    }, 100);
+  /* ── Language change ── */
+  const handleLangChange = (lng) => {
+    if (lng === currentLang) { setLangOpen(false); return; }
+    localStorage.setItem(STORAGE_KEY, lng);
+    setLang(lng);
+    setLangOpen(false);
+    if (lng === "en") { clearGTCookie(); } else { setGTCookie(lng); }
+    window.location.reload();
   };
 
-  const linkClasses = ({ isActive }) =>
-    `flex-shrink-0 min-w-[90px] text-center px-3 py-2 text-lg font-medium rounded-md transition-colors duration-200 ${isActive ? "text-[#004AAD] font-medium" : "text-gray-700 font-medium hover:text-gray-900 hover:bg-gray-50"}`;
+  /* ── Close lang dropdown on outside click ── */
+  useEffect(() => {
+    const handler = (e) => {
+      if (!e.target.closest("#lang-wrapper")) setLangOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-  const mobileLink = "block w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50";
+  /* ── Helper: render a desktop nav link ── */
+  const DesktopLink = ({ link }) => {
+    if (link.type === "route") {
+      return (
+        <NavLink
+          to={link.to}
+          style={({ isActive }) => ({
+            ...desktopLinkStyle,
+            color: isActive ? GOLD : "rgba(255,255,255,0.85)",
+          })}
+          onMouseEnter={(e) => (e.currentTarget.style.color = GOLD)}
+          onMouseLeave={(e) => {
+            // keep gold if active — NavLink re-applies style prop anyway on next render
+            e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+          }}
+        >
+          {link.label}
+        </NavLink>
+      );
+    }
+    return (
+      <a
+        href={link.href}
+        style={desktopLinkStyle}
+        onMouseEnter={(e) => (e.currentTarget.style.color = GOLD)}
+        onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.85)")}
+      >
+        {link.label}
+      </a>
+    );
+  };
 
+  /* ── Helper: render a mobile nav link ── */
+  const MobileLink = ({ link }) => {
+    if (link.type === "route") {
+      return (
+        <NavLink
+          to={link.to}
+          onClick={() => setOpen(false)}
+          style={mobileLinkStyle}
+        >
+          {link.label}
+        </NavLink>
+      );
+    }
+    return (
+      <a
+        href={link.href}
+        onClick={() => setOpen(false)}
+        style={mobileLinkStyle}
+      >
+        {link.label}
+      </a>
+    );
+  };
+
+  /* ─────────────── RENDER ─────────────── */
   return (
     <>
-      <div id="google_translate_element" style={{ display: 'none' }}></div>
+      <div id="google_translate_element" style={{ display: "none" }} />
 
-      <div className="fixed top-0 z-50 w-full bg-white notranslate border-b border-gray-100">
-        <header>
-          <div className="Resizer px-4 sm:px-6">
-            <div className="flex items-center justify-between h-20">
-
-              {/* LOGO */}
-              <div className="flex items-center">
-                <NavLink to="/" onClick={closeAll}>
-                  <img
-                    src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
-                    alt="Logo"
-                    className="w-24 h-auto"
-                  />
-                </NavLink>
+      <nav
+        style={{
+          position: "fixed",
+          top: 0, left: 0, right: 0,
+          zIndex: 100,
+          background: scrolled ? NAVY : "transparent",
+          transition: "background 0.4s ease",
+          color: WHITE,
+          borderBottom: scrolled ? "1px solid rgba(245,197,24,0.2)" : "none",
+        }}
+      >
+        {/* ── INNER ROW ── */}
+        <div
+          style={{
+            maxWidth: 1400,
+            margin: "0 auto",
+            padding: "0 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            height: 72,
+          }}
+        >
+          {/* ── LOGO ── */}
+          <NavLink to="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+            <img
+              src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
+              alt="Halimatu Sa'diyyah Islamic Academy"
+              style={{
+                width: 52, height: 52,
+                objectFit: "cover",
+                flexShrink: 0,
+              }}
+            />
+            <div>
+              <div style={{ color: GOLD, fontWeight: 800, fontSize: 13, letterSpacing: 1, lineHeight: 2 }}>
+                HALIMATU SA'DIYYAH
               </div>
-
-              {/* DESKTOP NAV */}
-              <nav className="hidden lg:flex items-center gap-2 xl:gap-4">
-                <NavLink to="/" className={linkClasses}>Home</NavLink>
-                <NavLink to="/about" className={linkClasses}>About Us</NavLink>
-
-                {/* STUDY PLAN */}
-                {/* <div className="relative shrink-0">
-                  <button
-                    onClick={() => { setIsStudyOpen(!isStudyOpen); setIsLangOpen(false); }}
-                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${isStudyOpen ? "bg-gray-200" : "bg-gray-100 hover:bg-gray-200"}`}
-                  >
-                    Study Plan
-                    <ChevronDown className={`h-4 w-4 transition-transform ${isStudyOpen ? "rotate-180" : ""}`} />
-                  </button>
-
-                  {isStudyOpen && (
-                    <div className="absolute top-full left-0 mt-3 w-56 bg-white rounded-xl border border-gray-100 shadow-lg z-50 overflow-hidden">
-                      <NavLink to="/curriculum" onClick={() => setIsStudyOpen(false)} className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                        Curriculum
-                      </NavLink>
-                      <NavLink to="/schedule" onClick={() => setIsStudyOpen(false)} className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                        Schedule
-                      </NavLink>
-                    </div>
-                  )}
-                </div> */}
-
-                <NavLink to="/faqs" className={linkClasses}>FAQs</NavLink>
-                <NavLink to="/contact" className={linkClasses}>Contact Us</NavLink>
-
-                {/* Private Tutor Request Button */}
-                <button
-                  onClick={() => setIsTutorModalOpen(true)}
-                  className="flex items-center gap-2 px-5 py-2 text-sm cursor-pointer font-medium bg-[#004aad] text-white rounded-md hover:bg-[#003a8c] transition-all"
-                >
-                  <UserCheck size={18} />
-                  Private Tutor
-                </button>
-
-                {/* LANGUAGE */}
-                <div className="relative shrink-0">
-                  <button 
-                    onClick={() => { setIsLangOpen(!isLangOpen); setIsStudyOpen(false); }} 
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium bg-gray-100 rounded-md"
-                  >
-                    <Globe className="h-4 w-4" />
-                    {language.toUpperCase()}
-                  </button>
-                  {isLangOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-full bg-white rounded-md shadow z-50">
-                      {["en", "ar"].map((lng) => (
-                        <button 
-                          key={lng} 
-                          onClick={() => { changeGoogleLanguage(lng); setIsLangOpen(false); }} 
-                          className="block w-full px-3 py-2 text-sm text-left hover:bg-gray-50"
-                        >
-                          {lng.toUpperCase()}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </nav>
-
-              {/* DESKTOP AUTH */}
-              <div className="hidden lg:flex items-center gap-3 shrink-0">
-                {authState.isLoggedIn ? (
-                  <NavLink to={authState.dashboardUrl}>
-                    <button className="min-w-32 px-5 py-2 text-sm bg-[#004AAD] text-white rounded-md flex items-center justify-center gap-2">
-                      <LayoutDashboard size={16} />
-                      Dashboard
-                    </button>
-                  </NavLink>
-                ) : (
-                  <>
-                    <NavLink to="/login">
-                      <button className="min-w-24 px-5 py-2 text-sm border border-[#101E55] rounded-md">Login</button>
-                    </NavLink>
-                    <NavLink to="/register">
-                      <button className="min-w-28 px-5 py-2 text-sm bg-gradient text-white rounded-md">Register</button>
-                    </NavLink>
-                  </>
-                )}
+              <div style={{ color: "#fff", fontSize: 10, letterSpacing: 0.5 }}>
+                ISLAMIC ACADEMY
               </div>
-
-              {/* MOBILE TOGGLE */}
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2 rounded-md hover:bg-gray-100">
-                {isMenuOpen ? <X /> : <Menu />}
-              </button>
             </div>
+          </NavLink>
+
+          {/* ── DESKTOP NAV LINKS ── */}
+          <div className="desktop-nav" style={{ display: "flex", gap: 24, alignItems: "center" }}>
+            {links.map((l) => <DesktopLink key={l.label} link={l} />)}
+
+            {/* Private Tutor button */}
+            <button
+              onClick={() => setTutorModal(true)}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                background: "rgba(245,197,24,0.12)",
+                border: `1px solid ${GOLD}`,
+                color: GOLD,
+                padding: "8px 14px", borderRadius: 5,
+                fontSize: 14, fontWeight: 400,
+                cursor: "pointer", whiteSpace: "nowrap",
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(245,197,24,0.22)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(245,197,24,0.12)")}
+            >
+              <UserCheck size={15} />
+              Private Tutor
+            </button>
           </div>
 
-          {/* MOBILE MENU */}
-          {isMenuOpen && (
-            <div className="fixed inset-0 z-50 bg-black/30 lg:hidden">
-              <div className="fixed top-0 right-0 h-full w-80 bg-white p-4 shadow-xl">
-                <div className="flex justify-between items-center border-b border-gray-400 pb-3">
-                  <NavLink to="/" onClick={closeAll}>
-                    <img 
-                      src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png" 
-                      alt="Logo" 
-                      className="w-20 h-auto" 
-                    />
-                  </NavLink>
-                  <button onClick={closeAll}><X /></button>
+          {/* ── DESKTOP RIGHT: Lang + Auth + CTA ── */}
+          <div className="desktop-right" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+
+            {/* Language switcher */}
+            <div id="lang-wrapper" style={{ position: "relative" }}>
+              <button
+                onClick={(e) => { e.stopPropagation(); setLangOpen((v) => !v); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  color: WHITE,
+                  padding: "8px 12px", borderRadius: 5,
+                  fontSize: 14, fontWeight: 400,
+                  cursor: "pointer", whiteSpace: "nowrap",
+                }}
+              >
+                <Globe size={14} />
+                {currentLang === "en" ? "🇬🇧 EN" : "🇸🇦 AR"}
+                <ChevronDown
+                  size={12}
+                  style={{ transform: langOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }}
+                />
+              </button>
+
+              {langOpen && (
+                <div
+                  style={{
+                    position: "absolute", top: "calc(100% + 6px)", right: 0,
+                    background: NAVY,
+                    border: "1px solid rgba(245,197,24,0.25)",
+                    borderRadius: 5, overflow: "hidden",
+                    minWidth: 120,
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+                    zIndex: 200,
+                  }}
+                >
+                  {[
+                    { code: "en", label: "🇬🇧 English" },
+                    { code: "ar", label: "🇸🇦 العربية" },
+                  ].map(({ code, label }) => (
+                    <button
+                      key={code}
+                      onClick={() => handleLangChange(code)}
+                      style={{
+                        display: "block", width: "100%",
+                        padding: "11px 14px",
+                        background: currentLang === code ? "rgba(245,197,24,0.12)" : "none",
+                        border: "none",
+                        color: currentLang === code ? GOLD : "rgba(255,255,255,0.85)",
+                        fontSize: 13,
+                        fontWeight: currentLang === code ? 700 : 500,
+                        textAlign: "left", cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(245,197,24,0.1)"; e.currentTarget.style.color = GOLD; }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = currentLang === code ? "rgba(245,197,24,0.12)" : "none";
+                        e.currentTarget.style.color = currentLang === code ? GOLD : "rgba(255,255,255,0.85)";
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
-
-                <nav className="mt-4 space-y-4">
-                  <NavLink to="/" className={mobileLink} onClick={closeAll}>Home</NavLink>
-                  <NavLink to="/about" className={mobileLink} onClick={closeAll}>About Us</NavLink>
-
-                  {/* Private Tutor Request in Mobile Menu */}
-                  <button
-                    onClick={() => {
-                      setIsTutorModalOpen(true);
-                      closeAll();
-                    }}
-                    className="w-full text-left px-3 py-3 text-sm font-medium text-[#004aad] hover:bg-gray-50 rounded-md flex items-center gap-2"
-                  >
-                    <UserCheck size={18} />
-                    Apply for Private Tutor
-                  </button>
-
-                  {/* AUTH MOBILE */}
-                  <div className="pt-3 space-y-2">
-                    {authState.isLoggedIn ? (
-                      <NavLink to={authState.dashboardUrl} onClick={closeAll}>
-                        <button className="w-full px-4 py-3 bg-[#004AAD] text-white rounded-md text-sm flex items-center justify-center gap-2">
-                          <LayoutDashboard size={18} />
-                          Go to Dashboard
-                        </button>
-                      </NavLink>
-                    ) : (
-                      <>
-                        <NavLink to="/login" onClick={closeAll}>
-                          <button className="w-full px-4 py-3 border border-gray-400 cursor-pointer rounded-md text-sm mb-4">Login</button>
-                        </NavLink>
-                        <NavLink to="/register" onClick={closeAll}>
-                          <button className="w-full px-4 py-3 bg-gradient text-white cursor-pointer rounded-md text-sm">Register</button>
-                        </NavLink>
-                      </>
-                    )}
-                  </div>
-                </nav>
-              </div>
+              )}
             </div>
-          )}
-        </header>
-      </div>
 
-      {/* Private Tutor Modal */}
-      <PrivateTutorRequestModal 
-        isOpen={isTutorModalOpen} 
-        onClose={() => setIsTutorModalOpen(false)} 
+            {/* Login */}
+            <NavLink to="/login" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  border: "1px solid rgba(255,255,255,0.4)", color: WHITE,
+                  background: "none", padding: "8px 18px", borderRadius: 5,
+                  fontSize: 14, fontWeight: 400, cursor: "pointer", whiteSpace: "nowrap",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = GOLD; e.currentTarget.style.color = GOLD; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; e.currentTarget.style.color = WHITE; }}
+              >
+                Login
+              </button>
+            </NavLink>
+
+            {/* Register */}
+            <NavLink to="/register" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`,
+                  color: NAVY, border: "none",
+                  padding: "8px 18px", borderRadius: 5,
+                  fontSize: 14, fontWeight: 400, cursor: "pointer",
+                  boxShadow: "0 4px 16px rgba(245,197,24,0.35)", whiteSpace: "nowrap",
+                }}
+              >
+                Register
+              </button>
+            </NavLink>
+
+          </div>
+
+          {/* ── MOBILE TOGGLE ── */}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="mobile-menu-btn"
+            style={{ background: "none", border: "none", color: WHITE, cursor: "pointer", display: "none" }}
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
+
+        {/* ── MOBILE DROPDOWN ── */}
+        {open && (
+          <div style={{ background: NAVY, padding: "16px 24px 28px", borderTop: "1px solid rgba(245,197,24,0.2)" }}>
+
+            {/* Nav links */}
+            {links.map((l) => <MobileLink key={l.label} link={l} />)}
+
+            {/* Private Tutor mobile */}
+            <button
+              onClick={() => { setTutorModal(true); setOpen(false); }}
+              style={{
+                ...mobileLinkStyle,
+                color: GOLD,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              <UserCheck size={17} />
+              Private Tutor
+            </button>
+
+            {/* Mobile lang */}
+            <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+              {[
+                { code: "en", label: "🇬🇧 English" },
+                { code: "ar", label: "🇸🇦 العربية" },
+              ].map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => handleLangChange(code)}
+                  style={{
+                    flex: 1, padding: "11px 8px", borderRadius: 5,
+                    fontSize: 14, fontWeight: 400, cursor: "pointer",
+                    border: `1px solid ${currentLang === code ? GOLD : "rgba(255,255,255,0.2)"}`,
+                    background: currentLang === code ? "rgba(245,197,24,0.15)" : "rgba(255,255,255,0.05)",
+                    color: currentLang === code ? GOLD : WHITE,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile auth */}
+            <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+              <NavLink to="/login" style={{ flex: 1, textDecoration: "none" }} onClick={() => setOpen(false)}>
+                <button
+                  style={{
+                    width: "100%", padding: "12px", borderRadius: 5,
+                    fontSize: 14, fontWeight: 700, cursor: "pointer",
+                    background: "none", border: "1px solid rgba(255,255,255,0.4)", color: WHITE,
+                  }}
+                >
+                  Login
+                </button>
+              </NavLink>
+              <NavLink to="/register" style={{ flex: 1, textDecoration: "none" }} onClick={() => setOpen(false)}>
+                <button
+                  style={{
+                    width: "100%", padding: "12px", borderRadius: 5,
+                    fontSize: 14, fontWeight: 700, cursor: "pointer",
+                    background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`,
+                    border: "none", color: NAVY,
+                  }}
+                >
+                  Register
+                </button>
+              </NavLink>
+            </div>
+
+          </div>
+        )}
+
+        <style>{`
+          @media (max-width: 1024px) {
+            .desktop-nav     { display: none !important; }
+            .desktop-right   { display: none !important; }
+            .mobile-menu-btn { display: block !important; }
+          }
+        `}</style>
+      </nav>
+
+      {/* ── PRIVATE TUTOR MODAL ── */}
+      <PrivateTutorRequestModal
+        isOpen={tutorModal}
+        onClose={() => setTutorModal(false)}
       />
     </>
   );

@@ -1,170 +1,212 @@
-import React, { useState } from 'react';
-import { Star, ChevronRight, Sparkles } from 'lucide-react';
-import { useLanguage } from '../../../context/LanguageContext';
+import { CheckCircle } from "lucide-react";
+import { GOLD, GOLD_DARK, NAVY, NAVY_LIGHT, NAVY_MID, OFF_WHITE, WHITE } from "../../../i18n/tokens";
 
-const ProgramSection = () => {
-  const { t } = useLanguage();
-  const [hoveredCard, setHoveredCard] = useState(null);
+const promises = [
+  "Sound, qualified Islamic tutors",
+  "Structured curriculum for all levels",
+  "Flexible scheduling around your life",
+  "Private one-on-one sessions available",
+  "Affordable with yearly payment plans",
+];
 
-  const subjects = t.programSection.subjects.map((subject, index) => ({
-    ...subject,
-    delay: `${index * 100}`, // stagger animation
-    icon: index === 0 ? '✍️' : '🤲' // keep your icons
-  }));
+const quickStats = [
+  { value: "100+", label: "Students Enrolled" },
+  { value: "4+", label: "Years Experience" },
+  { value: "100%", label: "Online & Flexible" },
+];
 
+export default function About() {
   return (
-    <div className="bg-[#F9F9F8] p-8" dir={t.dir}>
-      <div className="section Resizer mx-auto space-y-10">
-        {/* Header Section */}
-        <div className="text-center space-y-6 animate-fade-in">
-          <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-xl rounded-md border border-[#004aad]">
-            <Star className="w-5 h-5 text-[#004aad] animate-pulse" />
-            <span className="text-sm text-[#004aad] tracking-wider uppercase">
-              {t.programSection.headerBadge}
-            </span>
-            <Star className="w-5 h-5 text-[#004aad] animate-pulse" />
+    <section style={{ background: OFF_WHITE, padding: "80px" }}>
+      <div
+        style={{
+          maxWidth: 1400,
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 80,
+          alignItems: "center",
+        }}
+        className="about-grid"
+      >
+        {/* Left — Text */}
+        <div>
+          <div
+            style={{
+              display: "inline-block",
+              background: "rgba(10,22,40,0.08)",
+              color: NAVY_MID,
+              padding: "6px 16px",
+              borderRadius: 100,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: 1.5,
+              textTransform: "uppercase",
+              marginBottom: 20,
+            }}
+          >
+            About Us
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold text-black tracking-tight">
-              {t.programSection.title}
-            </h2>
-          </div>
+          <h2
+            style={{
+              fontSize: 42,
+              fontWeight: 900,
+              color: NAVY,
+              lineHeight: 1.4,
+              margin: "0 0 24px",
+            }}
+          >
+            Knowledge is Light.
+            <br />
+            <span style={{ color: GOLD_DARK }}>We Carry the Torch.</span>
+          </h2>
 
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-16 h-1 bg-linear-to-r from-transparent via-[#004aad] to-transparent rounded-full animate-pulse"></div>
-            <Sparkles className="w-6 h-6 text-[#004aad] animate-bounce" />
-            <div className="w-16 h-1 bg-linear-to-r from-transparent via-[#004aad] to-transparent rounded-full animate-pulse"></div>
-          </div>
-
-          <p className="text-base text-black max-w-3xl mx-auto leading-loose">
-            {t.programSection.description}
+          <p
+            style={{
+              fontSize: 17,
+              color: "#000",
+              lineHeight: 1.8,
+              marginBottom: 24,
+            }}
+          >
+            Halimatu Sa'diyyah Islamic Academy was founded with one mission — to
+            make authentic Islamic and Arabic education accessible to every
+            Muslim, wherever they are in the world.
           </p>
-        </div>
+          <p
+            style={{
+              fontSize: 17,
+              color: "#000",
+              lineHeight: 1.8,
+              marginBottom: 36,
+            }}
+          >
+            Our qualified tutors are passionate about nurturing a love for the
+            Qur'an, Arabic language, and Islamic sciences. Whether you are 8 or
+            60, a beginner or an advanced learner, there is a place for you
+            here.
+          </p>
 
-        {/* Subjects Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {subjects.map((subject, index) => (
-            <div
-              key={index}
-              style={{ animationDelay: `${subject.delay}ms` }}
-              className="animate-slide-up"
-              onMouseEnter={() => setHoveredCard(index)}
-              onMouseLeave={() => setHoveredCard(null)}
-            >
-              <div className="group relative bg-white rounded-md overflow-hidden cursor-pointer hover:shadow-1xl transition-all duration-500 hover:-translate-y-3 h-full">
-                {/* Animated Background Gradient */}
+          <div style={{ display: "flex", gap: 40 }}>
+            {quickStats.map((s) => (
+              <div key={s.label}>
                 <div
-                  className={`absolute inset-0 bg-linear-to-br ${subject.gradient || 'from-purple-500 to-indigo-600'} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                ></div>
-
-                {/* Icon Header */}
-                <div
-                  className={`relative h-40 bg-linear-to-br ${subject.gradient || 'from-purple-500 to-indigo-600'} flex items-center justify-center overflow-hidden`}
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 900,
+                    color: NAVY,
+                    lineHeight: 1,
+                  }}
                 >
-                  {/* Animated Background Pattern */}
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full -translate-x-20 -translate-y-20 group-hover:scale-150 transition-transform duration-700"></div>
-                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-white rounded-full translate-x-20 translate-y-20 group-hover:scale-150 transition-transform duration-700"></div>
-                  </div>
-
-                  {/* Icon with Animation */}
-                  <div className="relative z-10 transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">
-                    <span className="text-7xl filter drop-shadow-lg animate-float">
-                      {subject.icon}
-                    </span>
-                  </div>
-
-                  {/* Sparkle Effect */}
-                  {hoveredCard === index && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Sparkles className="w-8 h-8 text-white animate-ping" />
-                    </div>
-                  )}
+                  {s.value}
                 </div>
-
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-[#004aad] group-hover:text-black transition-colors duration-300">
-                      {subject.title}
-                    </h3>
-                    <div
-                      className={`h-1 w-0 group-hover:w-16 bg-linear-to-r ${
-                        subject.gradient || 'from-purple-500 to-indigo-600'
-                      } rounded-full transition-all duration-500`}
-                    ></div>
-                  </div>
-
-                  <p className="text-black text-sm leading-loose min-h-25">
-                    {subject.description}
-                  </p>
-
-                 
-                </div>
-
-                {/* Corner Decoration */}
-                <div className="absolute top-0 right-0 w-20 h-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div
-                    className={`absolute top-0 right-0 w-full h-full bg-linear-to-br ${
-                      subject.gradient || 'from-purple-500 to-indigo-600'
-                    } opacity-20 rounded-bl-full`}
-                  ></div>
+                <div
+                  style={{ fontSize: 13, color: "#000", marginTop: 4 }}
+                >
+                  {s.label}
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — Card */}
+        <div style={{ position: "relative" }}>
+          <div
+            style={{
+              background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_LIGHT} 100%)`,
+              borderRadius: 24,
+              padding: 48,
+              color: WHITE,
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            {/* Decorative ring */}
+            <div
+              style={{
+                position: "absolute",
+                top: -40,
+                right: -40,
+                width: 180,
+                height: 180,
+                borderRadius: "50%",
+                border: "2px solid rgba(245,197,24,0.2)",
+              }}
+            />
+            <div style={{ fontSize: 40, marginBottom: 24 }}>🕌</div>
+            <h3
+              style={{
+                fontSize: 24,
+                fontWeight: 800,
+                color: GOLD,
+                marginBottom: 16,
+              }}
+            >
+              Our Promise to You
+            </h3>
+            {promises.map((item) => (
+              <div
+                key={item}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 15,
+                  marginBottom: 24,
+                  color: "#fff",
+                }}
+              >
+                <CheckCircle
+                  size={18}
+                  color={GOLD}
+                  style={{ flexShrink: 0, marginTop: 2 }}
+                />
+                <span
+                  style={{ fontSize: 15, color: "rgba(255,255,255,0.85)" }}
+                >
+                  {item}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Floating badge */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: -40,
+              left: -20,
+              background: GOLD,
+              borderRadius: 16,
+              padding: "16px 20px",
+              boxShadow: "0 8px 32px rgba(245,197,24,0.4)",
+            }}
+          >
+            <div
+              style={{ fontSize: 24, fontWeight: 900, color: NAVY }}
+            >
+              Ages
             </div>
-          ))}
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 900,
+                color: NAVY,
+                lineHeight: 1,
+              }}
+            >
+              8–60
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.6s ease-out backwards;
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
+      <style>{`
+        @media (max-width: 768px) {
+          .about-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-    </div>
+    </section>
   );
-};
-
-export default ProgramSection;
+}

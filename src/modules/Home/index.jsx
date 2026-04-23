@@ -1,8 +1,10 @@
 import Banner from './Components/Banner';
-import NextBanner from './Components/NextBanner';
+import Statsbar from './Components/Statsbar';
+import Courses from './Components/Courses';
+import Features from './Components/Features';
 import TheProgram from './Components/TheProgram';
-import IslamicQuote from './Components/IslamicQuote';
-import LearningPathSection from './Components/LearningPathSection';
+import Privatetutor from './Components/Privatetutor';
+import Enroll from './Components/Enroll';
 import TestimonialsFAQs from './Components/TestimonialsFAQs';  
 import PrivateTutorRequestCTA from './Components/PrivateTutorRequestCTA';  
 
@@ -12,10 +14,13 @@ export default function NewHome() {
     return (
         <>
             <Banner />
-            <NextBanner />
+            <Statsbar />
+            <Courses />
             <TheProgram />
+            <Features />
+            {/* <Privatetutor /> */}
+            {/* <Enroll /> */}
             <PrivateTutorRequestCTA />
-            <IslamicQuote />
             <TestimonialsFAQs />
         </>
     );

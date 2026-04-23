@@ -7,7 +7,7 @@ const PrivateTutorRequestCTA = () => {
 
     return (
         <>
-            <div className="bg-linear-to-br from-[#004aad] to-[#003a8c]  overflow-hidden">
+            <div className=" overflow-hidden">
             <div className='Resizer'>
             <div className="grid md:grid-cols-2 gap-0">
     

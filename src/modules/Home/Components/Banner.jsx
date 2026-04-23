@@ -1,116 +1,334 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Clock, DollarSign, Laptop, Users, BookOpen } from 'lucide-react';
-import { useLanguage } from "../../../context/LanguageContext";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
+import { GOLD, GOLD_DARK, NAVY, WHITE } from "../../../i18n/tokens";
 
-const AcademyBanner = () => {
-    const { t } = useLanguage(); // dynamic translations
-    const [currentSlide, setCurrentSlide] = useState(0);
+const heroSlides = [
+  {
+    badge: "✦ Online Arabic & Islamic Classes",
+    title: "Learn Qur'an & Arabic",
+    subtitle: "From Home, With Expert Tutors",
+    desc: "Give your child — or yourself — the gift of Qur'an and Arabic. Learn from qualified, experienced tutors without leaving home.",
+    bg: `linear-gradient(135deg, #0A1628 0%, #0F2147 50%, #1A3466 100%)`,
+  },
+  {
+    badge: "✦ 4-Year Structured Program",
+    title: "A Complete Islamic",
+    subtitle: "Education Journey",
+    desc: "From Qur'an recitation to Tafsir and Taohid — our four-year curriculum gives you a comprehensive foundation in Islamic knowledge.",
+    bg: `linear-gradient(135deg, #0F1B0A 0%, #163310 50%, #1E4A14 100%)`,
+  },
+  {
+    badge: "✦ Private Tutor Available",
+    title: "One-on-One Learning",
+    subtitle: "Tailored Just for You",
+    desc: "Request a private tutor for personalized, focused sessions. Whether you're a beginner or advanced learner, we have the right teacher for you.",
+    bg: `linear-gradient(135deg, #1A0A28 0%, #2D1045 50%, #3D1766 100%)`,
+  },
+];
 
-    // Use translations for slides
-    const slides = t.banner.slides.map(slide => ({
-        ...slide,
-        gradient: slide.gradient || "from-purple-600 to-pink-700"
-    }));
-    const stats = [
-        { icon: Calendar, title: t.stats?.duration || "2 semesters (1 years)", subtitle: t.stats?.durationLabel || "Program Duration", color: "bg-emerald-500" },
-        { icon: Clock, title: t.stats?.semesterLength || "12 weeks", subtitle: t.stats?.semesterLengthLabel || "Semester Length", color: "bg-[#004aad] to-[#101e55]" },
-        { icon: DollarSign, title: t.stats?.cost || "Paid", subtitle: t.stats?.costLabel || "Online", color: "bg-purple-500" },
-        { icon: BookOpen, title: t.stats?.perWeek || "Per Week", subtitle: t.stats?.perWeekLabel || "15 Hours", color: "bg-orange-500" },
+const quickBadges = [
+  { icon: "👶", text: "Ages 8–60" },
+  { icon: "🏠", text: "Learn from Home" },
+  { icon: "👨‍🏫", text: "Private Tutor Available" },
+  { icon: "💰", text: "Affordable Fees" },
+];
 
-    ];
+export default function HeroBanner() {
+  const [slide, setSlide] = useState(0);
+  const [animating, setAnimating] = useState(false);
 
-    // auto-slide
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentSlide(prev => (prev + 1) % slides.length);
-        }, 5000);
-        return () => clearInterval(timer);
-    }, [slides.length]);
-
-    return (
-        <div className="w-full Resizer mx-auto p-4 space-y-2 mt-18">
-            {/* Banner Section */}
-            <div className="relative overflow-hidden rounded-md">
-                {slides.map((slide, index) => (
-                    <div
-                        key={index}
-                        className={`transition-all duration-700 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
-                    >
-                        <div className={`bg-linear-to-r ${slide.gradient} text-white`}>
-                            <div className="grid md:grid-cols-2 gap-8 items-center min-h-125">
-                                {/* Left Content */}
-                                <div className="md:p-12 sm:p-6 p-6 space-y-6">
-                                    <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm">
-                                        {slide.badge}
-                                    </div>
-                                    <h1 className="text-4xl font-bold leading-tight">{slide.title}</h1>
-                                    <h2 className="text-3xl font-light text-white/90">{slide.subtitle}</h2>
-                                    <p className="text-base text-white/90 leading-relaxed">{slide.description}</p>
-                                    <div className="flex gap-4 pt-4">
-                                        <Link to={"/register"} className="hidden md:inline-block">
-                                            <button className="px-8 py-3 bg-white text-gray-900 cursor-pointer rounded-md hover:bg-gray-100 transition-colors">
-                                                {slide.ctaPrimary}
-                                            </button>
-                                        </Link>
-                                        <Link to={"/about"}>
-                                            <button className="hidden md:block px-8 py-3 cursor-pointer border border-white text-white rounded-md hover:bg-white/30 transition-colors">
-                                                {slide.ctaSecondary}
-                                            </button>
-                                        </Link>
-                                    </div>
-                                </div>
-
-                                {/* Right Image */}
-                                <div className="relative w-full md:w-auto h-64 md:h-full min-h-0 md:min-h-125 overflow-hidden rounded-2xl">
-                                    <img
-                                        src={slide.image}
-                                        alt={slide.title}
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-linear-to-l from-transparent to-black/20"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-
-                {/* Slide Indicators */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-                    {slides.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setCurrentSlide(index)}
-                            className={`h-2 rounded-full transition-all ${index === currentSlide ? 'w-8 bg-white' : 'w-2 bg-white/50'}`}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* Stats Section */}
-            <div className="bg-white">
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 border-b border-[#004aad] rounded-b-md pt-4">
-                    {stats.map((stat, index) => {
-                        const Icon = stat.icon;
-                        return (
-                            <div
-                                key={index}
-                                className="flex flex-col items-center text-center space-y-3 p-4 rounded-2xl hover:bg-gray-50 transition-colors"
-                            >
-                                <div className={`${stat.color} p-4 rounded-2xl`}>
-                                    <Icon className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-900 text-sm">{stat.title}</p>
-                                    <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
+  useEffect(() => {
+    const t = setInterval(
+      // eslint-disable-next-line react-hooks/immutability
+      () => goTo((slide + 1) % heroSlides.length),
+      5500
     );
-};
+    return () => clearInterval(t);
+  }, [slide]);
 
-export default AcademyBanner;
+  const goTo = (idx) => {
+    setAnimating(true);
+    setTimeout(() => {
+      setSlide(idx);
+      setAnimating(false);
+    }, 300);
+  };
+
+  const s = heroSlides[slide];
+
+  return (
+    <section
+      id="home"
+      style={{
+        minHeight: "90vh",
+        background: s.bg,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        overflow: "hidden",
+        transition: "background 0.8s ease",
+      }}
+    >
+      {/* Decorative rings */}
+      <div
+        style={{
+          position: "absolute",
+          top: -120,
+          right: -120,
+          width: 500,
+          height: 500,
+          borderRadius: "50%",
+          border: "1px solid rgba(245,197,24,0.12)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: -60,
+          right: -60,
+          width: 300,
+          height: 300,
+          borderRadius: "50%",
+          border: "1px solid rgba(245,197,24,0.18)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: -80,
+          left: -80,
+          width: 400,
+          height: 400,
+          borderRadius: "50%",
+          border: "1px solid rgba(245,197,24,0.1)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Arabic text watermark */}
+      <div
+        style={{
+          position: "absolute",
+          top: 100,
+          right: 40,
+          fontSize: 80,
+          color: "rgba(245,197,24,0.06)",
+          pointerEvents: "none",
+          lineHeight: 1,
+          direction: "rtl",
+        }}
+      >
+        بِسْمِ اللَّهِ
+      </div>
+
+      {/* Slide Content */}
+      <div
+        style={{
+          maxWidth: 900,
+          margin: "0 auto",
+          padding: "80px 32px 80px",
+          textAlign: "center",
+          opacity: animating ? 0 : 1,
+          transform: animating ? "translateY(16px)" : "translateY(0)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+        }}
+      >
+        {/* Arabic name */}
+        <div
+          style={{
+            color: GOLD,
+            fontSize: 28,
+            marginBottom: 16,
+            letterSpacing: 1,
+            direction: "rtl",
+          }}
+        >
+          أكاديمية حليمة السعدية الإسلامية
+        </div>
+
+        {/* Badge */}
+        <div
+          style={{
+            display: "inline-block",
+            background: "rgba(245,197,24,0.15)",
+            border: "1px solid rgba(245,197,24,0.35)",
+            color: GOLD,
+            padding: "6px 20px",
+            borderRadius: 100,
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: 1,
+            marginBottom: 32,
+          }}
+        >
+          {s.badge}
+        </div>
+
+        <h1
+          style={{
+            fontSize: "clamp(36px, 6vw, 68px)",
+            fontWeight: 900,
+            color: WHITE,
+            lineHeight: 1.1,
+            margin: "0 0 8px",
+            letterSpacing: -1,
+          }}
+        >
+          {s.title}
+        </h1>
+        <h2
+          style={{
+            fontSize: "clamp(28px, 4.5vw, 52px)",
+            fontWeight: 300,
+            color: GOLD,
+            lineHeight: 1.2,
+            margin: "0 0 28px",
+            letterSpacing: -0.5,
+          }}
+        >
+          {s.subtitle}
+        </h2>
+        <p
+          style={{
+            fontSize: 18,
+            color: "rgba(255,255,255,0.75)",
+            maxWidth: 620,
+            margin: "0 auto 48px",
+            lineHeight: 1.7,
+          }}
+        >
+          {s.desc}
+        </p>
+
+        {/* CTAs */}
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <a
+            href="#enroll"
+            style={{
+              background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`,
+              color: NAVY,
+              padding: "16px 40px",
+              borderRadius: 10,
+              fontWeight: 900,
+              fontSize: 16,
+              textDecoration: "none",
+              letterSpacing: 0.5,
+              boxShadow: "0 8px 32px rgba(245,197,24,0.45)",
+              display: "inline-block",
+            }}
+          >
+            Enrol Now — Free Consultation
+          </a>
+          <a
+            href="#courses"
+            style={{
+              background: "transparent",
+              border: "2px solid rgba(255,255,255,0.3)",
+              color: WHITE,
+              padding: "16px 40px",
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: 16,
+              textDecoration: "none",
+              display: "inline-block",
+            }}
+          >
+            View Courses
+          </a>
+        </div>
+
+        {/* Quick Badges */}
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            justifyContent: "center",
+            marginTop: 48,
+            flexWrap: "wrap",
+          }}
+        >
+          {quickBadges.map((b) => (
+            <div
+              key={b.text}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                padding: "8px 16px",
+                borderRadius: 100,
+                color: "rgba(255,255,255,0.85)",
+                fontSize: 13,
+              }}
+            >
+              <span style={{ fontSize: 14 }}>{b.icon}</span>
+              {b.text}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Slide Indicators */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 40,
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: 8,
+        }}
+      >
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            style={{
+              width: i === slide ? 32 : 8,
+              height: 8,
+              borderRadius: 4,
+              border: "none",
+              cursor: "pointer",
+              background:
+                i === slide ? GOLD : "rgba(255,255,255,0.3)",
+              transition: "all 0.3s ease",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Scroll hint */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 80,
+          right: 40,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+          color: "rgba(255,255,255,0.4)",
+          fontSize: 11,
+          letterSpacing: 2,
+        }}
+      >
+        <span style={{ writingMode: "vertical-rl", textTransform: "uppercase" }}>
+          Scroll
+        </span>
+        <ChevronDown size={14} />
+      </div>
+    </section>
+  );
+}
