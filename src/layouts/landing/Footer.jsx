@@ -1,6 +1,7 @@
 import { Phone } from "lucide-react";
 import { GOLD, GOLD_DARK, NAVY, WHITE, courses } from "../../i18n/tokens";
 import { Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Send, Heart } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 export default function Footer() {
     const currentYear = new Date().getFullYear();
@@ -26,8 +27,8 @@ export default function Footer() {
           className="footer-grid"
         >
           {/* Brand */}
-          <div>
-          <a href="#home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+          <div className="footer-brand">
+          <a href="#home" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }} className="footer-logo">
             <img
               src="https://res.cloudinary.com/ddj0k8gdw/image/upload/v1775316825/Halimatu-Academy-Images/20260222_122110_1_2_yasq5x.png"
               alt="Halimatu Sa'diyyah Islamic Academy"
@@ -37,7 +38,7 @@ export default function Footer() {
                 flexShrink: 0,
               }}
             />
-            <div>
+            <div style={{ textAlign: 'left' }}>
               <div style={{ color: GOLD, fontWeight: 500, fontSize: 13, letterSpacing: 1, lineHeight: 2 }}>
                 HALIMATU SA'DIYYAH
               </div>
@@ -54,12 +55,13 @@ export default function Footer() {
                 maxWidth: 320,
                 marginTop: 16,
               }}
+              className="footer-desc"
             >
               Bringing authentic Islamic education to every home. Online Arabic
               & Islamic classes for ages 8–60, with qualified tutors and
               flexible scheduling.
             </p>
-            <div className="flex gap-6">
+            <div className="flex gap-6 footer-socials" style={{ display: 'flex', gap: '24px' }}>
                   {[
                     { icon: Facebook, href: "#", color: "hover:bg-blue-600", name: "Facebook" },
                     { icon: Twitter, href: "#", color: "hover:bg-sky-500", name: "Twitter" },
@@ -73,8 +75,9 @@ export default function Footer() {
                         href={social.href}
                         aria-label={social.name}
                         className={`p-3 bg-white mt-7 backdrop-blur-md rounded-full ${social.color} transition-all duration-300 hover:scale-110 hover:shadow-lg`}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '44px', height: '44px', borderRadius: '50%', background: 'white' }}
                       >
-                        <Icon className="w-5 h-5" />
+                        <Icon size={20} color={NAVY} />
                       </a>
                     );
                   })}
@@ -82,7 +85,7 @@ export default function Footer() {
           </div>
 
           {/* Courses Links */}
-          <div>
+          <div className="footer-links">
             <h4
               style={{
                 color: WHITE,
@@ -118,7 +121,7 @@ export default function Footer() {
           </div>
 
           {/* Contact */}
-          <div>
+          <div className="footer-contact">
             <h4
               style={{
                 color: WHITE,
@@ -159,24 +162,26 @@ export default function Footer() {
             </div>
             <a
               href="tel:08145489933"
+              className="enroll-btn"
               style={{
                 display: "inline-block",
                 background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`,
                 color: NAVY,
                 padding: "12px 24px",
                 borderRadius: 8,
-                fontWeight: 800,
+                fontWeight: 400,
                 fontSize: 13,
                 textDecoration: "none",
               }}
             >
-              Enrol Now
+              <Link  to={"register"}>Start Learning Today</Link>
             </a>
           </div>
         </div>
 
         {/* Bottom Bar */}
         <div
+          className="footer-bottom"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -192,23 +197,40 @@ export default function Footer() {
               margin: 0,
             }}
           >
-            © {currentYear} Halimatu Sa'diyyah Islamic Academy. All rights reserved.
+            © {currentYear} Halimatu Sa'diyyah Islamic Academy.
           </p>
           <p
             style={{
-              color: "rgba(255,255,255,0.2)",
+              color: "rgba(255,255,255,0.5)",
               fontSize: 12,
               margin: 0,
             }}
           >
-            Knowledge is Light · Online Arabic & Islamic Education
+            Knowledge is Light · Online Education
           </p>
         </div>
       </div>
 
       <style>{`
         @media (max-width: 768px) {
-          .footer-grid { grid-template-columns: 1fr !important; gap: 36px !important; }
+          footer { padding: 48px 20px 32px !important; }
+          .footer-grid { 
+            grid-template-columns: 1fr !important; 
+            gap: 40px !important; 
+            text-align: center;
+            paddingBottom: 40px !important;
+            marginBottom: 40px !important;
+          }
+          .footer-logo { justify-content: center !important; }
+          .footer-desc { margin: 16px auto 0 !important; }
+          .footer-socials { justify-content: center !important; margin-top: 10px !important; }
+          .footer-bottom { 
+            flex-direction: column !important; 
+            text-align: center; 
+            gap: 8px !important; 
+          }
+          .enroll-btn { width: 100%; box-sizing: border-box; }
+          .footer-contact div { justify-content: center; }
         }
       `}</style>
     </footer>
