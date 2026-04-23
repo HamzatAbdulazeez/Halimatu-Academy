@@ -3,7 +3,7 @@ import { GOLD, NAVY } from "../../../i18n/tokens";
 
 const stats = [
   { icon: Clock, label: "Program Duration", value: "4 Years" },
-  { icon: BookOpen, label: "Semester Length", value: "12 Weeks" },
+  { icon: BookOpen, label: "Semester Length", value: "22 Weeks" },
   { icon: Laptop, label: "Mode", value: "Online Only" },
   { icon: GraduationCap, label: "Weekly Hours", value: "15 Hrs/Week" },
 ];
