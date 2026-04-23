@@ -3,8 +3,8 @@ import { BookOpen, Save, X, Image, Tag, AlertCircle, Upload, Link, Award } from 
 import { getImageUrl } from '../../../../../api/courseApi';
 
 const CATEGORIES = [
-    'Quranic Studies', 'Arabic Language', 'Islamic Studies',
-    'Tajweed', 'Fiqh', 'Hadith', 'Seerah', 'Other',
+    'Quran & Arabic', 'Tajwīd & Hadith', 'Sīrah & Fiqh',
+    'Tafsīr & Taohid','Other',
 ];
 
 const STATUS_OPTIONS = ['draft', 'published', 'archived'];
@@ -12,14 +12,14 @@ const STATUS_OPTIONS = ['draft', 'published', 'archived'];
 const EMPTY_COURSE = {
     title:           '',
     instructor:      '',
-    category:        'Quranic Studies',
+    category:        'Quran & Arabic',
     duration_months: '',
     price:           0,
     status:          'draft',
     description:     '',
     image:           '',
     imageFile:       null,
-    plan_id:         '',   // ← new
+    plan_id:         '', 
 };
 
 const CourseModal = ({ course, onSave, onClose, isNew, loading = false, plans = [] }) => {
@@ -29,14 +29,14 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false, plans = 
             id:              course.id,
             title:           course.title           ?? '',
             instructor:      course.instructor      ?? '',
-            category:        course.category        ?? 'Quranic Studies',
+            category:        course.category        ?? 'Quran & Arabic',
             duration_months: course.duration_months ?? '',
             price:           course.price           ?? 0,
             status:          course.status          ?? 'draft',
             description:     course.description     ?? '',
             image:           course.image           ?? '',
             imageFile:       null,
-            plan_id:         course.plan_id         ?? '',   // ← new
+            plan_id:         course.plan_id         ?? '',  
         };
     });
 
@@ -88,7 +88,7 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false, plans = 
                 {/* Body */}
                 <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
 
-                    {/* ── Image section (unchanged) ── */}
+                    {/* ── Image section── */}
                     <div>
                         <div className="flex items-center justify-between mb-2">
                             <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
@@ -155,7 +155,7 @@ const CourseModal = ({ course, onSave, onClose, isNew, loading = false, plans = 
                         </label>
                         <input type="text" value={form.title}
                             onChange={e => set('title', e.target.value)}
-                            placeholder="e.g. Quranic Studies - Complete Foundation"
+                            placeholder="e.g. Quran & Arabic - Complete Foundation"
                             className="w-full px-4 py-2.5 border border-gray-200 rounded-md text-sm outline-none focus:outline-none focus:border-[#004aad]" />
                     </div>
 
