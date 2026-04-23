@@ -7,6 +7,7 @@ import Privatetutor from './Components/Privatetutor';
 import Enroll from './Components/Enroll';
 import TestimonialsFAQs from './Components/TestimonialsFAQs';  
 import PrivateTutorRequestCTA from './Components/PrivateTutorRequestCTA';  
+import WhatsAppChatButton from "./Components/WhatsAppChatButton";
 
 
 
@@ -22,6 +23,7 @@ export default function NewHome() {
             {/* <Enroll /> */}
             <PrivateTutorRequestCTA />
             <TestimonialsFAQs />
+            <WhatsAppChatButton />
         </>
     );
 }

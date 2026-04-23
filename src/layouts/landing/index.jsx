@@ -1,6 +1,7 @@
 import Header from "./Header";
 import Footer from "./Footer";
 import { Outlet } from "react-router-dom";
+import ScrollToTop from "./ScrollToTop";
 
 const LandingLayout = () => {
   return (
@@ -9,6 +10,7 @@ const LandingLayout = () => {
         <Header />
         <Outlet />
         <Footer />
+        <ScrollToTop />
       </div>
     </>
   );

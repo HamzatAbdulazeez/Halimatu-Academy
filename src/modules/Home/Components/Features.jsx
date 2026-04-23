@@ -58,10 +58,10 @@ export default function Features() {
           </div>
           <h2
             style={{
-              fontSize: "clamp(32px, 5vw, 52px)",
+              fontSize: "clamp(24px, 5vw, 42px)",
               fontWeight: 900,
               color: NAVY,
-              margin: "0 0 16px",
+              margin: "0 0 10px",
             }}
           >
             Everything You Need
@@ -71,8 +71,9 @@ export default function Features() {
           <p
             style={{
               fontSize: 18,
-              color: "#718096",
+              color: "#000",
               maxWidth: 520,
+              lineHeight: 1.7,
               margin: "0 auto",
             }}
           >
