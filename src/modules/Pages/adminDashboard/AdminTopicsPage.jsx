@@ -9,6 +9,7 @@ import {
     updateCourse,
     deleteCourse,
     createTopic,
+    updateTopic,  
     deleteTopic,
     getCourseTopics,
     assignCourseToPlan,
@@ -66,7 +67,6 @@ const AdminTopicsPage = () => {
     }, []);
 
     // ── Publish / Unpublish ────────────────────────────────────────────────────
-    // Must send ALL fields as multipart — backend ignores partial updates
     const handleTogglePublish = async (courseId, newStatus) => {
         const course = courses.find(c => c.id === courseId);
         if (!course) return;
@@ -109,23 +109,63 @@ const AdminTopicsPage = () => {
         try {
             const course    = courses.find(c => c.id === courseId);
             const oldTopics = course?.whatYouLearn ?? [];
-            const newIds    = new Set(newTopics.filter(t => t.id).map(t => t.id));
-            const toDelete  = oldTopics.filter(t => t.id && !newIds.has(t.id));
 
-            for (const topic of toDelete) await deleteTopic(topic.id);
+            // Build a lookup of old topics by id for quick title comparison
+            const oldTopicMap = Object.fromEntries(
+                oldTopics.filter(t => t.id).map(t => [t.id, t])
+            );
 
-            const created = [];
+            // Stringify ids for reliable comparison (API may return int, state may hold string)
+            const newIds = new Set(newTopics.filter(t => t.id).map(t => String(t.id)));
+
+            // 1. Delete topics that were removed — use allSettled so one failure doesn't abort the rest
+            const toDelete = oldTopics.filter(t => t.id && !newIds.has(String(t.id)));
+            console.log('[Topics] to delete:', toDelete);
+            const deleteResults = await Promise.allSettled(
+                toDelete.map(topic => deleteTopic(topic.id))
+            );
+            deleteResults.forEach((result, i) => {
+                if (result.status === 'rejected') {
+                    console.error(
+                        `[Topics] Failed to delete topic id=${toDelete[i].id}:`,
+                        result.reason?.response?.data || result.reason
+                    );
+                }
+            });
+
+            // 2. Update existing topics whose title changed, create new ones
+            const saved = [];
             for (const item of newTopics) {
-                if (item.id) { created.push(item); continue; }
                 const title = (item.title ?? '').trim();
                 if (!title) continue;
-                created.push(await createTopic(courseId, title));
+
+                if (item.id) {
+                    // Existing topic — update only if title actually changed
+                    const original = oldTopicMap[item.id];
+                    if (original && original.title !== title) {
+                        try {
+                            const updated = await updateTopic(item.id, { title });
+                            saved.push(updated ?? item);
+                        } catch (err) {
+                            console.error('updateTopic error:', err);
+                            saved.push(item); // keep local value on error
+                        }
+                    } else {
+                        saved.push(item); // unchanged
+                    }
+                } else {
+                    // New topic — create it
+                    const created = await createTopic(courseId, title);
+                    saved.push(created);
+                }
             }
 
-            const freshTopics = await getCourseTopics(courseId).catch(() => created);
+            // 3. Re-fetch from server for the source of truth
+            const freshTopics = await getCourseTopics(courseId).catch(() => saved);
+
             setCourses(prev =>
                 prev.map(c => c.id === courseId
-                    ? { ...c, whatYouLearn: Array.isArray(freshTopics) ? freshTopics : created }
+                    ? { ...c, whatYouLearn: Array.isArray(freshTopics) ? freshTopics : saved }
                     : c
                 )
             );
@@ -152,7 +192,6 @@ const AdminTopicsPage = () => {
                 savedCourse = await createCourse(form);
                 setCourses(prev => [...prev, { ...savedCourse, whatYouLearn: [] }]);
 
-                // Assign to plan right after creation if selected
                 if (form.plan_id) {
                     try {
                         await assignCourseToPlan(savedCourse.id, form.plan_id);
@@ -177,7 +216,6 @@ const AdminTopicsPage = () => {
                     )
                 );
 
-                // Assign to plan if selected
                 if (form.plan_id) {
                     try {
                         await assignCourseToPlan(form.id, form.plan_id);

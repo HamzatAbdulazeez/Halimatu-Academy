@@ -2,35 +2,53 @@ import React, { useState } from 'react';
 import { BookMarked, Plus, Pencil, Trash2, Save, X, Check } from 'lucide-react';
 
 const TopicsModal = ({ course, onSave, onClose, loading = false }) => {
-    // Keep topics as objects {id?, title} so we can delete by id from the API
+    // Normalise topics to {id, title} objects
     const normalise = (t) => typeof t === 'string'
         ? { id: null, title: t }
         : { id: t.id ?? null, title: t.title ?? t.name ?? '' };
-    const [topics, setTopics] = useState(
-        (course.whatYouLearn ?? []).map(normalise)
-    );
+
+    const [topics,   setTopics]  = useState((course.whatYouLearn ?? []).map(normalise));
     const [newTopic, setNewTopic] = useState('');
-    const [editIdx, setEditIdx] = useState(null);
-    const [editVal, setEditVal] = useState('');
+    const [editIdx,  setEditIdx]  = useState(null);
+    const [editVal,  setEditVal]  = useState('');
 
     const addTopic = () => {
-        if (newTopic.trim()) {
-            setTopics(prev => [...prev, { id: null, title: newTopic.trim() }]);
+        const trimmed = newTopic.trim();
+        if (trimmed) {
+            setTopics(prev => [...prev, { id: null, title: trimmed }]);
             setNewTopic('');
         }
     };
 
-    const removeTopic = (idx) => setTopics(prev => prev.filter((_, i) => i !== idx));
+    const removeTopic = (idx) => {
+        // If we're editing this item, cancel the edit first
+        if (editIdx === idx) { setEditIdx(null); setEditVal(''); }
+        setTopics(prev => prev.filter((_, i) => i !== idx));
+    };
 
-    const startEdit = (idx) => { setEditIdx(idx); setEditVal(topics[idx].title); };
+    const startEdit = (idx) => {
+        setEditIdx(idx);
+        setEditVal(topics[idx].title);
+    };
 
     const saveEdit = () => {
-        if (editVal.trim()) {
-            setTopics(prev => prev.map((t, i) => i === editIdx ? { ...t, title: editVal.trim() } : t));
+        const trimmed = editVal.trim();
+        if (trimmed) {
+            setTopics(prev =>
+                prev.map((t, i) => i === editIdx ? { ...t, title: trimmed } : t)
+            );
         }
         setEditIdx(null);
         setEditVal('');
     };
+
+    const cancelEdit = () => {
+        setEditIdx(null);
+        setEditVal('');
+    };
+
+    // Course display name — backend may use title or name
+    const courseName = course.title || course.name || '';
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -44,7 +62,7 @@ const TopicsModal = ({ course, onSave, onClose, loading = false }) => {
                         </div>
                         <div>
                             <h3 className="text-white font-bold text-base">What You Will Learn</h3>
-                            <p className="text-white/70 text-xs truncate max-w-[260px]">{course.name}</p>
+                            <p className="text-white/70 text-xs truncate max-w-[260px]">{courseName}</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-xl transition-colors">
@@ -60,7 +78,7 @@ const TopicsModal = ({ course, onSave, onClose, loading = false }) => {
                         </div>
                     )}
                     {topics.map((topic, idx) => (
-                        <div key={idx} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 group">
+                        <div key={topic.id ?? `new-${idx}`} className="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border border-gray-100 group">
                             <div className="w-6 h-6 bg-[#004aad]/10 text-[#004aad] rounded-lg flex items-center justify-center text-xs font-bold shrink-0">
                                 {idx + 1}
                             </div>
@@ -68,7 +86,10 @@ const TopicsModal = ({ course, onSave, onClose, loading = false }) => {
                                 <input
                                     value={editVal}
                                     onChange={e => setEditVal(e.target.value)}
-                                    onKeyDown={e => e.key === 'Enter' && saveEdit()}
+                                    onKeyDown={e => {
+                                        if (e.key === 'Enter') saveEdit();
+                                        if (e.key === 'Escape') cancelEdit();
+                                    }}
                                     className="flex-1 px-2 py-1 border border-[#004aad] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004aad]/20"
                                     autoFocus
                                 />
@@ -77,15 +98,36 @@ const TopicsModal = ({ course, onSave, onClose, loading = false }) => {
                             )}
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {editIdx === idx ? (
-                                    <button onClick={saveEdit} className="p-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-600 rounded-lg transition-colors">
-                                        <Check className="w-3.5 h-3.5" />
-                                    </button>
+                                    <>
+                                        <button
+                                            onClick={saveEdit}
+                                            className="p-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-600 rounded-lg transition-colors"
+                                            title="Save"
+                                        >
+                                            <Check className="w-3.5 h-3.5" />
+                                        </button>
+                                        <button
+                                            onClick={cancelEdit}
+                                            className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg transition-colors"
+                                            title="Cancel"
+                                        >
+                                            <X className="w-3.5 h-3.5" />
+                                        </button>
+                                    </>
                                 ) : (
-                                    <button onClick={() => startEdit(idx)} className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">
+                                    <button
+                                        onClick={() => startEdit(idx)}
+                                        className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+                                        title="Edit"
+                                    >
                                         <Pencil className="w-3.5 h-3.5" />
                                     </button>
                                 )}
-                                <button onClick={() => removeTopic(idx)} className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors">
+                                <button
+                                    onClick={() => removeTopic(idx)}
+                                    className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
+                                    title="Delete"
+                                >
                                     <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                             </div>
