@@ -19,10 +19,15 @@ export const getTutorRequestDetail = async (requestId) => {
     return res.data;
 };
 
+
 export const updateTutorRequestStatus = async (requestId, status) => {
-    const res = await axiosInstance.put(`/admin/tutor-requests/${requestId}/status`, { status });
+    const res = await axiosInstance.patch(
+        `/admin/tutor-requests/${requestId}`, 
+        { status }
+    );
     return res.data;
 };
+
 
 export const deleteTutorRequest = async (requestId) => {
     const res = await axiosInstance.delete(`/admin/tutor-requests/${requestId}`);

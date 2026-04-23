@@ -1,9 +1,9 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  getAdminProfile, 
-  updateAdminProfile, 
-  changeAdminPassword 
+import {
+  getAdminProfile,
+  updateAdminProfile,
+  changeAdminPassword,
 } from "../../../api/setting";
 import { notify } from "../../../utils/toast";
 import { getImageUrl } from "../../../utils/imageHelper";
@@ -11,330 +11,459 @@ import { getImageUrl } from "../../../utils/imageHelper";
 const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState("personalDetails");
   const [activeSection, setActiveSection] = useState("Profile");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [profile, setProfile] = useState({
-    id: "",
-    name: "",
-    email: "",
-    phone: "",
-    address: "",
-    country: "Nigeria",
-    state: "",
-    role: "",
-    last_login: "",
+    name: "Admin Abdul",
+    email: "admin@hsaacademy.com",
     profile_picture: null,
+    phone: "0700 123 4567",
+    address: "Admin Office, HSA Academy",
+    country: "Nigeria",
+    state: "Rivers",
+    role: "Super Administrator",
+    lastLogin: "",
+    currentPassword: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const fileInputRef = useRef(null);
 
-  // Load profile on mount
   useEffect(() => {
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const data = await getAdminProfile();
-    
-        if (data) {
-          setProfile({
-            id: data.id || "",
-            name: data.name || "Admin",
-            email: data.email || "",
-            phone: data.phone || "",
-            address: data.address || "",
-            state: data.state || "",
-            country: data.country || "Nigeria",
-            role: data.role?.name || data.role || "Administrator",
-            last_login: data.last_login 
-              ? new Date(data.last_login).toLocaleString('en-US', { 
-                  month: 'long', day: 'numeric', year: 'numeric', 
-                  hour: 'numeric', minute: '2-digit', hour12: true 
-                }) + " WAT"
-              : "Never",
-            profile_picture: data.profile_picture || null,
-          });
-        } else {
-          // Keep default empty values - user can still fill and save
-          notify.info("Profile details will load once backend endpoint is ready.");
-        }
-      } catch (error) {
-        console.error("Failed to load profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
+    fetchAdminProfile();
   }, []);
 
+  const fetchAdminProfile = async () => {
+    try {
+      setLoading(true);
+      const data = await getAdminProfile();
+
+      if (!data) return;
+
+      setProfile((prev) => ({
+        ...prev,
+        name: data?.name || prev.name,
+        email: data?.email || prev.email,
+        phone: data?.phone || prev.phone || "",
+        profile_picture: data?.profile_picture || prev.profile_picture || null,
+        role:
+          typeof data?.role === "object"
+            ? data?.role?.name || prev.role
+            : data?.role || prev.role,
+        lastLogin: data?.last_login
+          ? new Date(data.last_login).toLocaleString()
+          : prev.lastLogin,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch admin profile:", error);
+      notify.error?.(
+        error?.response?.data?.detail || "Failed to load admin profile"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        notify.error("File size must be less than 2MB");
-        return;
-      }
+  const uploadImage = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       const url = URL.createObjectURL(file);
-      setProfile({ ...profile, profile_picture: url });
-      // You can call uploadProfilePicture(file) here if you want immediate upload
+
+      setProfile((prev) => ({
+        ...prev,
+        profile_picture: url,
+      }));
+
+      e.target.value = "";
+      notify.success?.("Profile picture selected");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
 
     try {
+      setSaving(true);
+
       if (activeTab === "personalDetails") {
         const payload = {
           name: profile.name,
           email: profile.email,
           phone: profile.phone,
-          // Add address, state, country if your backend accepts them
         };
 
-        await updateAdminProfile(payload);
-        notify.success("Profile updated successfully!");
-      } 
-      else if (activeTab === "updatePassword") {
+        const response = await updateAdminProfile(payload);
+
+        setProfile((prev) => ({
+          ...prev,
+          name: response?.name || prev.name,
+          email: response?.email || prev.email,
+          phone: response?.phone || prev.phone,
+          role:
+            typeof response?.role === "object"
+              ? response?.role?.name || prev.role
+              : response?.role || prev.role,
+          lastLogin: response?.last_login
+            ? new Date(response.last_login).toLocaleString()
+            : prev.lastLogin,
+        }));
+
+        notify.success?.("Admin profile updated successfully");
+      }
+
+      if (activeTab === "updatePassword") {
+        if (!profile.currentPassword) {
+          notify.error?.("Current password is required");
+          return;
+        }
+
+        if (profile.password.length < 8) {
+          notify.error?.("New password must be at least 8 characters");
+          return;
+        }
+
         if (profile.password !== profile.confirmPassword) {
-          notify.error("Passwords do not match!");
-          setSaving(false);
+          notify.error?.("Passwords do not match");
           return;
         }
 
         await changeAdminPassword({
-          current_password: profile.currentPassword || "", // Add this field if needed
+          current_password: profile.currentPassword,
           new_password: profile.password,
           confirm_password: profile.confirmPassword,
         });
 
-        notify.success("Password updated successfully!");
-        
-        // Clear password fields
-        setProfile(prev => ({
+        setProfile((prev) => ({
           ...prev,
+          currentPassword: "",
           password: "",
           confirmPassword: "",
-          currentPassword: ""
         }));
+
+        notify.success?.("Password updated successfully");
       }
     } catch (error) {
-      console.error("Update failed:", error);
-      const message = error.response?.data?.message || "Failed to update. Please try again.";
-      notify.error(message);
+      console.error("Admin settings update error:", error);
+      notify.error?.(
+        error?.response?.data?.detail ||
+          error?.response?.data?.message ||
+          "Something went wrong"
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  const profileImageSrc = profile.profile_picture
+    ? getImageUrl(profile.profile_picture)
+    : null;
+
   return (
     <>
-      <div className="bg-white px-6 py-4 mb-6">
-        <h1 className="text-2xl font-medium mb-3">Admin Settings</h1>
-        <p className="text-gray-500">
-          <Link to="/admin" className="text-[#004aad] hover:underline">Dashboard</Link> &gt; Settings
-        </p>
-      </div>
+      <div className="px-4 sm:px-6 lg:px-8 py-6">
+        <h1 className="text-2xl font-bold text-gray-900">Admin Settings</h1>
 
-      <div className="flex flex-col md:flex-row bg-gray-100">
-        {/* Sidebar Navigation */}
-        <div className="w-full md:w-1/5 bg-white md:mb-0 mb-6 h-fit p-4 rounded-lg shadow-sm">
-          <ul className="space-y-2 text-gray-600">
-            <li
-              className={`cursor-pointer px-4 py-3 rounded-lg transition-colors duration-300 ${
-                activeSection === "Profile" ? "font-medium text-white bg-[#004aad]" : "hover:text-[#004aad] hover:bg-gray-50"
-              }`}
-              onClick={() => setActiveSection("Profile")}
-            >
-              Profile
-            </li>
-          </ul>
+        <div className="mt-2 text-sm text-gray-600">
+          <Link to="/admin" className="text-[#004aad] hover:underline">
+            Dashboard
+          </Link>{" "}
+          &gt; Settings
         </div>
 
-        {/* Main Content */}
-        <div className="w-full md:w-4/5 bg-white p-6 rounded-lg md:ml-6 shadow-sm">
-          {activeSection === "Profile" && (
-            <div>
-              <h2 className="text-xl font-medium mb-6">Admin Profile</h2>
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3">
+              <ul className="space-y-2">
+                <li
+                  className={`cursor-pointer px-4 py-3 rounded-lg transition-colors duration-300 ${
+                    activeSection === "Profile"
+                      ? "font-medium text-white bg-[#004aad]"
+                      : "hover:text-[#004aad] hover:bg-gray-50"
+                  }`}
+                  onClick={() => setActiveSection("Profile")}
+                >
+                  Profile
+                </li>
 
-              {/* Profile Picture */}
-              <div className="flex flex-col md:flex-row items-center gap-6 mb-10">
-                {profile.profile_picture ? (
-                  <img
-                    src={getImageUrl(profile.profile_picture)}
-                    alt="Profile"
-                    className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-md"
-                  />
-                ) : (
-                  <div className="w-28 h-28 rounded-full bg-[#004aad] flex items-center justify-center text-4xl font-bold text-white shadow-md">
-                    {profile.name ? profile.name.charAt(0).toUpperCase() : "A"}
+                {/* You can add more later */}
+                {/* <li>System Settings</li> */}
+                {/* <li>Notifications</li> */}
+              </ul>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {activeSection === "Profile" && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Admin Profile
+                </h2>
+
+                {/* Profile Picture */}
+                <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-5">
+                  {profileImageSrc ? (
+                    <img
+                      src={profileImageSrc}
+                      alt="Admin Profile"
+                      className="w-28 h-28 rounded-full object-cover border-2 border-[#004aad]/30"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 rounded-full bg-[#004aad]/10 text-[#004aad] flex items-center justify-center text-3xl font-semibold border-2 border-[#004aad]/30">
+                      {profile.name?.charAt(0)?.toUpperCase() || "A"}
+                    </div>
+                  )}
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleButtonClick}
+                      className="border border-[#004aad] text-[#004aad] px-5 py-2.5 rounded-lg hover:bg-[#004aad]/10 transition"
+                    >
+                      Change Profile Picture
+                    </button>
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={uploadImage}
+                      className="hidden"
+                    />
+
+                    <p className="mt-2 text-sm text-gray-500">
+                      JPG, PNG • Max 2MB
+                    </p>
                   </div>
-                )}
+                </div>
 
-                <div>
+                {/* Tabs */}
+                <div className="mt-8 border-b border-gray-200 flex items-center gap-8">
                   <button
                     type="button"
-                    onClick={handleButtonClick}
-                    className="border border-[#004aad] text-[#004aad] px-6 py-3 rounded-lg hover:bg-[#004aad]/10 transition font-medium"
+                    className={`pb-3 px-1 font-medium transition-colors ${
+                      activeTab === "personalDetails"
+                        ? "border-b-2 border-[#004aad] text-[#004aad]"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("personalDetails")}
                   >
-                    Change Profile Picture
+                    Personal Details
                   </button>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <p className="text-sm text-gray-500 mt-2">JPG or PNG • Maximum 2MB</p>
+
+                  <button
+                    type="button"
+                    className={`pb-3 px-1 font-medium transition-colors ${
+                      activeTab === "updatePassword"
+                        ? "border-b-2 border-[#004aad] text-[#004aad]"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                    onClick={() => setActiveTab("updatePassword")}
+                  >
+                    Update Password
+                  </button>
+                </div>
+
+                {/* Tab Content */}
+                <div className="mt-8">
+                  {loading ? (
+                    <div className="text-gray-500">Loading profile...</div>
+                  ) : (
+                    <>
+                      {activeTab === "personalDetails" && (
+                        <form
+                          className="space-y-6 max-w-3xl"
+                          onSubmit={handleSubmit}
+                        >
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Full Name
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              value={profile.name}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              name="email"
+                              value={profile.email}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
+                              disabled
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Phone Number
+                            </label>
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={profile.phone}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Role
+                            </label>
+                            <input
+                              type="text"
+                              name="role"
+                              value={profile.role}
+                              readOnly
+                              className="w-full p-3.5 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Address
+                            </label>
+                            <input
+                              type="text"
+                              name="address"
+                              value={profile.address}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                State
+                              </label>
+                              <input
+                                type="text"
+                                name="state"
+                                value={profile.state}
+                                onChange={handleChange}
+                                className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Country
+                              </label>
+                              <input
+                                type="text"
+                                name="country"
+                                value={profile.country}
+                                onChange={handleChange}
+                                className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="text-sm text-gray-500">
+                            Last Login: {profile.lastLogin || "N/A"}
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={saving}
+                            className="mt-6 bg-linear-to-r from-[#004aad] to-blue-700 text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-70"
+                          >
+                            {saving ? "Saving..." : "Save Changes"}
+                          </button>
+                        </form>
+                      )}
+
+                      {activeTab === "updatePassword" && (
+                        <form
+                          className="space-y-6 max-w-md"
+                          onSubmit={handleSubmit}
+                        >
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Current Password
+                            </label>
+                            <input
+                              type="password"
+                              name="currentPassword"
+                              value={profile.currentPassword}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              required
+                              placeholder="Enter current password"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              New Password
+                            </label>
+                            <input
+                              type="password"
+                              name="password"
+                              value={profile.password}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              required
+                              minLength={8}
+                              placeholder="At least 8 characters"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Confirm New Password
+                            </label>
+                            <input
+                              type="password"
+                              name="confirmPassword"
+                              value={profile.confirmPassword}
+                              onChange={handleChange}
+                              className="w-full p-3.5 border border-gray-300 rounded-lg outline-none"
+                              required
+                              placeholder="Re-type password"
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={saving}
+                            className="mt-6 bg-linear-to-r from-[#004aad] to-blue-700 text-white px-8 py-3 rounded-lg font-medium hover:shadow-lg transition-all disabled:opacity-70"
+                          >
+                            {saving ? "Updating..." : "Update Password"}
+                          </button>
+                        </form>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
-
-              {/* Tabs */}
-              <div className="flex space-x-10 border-b border-gray-200 mb-8">
-                <button
-                  className={`pb-4 px-1 font-medium text-lg transition-colors ${
-                    activeTab === "personalDetails" ? "border-b-2 border-[#004aad] text-[#004aad]" : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("personalDetails")}
-                >
-                  Personal Details
-                </button>
-                <button
-                  className={`pb-4 px-1 font-medium text-lg transition-colors ${
-                    activeTab === "updatePassword" ? "border-b-2 border-[#004aad] text-[#004aad]" : "text-gray-500 hover:text-gray-700"
-                  }`}
-                  onClick={() => setActiveTab("updatePassword")}
-                >
-                  Change Password
-                </button>
-              </div>
-
-              {/* Forms */}
-              <form onSubmit={handleSubmit} className="max-w-3xl">
-                {activeTab === "personalDetails" && (
-                  <div className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">Full Name</label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={profile.name}
-                          onChange={handleChange}
-                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#004aad] outline-none"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">Email Address</label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={profile.email}
-                          onChange={handleChange}
-                          className="w-full p-4 border border-gray-300 rounded-xl bg-gray-50 cursor-not-allowed"
-                          disabled
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">Phone Number</label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={profile.phone}
-                          onChange={handleChange}
-                          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#004aad] outline-none"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-gray-700 font-medium mb-2">Role</label>
-                        <input
-                          type="text"
-                          value={profile.role}
-                          readOnly
-                          className="w-full p-4 border border-gray-300 rounded-xl bg-gray-50 cursor-not-allowed"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">Address</label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={profile.address}
-                        onChange={handleChange}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#004aad] outline-none"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="mt-8 bg-gradient-to-r from-[#004aad] to-blue-700 text-white px-10 py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-70"
-                    >
-                      {saving ? "Saving Changes..." : "Save Changes"}
-                    </button>
-                  </div>
-                )}
-
-                {activeTab === "updatePassword" && (
-                  <div className="space-y-8 max-w-md">
-                    {/* Add current password field if your API requires it */}
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">New Password</label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={profile.password || ""}
-                        onChange={handleChange}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#004aad] outline-none"
-                        placeholder="Minimum 8 characters"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">Confirm New Password</label>
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        value={profile.confirmPassword || ""}
-                        onChange={handleChange}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#004aad] outline-none"
-                        placeholder="Re-enter new password"
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="mt-8 bg-gradient-to-r from-[#004aad] to-blue-700 text-white px-10 py-4 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-70"
-                    >
-                      {saving ? "Updating Password..." : "Update Password"}
-                    </button>
-                  </div>
-                )}
-              </form>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </>

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext"; 
-import { logoutUser } from "../../../api/authApi"; // Keep if needed for fallback
 import { notify } from "../../../utils/toast";
 
 import {
@@ -12,7 +11,7 @@ import {
 import { UserCheck, LogOut, MessageSquare, LogOut as LogOutAll } from "lucide-react";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
-  const { user, logout: contextLogout } = useAuth(); // Use context logout if available
+  const { user, logout: contextLogout } = useAuth(); 
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,10 +58,8 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Add your auth header if needed (e.g., Bearer token)
-          // Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        credentials: "include", // Important if using cookies/sessions
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -211,7 +208,6 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-// SidebarItem component remains unchanged
 const SidebarItem = ({ to, icon, text, onClick, end = false }) => (
   <NavLink
     to={to}

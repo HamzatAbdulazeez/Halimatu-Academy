@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     Video, Plus, ChevronRight, Search, Link2, AlertCircle,
@@ -25,7 +26,7 @@ import DeleteModal from './Components/shared/DeleteModal';
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({ label, value, icon: Icon, color, bg }) => (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 flex items-center gap-4 sm:gap-5">
-        <div className={`w-12 h-12 sm:w-14 sm:h-14 ${bg} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-12 h-12 sm:w-14 sm:h-14 ${bg} rounded-2xl flex items-center justify-center shrink-0`}>
             <Icon className={`w-6 h-6 sm:w-7 sm:h-7 ${color}`} />
         </div>
         <div>
@@ -44,7 +45,7 @@ const AssignPlanModal = ({ courseName, plans, loading, onAssign, onClose }) => {
             <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-[#004aad] to-[#003a8c] px-6 py-5 flex items-center justify-between">
+                <div className="bg-linear-to-r from-[#004aad] to-[#003a8c] px-6 py-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
                             <Award className="w-5 h-5 text-white" />
@@ -113,7 +114,7 @@ const AssignPlanModal = ({ courseName, plans, loading, onAssign, onClose }) => {
                     <button
                         onClick={() => selectedPlanId && onAssign(selectedPlanId)}
                         disabled={!selectedPlanId || loading || plans.length === 0}
-                        className="flex-1 py-2.5 bg-gradient-to-r from-[#004aad] to-[#003a8c] text-white rounded-2xl text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        className="flex-1 py-2.5 bg-linear-to-r from-[#004aad] to-[#003a8c] text-white rounded-2xl text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <>
@@ -238,7 +239,7 @@ const CourseRow = ({ course, expanded, onToggleTopic, onAssignPlan, onAddClass, 
                 {/* Assign Button */}
                 <button
                     onClick={() => onAssignPlan(course.id, courseName)}
-                    className="flex items-center justify-center gap-2 px-5 py-2.5 w-full sm:w-auto bg-gradient-to-r from-[#004aad] to-[#003a8c] text-white rounded-xl text-sm font-medium hover:brightness-110 transition-all shrink-0"
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 w-full sm:w-auto bg-linear-to-r from-[#004aad] to-[#003a8c] text-white rounded-xl text-sm font-medium hover:brightness-110 transition-all shrink-0"
                 >
                     <Award className="w-4 h-4" />
                     {assignedPlans.length > 0 ? 'Add Another Plan' : 'Assign to Plan'}

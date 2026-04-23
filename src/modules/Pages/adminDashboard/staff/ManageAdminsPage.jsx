@@ -106,12 +106,29 @@ const ManageAdminsPage = () => {
   // Toggle Status
   const handleToggleStatus = async (adminId) => {
     try {
-      await toggleAdminStatus(adminId);
+      // 1. Capture the response from the API
+      const response = await toggleAdminStatus(adminId);
+      
+      // 2. Use the updated data from the server response if available
+      // If your API returns the updated admin object, use that. 
+      // If not, keep the manual toggle logic.
+      const updatedAdmin = response?.data || response;
+
+      setAdmins(prev => prev.map(admin => {
+        if (admin.id === adminId) {
+          return { 
+            ...admin, 
+            is_active: updatedAdmin.is_active !== undefined 
+              ? updatedAdmin.is_active 
+              : !admin.is_active 
+          };
+        }
+        return admin;
+      }));
+
       notify.success("Status updated");
-      setAdmins(prev => prev.map(admin =>
-        admin.id === adminId ? { ...admin, is_active: !admin.is_active } : admin
-      ));
     } catch (err) {
+      console.error(err);
       notify.error("Failed to update status");
     }
   };
@@ -186,7 +203,7 @@ const ManageAdminsPage = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-[#004aad] hover:bg-[#003a8f] text-white rounded-xl font-semibold transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-[#004aad] hover:bg-[#003a8f] cursor-pointer text-white rounded-md transition-all"
           >
             <UserPlus size={20} />
             Add New Admin
@@ -251,16 +268,17 @@ const ManageAdminsPage = () => {
                         </span>
                       </td>
                       <td className="px-6 py-5">
-                        <button
-                          onClick={() => handleToggleStatus(admin.id)}
-                          className={`px-4 py-1.5 rounded-2xl text-xs font-semibold transition-all ${
-                            admin.is_active 
-                              ? 'bg-emerald-100 text-emerald-700' 
-                              : 'bg-red-100 text-red-700'
-                          }`}
-                        >
-                          {admin.is_active ? 'ACTIVE' : 'INACTIVE'}
-                        </button>
+                      <button
+  onClick={() => handleToggleStatus(admin.id)}
+  className={`px-4 py-1.5 rounded-2xl text-xs font-semibold transition-all ${
+    // This check handles true, "true", 1, and "1"
+    (admin.is_active === true || admin.is_active === 1 || admin.is_active === "1") 
+      ? 'bg-emerald-100 text-emerald-700' 
+      : 'bg-red-100 text-red-700'
+  }`}
+>
+  {(admin.is_active === true || admin.is_active === 1 || admin.is_active === "1") ? 'ACTIVE' : 'INACTIVE'}
+</button>
                       </td>
                       <td className="px-6 py-5 text-right">
                         <div className="flex justify-end gap-2">
@@ -300,7 +318,7 @@ const ManageAdminsPage = () => {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b flex justify-between items-center">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-2xl font-bold">Add New Admin</h3>
               <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />
@@ -313,7 +331,7 @@ const ManageAdminsPage = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   required
                 />
               </div>
@@ -323,7 +341,7 @@ const ManageAdminsPage = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   required
                 />
               </div>
@@ -332,7 +350,7 @@ const ManageAdminsPage = () => {
                 <select
                   value={formData.role_id}
                   onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad] bg-white"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad] bg-white"
                   required
                 >
                   <option value="">Select Role</option>
@@ -347,16 +365,16 @@ const ManageAdminsPage = () => {
                   type="password"
                   value={formData.password || ''}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   required
                 />
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 py-4 border rounded-2xl font-semibold hover:bg-gray-50">
+                <button type="button" onClick={() => setShowCreateModal(false)} className="flex-1 cursor-pointer py-4 border rounded-md hover:bg-gray-50">
                   Cancel
                 </button>
-                <button type="submit" disabled={isSubmitting} className="flex-1 py-4 bg-[#004aad] text-white rounded-2xl font-semibold hover:bg-[#003a8f] disabled:opacity-70">
+                <button type="submit" disabled={isSubmitting} className="flex-1 py-4 bg-[#004aad] cursor-pointer text-white rounded-md hover:bg-[#003a8f] disabled:opacity-70">
                   {isSubmitting ? "Creating..." : "Create Admin"}
                 </button>
               </div>
@@ -369,7 +387,7 @@ const ManageAdminsPage = () => {
       {showEditModal && selectedAdmin && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl">
-            <div className="p-6 border-b flex justify-between items-center">
+            <div className="p-6 border-b  border-gray-200 flex justify-between items-center">
               <h3 className="text-2xl font-bold">Edit Admin</h3>
               <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
                 <X size={24} />
@@ -382,7 +400,7 @@ const ManageAdminsPage = () => {
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   required
                 />
               </div>
@@ -392,7 +410,7 @@ const ManageAdminsPage = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   required
                 />
               </div>
@@ -401,7 +419,7 @@ const ManageAdminsPage = () => {
                 <select
                   value={formData.role_id}
                   onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad] bg-white"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad] bg-white"
                   required
                 >
                   <option value="">Select Role</option>
@@ -412,10 +430,10 @@ const ManageAdminsPage = () => {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 py-4 border rounded-2xl font-semibold hover:bg-gray-50">
+                <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 py-4 border  rounded-md hover:bg-gray-50">
                   Cancel
                 </button>
-                <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-[#004aad] text-white rounded-2xl font-semibold hover:bg-[#003a8f] disabled:opacity-70">
+                <button type="submit" disabled={isUpdating} className="flex-1 py-4 bg-[#004aad] text-white rounded-md hover:bg-[#003a8f] disabled:opacity-70">
                   {isUpdating ? "Updating..." : "Save Changes"}
                 </button>
               </div>
@@ -444,17 +462,17 @@ const ManageAdminsPage = () => {
                   type="password"
                   value={passwordData.password}
                   onChange={(e) => setPasswordData({ password: e.target.value })}
-                  className="w-full px-5 py-4 border border-gray-200 rounded-2xl focus:border-[#004aad]"
+                  className="w-full p-4 border border-gray-200 rounded-md text-sm outline-none transition focus:border-[#004aad]"
                   placeholder="Minimum 6 characters"
                   required
                 />
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-4 border rounded-2xl font-semibold hover:bg-gray-50">
+                <button type="button" onClick={() => setShowPasswordModal(false)} className="flex-1 py-4 border rounded-md cursor-pointer hover:bg-gray-50">
                   Cancel
                 </button>
-                <button type="submit" disabled={isChangingPassword} className="flex-1 py-4 bg-[#004aad] text-white rounded-2xl font-semibold hover:bg-[#003a8f] disabled:opacity-70">
+                <button type="submit" disabled={isChangingPassword} className="flex-1 py-4 bg-[#004aad] text-white rounded-md cursor-pointer hover:bg-[#003a8f] disabled:opacity-70">
                   {isChangingPassword ? "Updating..." : "Update Password"}
                 </button>
               </div>
