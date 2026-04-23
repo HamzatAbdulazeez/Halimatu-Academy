@@ -17,7 +17,7 @@ export default function StatsBar() {
       }}
     >
       <div
-        id="stats-grid" // Added the ID here so the media query works
+        id="stats-grid" 
         style={{
           maxWidth: 1400,
           margin: "0 auto",
@@ -31,7 +31,7 @@ export default function StatsBar() {
           return (
             <div
               key={i}
-              className="stats-item" // Added class for border control
+              className="stats-item" 
               style={{
                 padding: "28px 24px",
                 borderRight:
