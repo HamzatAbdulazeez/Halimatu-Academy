@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
 import { GOLD, GOLD_DARK, NAVY, WHITE } from "../../../i18n/tokens";
 
 const heroSlides = [
@@ -130,7 +131,7 @@ export default function HeroBanner() {
         style={{
           maxWidth: 900,
           margin: "0 auto",
-          padding: "80px 32px 80px",
+          padding: "100px 32px 80px",
           textAlign: "center",
           opacity: animating ? 0 : 1,
           transform: animating ? "translateY(16px)" : "translateY(0)",
@@ -220,26 +221,28 @@ export default function HeroBanner() {
               color: NAVY,
               padding: "16px 40px",
               borderRadius: 10,
-              fontWeight: 900,
-              fontSize: 16,
+              fontWeight: 500,
+              fontSize: 14,
               textDecoration: "none",
               letterSpacing: 0.5,
               boxShadow: "0 8px 32px rgba(245,197,24,0.45)",
               display: "inline-block",
             }}
           >
-            Enrol Now — Free Consultation
+            <Link to={'/register'} style={{ color: NAVY, textDecoration: "none" }}>
+            Get Started Now
+            </Link>
           </a>
           <a
             href="#courses"
             style={{
               background: "transparent",
-              border: "2px solid rgba(255,255,255,0.3)",
+              border: "1px solid rgba(255,255,255,0.3)",
               color: WHITE,
               padding: "16px 40px",
               borderRadius: 10,
-              fontWeight: 700,
-              fontSize: 16,
+              fontWeight: 400,
+              fontSize: 14,
               textDecoration: "none",
               display: "inline-block",
             }}

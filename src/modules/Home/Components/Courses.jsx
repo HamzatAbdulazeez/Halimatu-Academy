@@ -5,10 +5,10 @@ export default function Courses() {
   const [active, setActive] = useState(0);
 
   return (
-    <section id="courses" style={{ background: NAVY, padding: "100px 24px" }}>
+    <section id="courses" style={{ background: NAVY, padding: "100px 24px" }} className="courses-section">
       <div style={{ maxWidth: 1400, margin: "0 auto" }}>
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 64 }}>
+        <div style={{ textAlign: "center", marginBottom: 64 }} className="courses-header">
           <div
             style={{
               display: "inline-block",
@@ -51,12 +51,15 @@ export default function Courses() {
 
         {/* Year Tabs */}
         <div
+          className="tabs-container"
           style={{
             display: "flex",
             gap: 8,
             marginBottom: 40,
             overflowX: "auto",
-            paddingBottom: 4,
+            paddingBottom: "12px", // Increased for better scrollbar clearance
+            scrollbarWidth: "none", // Hide scrollbar for Firefox
+            msOverflowStyle: "none", // Hide scrollbar for IE
           }}
         >
           {courses.map((c, i) => (
@@ -102,7 +105,7 @@ export default function Courses() {
                 className="course-panel"
               >
                 {/* Left — Description */}
-                <div style={{ padding: "48px" }}>
+                <div className="panel-content-left" style={{ padding: "48px" }}>
                   <div style={{ fontSize: 48, marginBottom: 16 }}>{c.icon}</div>
                   <div
                     style={{
@@ -140,6 +143,7 @@ export default function Courses() {
                   </p>
                   <a
                     href="#enroll"
+                    className="start-button"
                     style={{
                       display: "inline-block",
                       background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`,
@@ -157,6 +161,7 @@ export default function Courses() {
 
                 {/* Right — Topics */}
                 <div
+                  className="panel-content-right"
                   style={{
                     padding: "48px",
                     background: "rgba(0,0,0,0.2)",
@@ -223,8 +228,35 @@ export default function Courses() {
       </div>
 
       <style>{`
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .tabs-container::-webkit-scrollbar {
+          display: none;
+        }
+
         @media (max-width: 768px) {
-          .course-panel { grid-template-columns: 1fr !important; }
+          .courses-section { padding: 60px 20px !important; }
+          .courses-header { marginBottom: 40px !important; }
+          
+          .course-panel { 
+            grid-template-columns: 1fr !important; 
+          }
+
+          .panel-content-left { 
+            padding: 32px 24px !important; 
+            text-align: center;
+          }
+
+          .panel-content-right { 
+            padding: 32px 24px !important; 
+            border-left: none !important;
+            border-top: 1px solid rgba(245,197,24,0.1);
+          }
+
+          .start-button {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+          }
         }
       `}</style>
     </section>

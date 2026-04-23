@@ -90,22 +90,22 @@ const ContactUsPage = () => {
             link: "tel:+08145489933",
             color: "from-blue-500 to-cyan-500"
         },
-        {
-            icon: MapPin,
-            title: "Visit Us",
-            details: "20, Ademola Alabi Str, Olusosun Ikeja Lagos.",
-            subDetails: "Lagos, Nigeria",
-            link: "#",
-            color: "from-purple-500 to-pink-500"
-        },
-        {
-            icon: Clock,
-            title: "Office Hours",
-            details: "Monday - Friday",
-            subDetails: "9:00 AM - 5:00 PM EST",
-            link: "#",
-            color: "from-orange-500 to-amber-500"
-        }
+        // {
+        //     icon: MapPin,
+        //     title: "Visit Us",
+        //     details: "20, Ademola Alabi Str, Olusosun Ikeja Lagos.",
+        //     subDetails: "Lagos, Nigeria",
+        //     link: "#",
+        //     color: "from-purple-500 to-pink-500"
+        // },
+        // {
+        //     icon: Clock,
+        //     title: "Office Hours",
+        //     details: "Monday - Friday",
+        //     subDetails: "9:00 AM - 5:00 PM EST",
+        //     link: "#",
+        //     color: "from-orange-500 to-amber-500"
+        // }
     ];
 
     const categories = [
@@ -153,7 +153,7 @@ const ContactUsPage = () => {
     const socialLinks = [
         { icon: Facebook, href: "#", name: "Facebook", color: "hover:bg-blue-600" },
         { icon: Twitter, href: "#", name: "Twitter", color: "hover:bg-sky-500" },
-        { icon: Instagram, href: "#", name: "Instagram", color: "hover:bg-pink-600" },
+        { icon: Instagram, href: "https://www.instagram.com/halimatusadiyyah_academy1?igsh=MWhiM3o3aTFzeWY4NA==", name: "Instagram", color: "hover:bg-pink-600" },
         { icon: Youtube, href: "#", name: "YouTube", color: "hover:bg-red-600" },
         { icon: Linkedin, href: "#", name: "LinkedIn", color: "hover:bg-blue-700" }
     ];
@@ -206,7 +206,7 @@ const ContactUsPage = () => {
 
                     {/* Contact Info Cards */}
                     <div className="Resizer mx-auto px-4 -mt-12 relative z-20 mb-16">
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
                             {contactInfo.map((info, index) => {
                                 const Icon = info.icon;
                                 return (

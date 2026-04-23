@@ -187,7 +187,7 @@ export default function Footer() {
         >
           <p
             style={{
-              color: "rgba(255,255,255,0.25)",
+              color: "#fff",
               fontSize: 13,
               margin: 0,
             }}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink , useLocation } from "react-router-dom";
 import { Menu, X, Globe, ChevronDown, UserCheck } from "lucide-react";
 import PrivateTutorRequestModal from "../../modules/Home/Components/PrivateTutorRequestModal";
 
@@ -8,13 +8,14 @@ const GOLD_DARK = "#C9A000";
 const NAVY      = "#0A1628";
 const WHITE     = "#ffffff";
 
+
+
 const STORAGE_KEY = "hs_academy_lang";
 const links = [
   { label: "Home",       type: "route", to: "/"        },
   { label: "About Us",   type: "route", to: "/about"   },
   { label: "Courses",    type: "hash",  href: "#courses"  },
   { label: "Features",   type: "hash",  href: "#features" },
-  { label: "FAQs",       type: "hash",  href: "#faqs"     },
   { label: "Contact Us", type: "route", to: "/contact" },
 ];
 
@@ -64,6 +65,9 @@ export default function Navbar() {
   const [currentLang,  setLang]       = useState(getSaved);
   const [tutorModal,   setTutorModal] = useState(false);
   const gtLoaded = useRef(false);
+
+  const location = useLocation(); 
+const isHomePage = location.pathname === "/";
 
   /* ── Scroll shadow ── */
   useEffect(() => {
@@ -193,14 +197,18 @@ export default function Navbar() {
 
       <nav
         style={{
-          position: "fixed",
-          top: 0, left: 0, right: 0,
-          zIndex: 100,
-          background: scrolled ? NAVY : "transparent",
-          transition: "background 0.4s ease",
-          color: WHITE,
-          borderBottom: scrolled ? "1px solid rgba(245,197,24,0.2)" : "none",
-        }}
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    // If it's NOT the home page, OR if we have scrolled, show NAVY
+    background: !isHomePage || scrolled ? NAVY : "transparent",
+    transition: "background 0.4s ease",
+    color: WHITE,
+    // Show the border only when the background is solid
+    borderBottom: !isHomePage || scrolled ? "1px solid rgba(245,197,24,0.2)" : "none",
+  }}
       >
         {/* ── INNER ROW ── */}
         <div

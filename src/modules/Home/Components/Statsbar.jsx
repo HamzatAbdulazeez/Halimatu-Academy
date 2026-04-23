@@ -17,6 +17,7 @@ export default function StatsBar() {
       }}
     >
       <div
+        id="stats-grid" // Added the ID here so the media query works
         style={{
           maxWidth: 1400,
           margin: "0 auto",
@@ -30,6 +31,7 @@ export default function StatsBar() {
           return (
             <div
               key={i}
+              className="stats-item" // Added class for border control
               style={{
                 padding: "28px 24px",
                 borderRight:
@@ -82,8 +84,34 @@ export default function StatsBar() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          #stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        @media (max-width: 992px) {
+          #stats-grid { 
+            grid-template-columns: repeat(2, 1fr) !important; 
+          }
+          .stats-item {
+            padding: 20px 16px !important;
+          }
+          /* Remove border from the 2nd and 4th items on mobile grid */
+          .stats-item:nth-of-type(2n) {
+            border-right: none !important;
+          }
+          /* Add a bottom border to the top row on mobile */
+          .stats-item:nth-of-type(1), .stats-item:nth-of-type(2) {
+            border-bottom: 1px solid rgba(245,197,24,0.15);
+          }
+        }
+        
+        @media (max-width: 480px) {
+          #stats-grid { 
+            grid-template-columns: 1fr !important; 
+          }
+          .stats-item {
+            border-right: none !important;
+            border-bottom: 1px solid rgba(245,197,24,0.15);
+          }
+          .stats-item:last-child {
+            border-bottom: none !important;
+          }
         }
       `}</style>
     </section>

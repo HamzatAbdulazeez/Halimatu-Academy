@@ -17,7 +17,7 @@ const quickStats = [
 
 export default function About() {
   return (
-    <section style={{ background: OFF_WHITE, padding: "80px" }}>
+    <section className="about-section" style={{ background: OFF_WHITE, padding: "80px" }}>
       <div
         style={{
           maxWidth: 1400,
@@ -30,7 +30,7 @@ export default function About() {
         className="about-grid"
       >
         {/* Left — Text */}
-        <div>
+        <div className="about-text-container">
           <div
             style={{
               display: "inline-block",
@@ -49,6 +49,7 @@ export default function About() {
           </div>
 
           <h2
+            className="about-title"
             style={{
               fontSize: 42,
               fontWeight: 900,
@@ -88,7 +89,7 @@ export default function About() {
             here.
           </p>
 
-          <div style={{ display: "flex", gap: 40 }}>
+          <div className="stats-row" style={{ display: "flex", gap: 40 }}>
             {quickStats.map((s) => (
               <div key={s.label}>
                 <div
@@ -112,8 +113,9 @@ export default function About() {
         </div>
 
         {/* Right — Card */}
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative" }} className="about-card-wrapper">
           <div
+            className="about-card"
             style={{
               background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_LIGHT} 100%)`,
               borderRadius: 24,
@@ -173,6 +175,7 @@ export default function About() {
 
           {/* Floating badge */}
           <div
+            className="floating-badge"
             style={{
               position: "absolute",
               bottom: -40,
@@ -181,17 +184,18 @@ export default function About() {
               borderRadius: 16,
               padding: "16px 20px",
               boxShadow: "0 8px 32px rgba(245,197,24,0.4)",
+              lineHeight: 2,
             }}
           >
             <div
-              style={{ fontSize: 24, fontWeight: 900, color: NAVY }}
+              style={{ fontSize: 24, fontWeight: 800, color: NAVY }}
             >
               Ages
             </div>
             <div
               style={{
-                fontSize: 32,
-                fontWeight: 900,
+                fontSize: 24,
+                fontWeight: 700,
                 color: NAVY,
                 lineHeight: 1,
               }}
@@ -203,8 +207,38 @@ export default function About() {
       </div>
 
       <style>{`
+        @media (max-width: 1024px) {
+          .about-section { padding: 60px 40px !important; }
+          .about-grid { gap: 40px !important; }
+        }
+
         @media (max-width: 768px) {
-          .about-grid { grid-template-columns: 1fr !important; }
+          .about-section { padding: 60px 24px !important; }
+          .about-grid { 
+            grid-template-columns: 1fr !important; 
+            gap: 60px !important; 
+          }
+          .about-title { 
+            font-size: 32px !important; 
+            text-align: center; 
+          }
+          .about-text-container { 
+            text-align: center; 
+          }
+          .stats-row { 
+            justify-content: center; 
+            gap: 20px !important; 
+          }
+          .about-card { padding: 32px !important; }
+          .about-card-wrapper { margin-bottom: 40px; }
+          
+          .floating-badge {
+            left: 50% !important;
+            transform: translateX(-50%);
+            bottom: -30px !important;
+            width: fit-content;
+            white-space: nowrap;
+          }
         }
       `}</style>
     </section>
