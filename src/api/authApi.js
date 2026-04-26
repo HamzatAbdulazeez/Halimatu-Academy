@@ -109,6 +109,22 @@ export const verifyOtp = async (verifyData) => {
 };
 
 
+// ====================== RESEND OTP ======================
+export const resendOtp = async ({ email, purpose = "email_verification" }) => {
+    try {
+        const payload = {
+            email: email?.trim().toLowerCase(),
+            purpose,
+        };
+
+        const response = await axiosInstance.post("/auth/resend-otp", payload);
+        return response.data;
+    } catch (error) {
+        console.error("Resend OTP API Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
 // ====================== FORGOT PASSWORD ======================
 export const forgotPassword = async (email) => {
     try {

@@ -215,7 +215,7 @@ const StudentSubscriptionPage = () => {
       console.log('2. Opening Flutterwave Checkout with tx_ref:', paymentData.tx_ref);
 
       window.FlutterwaveCheckout({
-        public_key: 'FLWPUBK_TEST-39ab6a4a6d75cab56a4e98abcbc5aeb4-X',
+        public_key: 'FLWPUBK-0b5372bba5b4a70922bde9eca54e77c3-X',
         tx_ref: paymentData.tx_ref,
         amount: paymentData.amount,
         currency: paymentData.currency || 'NGN',

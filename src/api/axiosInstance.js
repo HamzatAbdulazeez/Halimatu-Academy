@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://halimatu.farmsglobal.org/api",
+  baseURL: "https://api.halimatu-sadiyyah.com.ng/api",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -97,7 +97,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          "https://halimatu.farmsglobal.org/api/auth/refresh",
+          "https://api.halimatu-sadiyyah.com.ng/auth/refresh",
           { refresh_token: refreshToken },
           { headers: { "Content-Type": "application/json" } }
         );
