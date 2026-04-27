@@ -1,4 +1,4 @@
-export const IMAGE_BASE = 'https://halimatu.farmsglobal.org';
+export const IMAGE_BASE = 'https://api.halimatu-sadiyyah.com.ng';
 
 export const getImageUrl = (path) => {
     if (!path) return '';
