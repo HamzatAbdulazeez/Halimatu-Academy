@@ -222,7 +222,7 @@ const StudentSubscriptionPage = () => {
         payment_options: 'card, banktransfer, ussd',
         customer: paymentData.customer || { email: 'user@example.com' },
         customizations: {
-          title: 'Halimatu Academy',
+          title: 'Student Subscription',
           description: `Payment for ${selectedPlan.name}`,
           logo: '',
         },
@@ -473,9 +473,9 @@ const StudentSubscriptionPage = () => {
           {plans.length === 0 ? (
             <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 sm:p-16 text-center">
               <p className="text-gray-500 text-lg">No plans available at the moment.</p>
-              <p className="text-sm text-gray-400 mt-2">
+              {/* <p className="text-sm text-gray-400 mt-2">
                 Make sure your plans are set to &quot;Active&quot; in the Admin panel
-              </p>
+              </p> */}
             </div>
           ) : (
             <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">

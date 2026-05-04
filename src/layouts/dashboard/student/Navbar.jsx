@@ -163,7 +163,7 @@ export default function Navbar({ toggleSidebar }) {
                 </button>
 
                 <h1 className="text-base font-medium text-gray-700 lg:ml-4">
-                    Halimatu Academy
+                    Student  Dashboard
                 </h1>
 
                 {/* Right Side */}

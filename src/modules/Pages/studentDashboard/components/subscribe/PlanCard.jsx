@@ -1,99 +1,88 @@
 import React from 'react';
-import { FaSync } from 'react-icons/fa';
+import { FaSync, FaChevronRight } from 'react-icons/fa';
 
-const PlanCard = ({ plan, isCurrent, isProcessing, isDisabled, onSelectPlan }) => {
-    const disabled = isCurrent || isProcessing || isDisabled;
+const PlanCard = ({ plan, isCurrent, isProcessing, onSelectPlan }) => {
+    const isDisabled = isCurrent || isProcessing;
 
     return (
         <div className={`
-            bg-white rounded-2xl p-6 flex flex-col transition-all duration-200
-            ${isCurrent 
-                ? 'border-2 border-[#1D9E75] shadow-md' 
-                : plan.popular 
-                    ? 'border-2 border-[#185FA5] shadow-lg' 
-                    : 'border border-gray-200 hover:border-gray-300'
-            }
+            bg-white rounded-xl border p-6 transition-all duration-300 relative
+            ${isCurrent ? 'border-emerald-500 shadow-md' : 'border-blue-100 hover:border-blue-300 shadow-sm'}
         `}>
             
-            {/* Badge */}
-            {isCurrent ? (
-                <span className="inline-block text-[11px] font-medium px-3 py-1 bg-[#E1F5EE] text-[#085041] rounded-full mb-4">
-                    Your plan ✓
-                </span>
-            ) : plan.popular ? (
-                <span className="inline-block text-[11px] font-medium px-3 py-1 bg-[#E6F1FB] text-[#0C447C] rounded-full mb-4">
-                    Most popular
-                </span>
-            ) : (
-                <div className="h-5.25 mb-4" />
-            )}
-
-            {/* Period */}
-            <p className="text-[11px] font-medium tracking-[0.07em] uppercase text-[#185FA5] mb-1">
-                {plan.period}
-            </p>
-
-            {/* Plan Name */}
-            <h3 className="text-[17px] font-medium text-gray-900 mb-5">
-                {plan.name}
-            </h3>
-
-            {/* Price */}
-            <div className="flex items-baseline gap-1 mb-5 pb-5 border-b border-gray-100">
-                <span className="text-3xl font-medium text-gray-900">
-                    {plan.displayPrice}
-                </span>
-                <span className="text-sm text-gray-500">
-                    /{plan.period.toLowerCase()}
-                </span>
+            {/* Header: Plan Name & Subscription Type */}
+            <div className="mb-4">
+                <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>
+                <p className="text-xs text-gray-400 mt-1 capitalize">
+                    {plan.period || 'Annual'} • {plan.duration_months} Months
+                </p>
             </div>
 
-            {/* Features */}
-            <ul className="space-y-3 flex-1 mb-6">
-                {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-gray-600">
-                        <span className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0
-                            ${isCurrent ? 'bg-[#E1F5EE]' : 'bg-[#E6F1FB]'}`}>
-                            <svg width="9" height="9" viewBox="0 0 10 10" fill="none">
-                                <polyline 
-                                    points="2,5 4,7.5 8,3" 
-                                    stroke={isCurrent ? "#1D9E75" : "#185FA5"} 
-                                    strokeWidth="1.5" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                />
-                            </svg>
-                        </span>
-                        {feature}
-                    </li>
-                ))}
-            </ul>
-
-            {/* Subscribe Button */}
-            <button
-                onClick={() => !disabled && onSelectPlan(plan)}
-                disabled={disabled}
-                className={`
-                    w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all
-                    ${isCurrent 
-                        ? 'bg-[#E1F5EE] text-[#085041] cursor-default' 
-                        : isDisabled 
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                            : 'bg-[#185FA5] text-white hover:bg-[#0F4A85]'
-                    }
-                `}
-            >
-                {isProcessing ? (
-                    <>
-                        <FaSync className="animate-spin" />
-                        Processing...
-                    </>
-                ) : isCurrent ? (
-                    'Current plan ✓'
-                ) : (
-                    'Subscribe now →'
+          
+            <div className="flex items-center gap-3 mb-2">
+                <span className="text-3xl font-black text-gray-900">
+                    ₦{Number(plan.discounted_price || plan.price).toLocaleString()}
+                </span>
+                {plan.original_price && (
+                    <span className="text-lg text-gray-300 line-through decoration-gray-400">
+                        ₦{Number(plan.original_price).toLocaleString()}
+                    </span>
                 )}
-            </button>
+            </div>
+
+            {/* 50% OFF Badge */}
+            <div className="inline-block bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-1 rounded-md mb-5 uppercase tracking-wider">
+                50% OFF
+            </div>
+
+            {/* Plan Description */}
+            <p className="text-gray-500 text-sm leading-relaxed mb-6 max-w-xl">
+                {plan.description || "We provide structured online Qur’an, Tajw?d, Hadith, and Arabic language courses through qualified tutors. Our classes are designed for children and adults, allowing students to learn from the comfort of their homes. We offer both group sessions and private classes with a clear yearly curriculum and certification."}
+            </p>
+
+            {/* Feature List */}
+            <div className="space-y-2.5 mb-8">
+                {plan.features?.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-[12px] font-bold text-[#004aad] capitalize tracking-tight">
+                        <span className="w-1.5 h-1.5 bg-[#004aad] rounded-full shrink-0" />
+                       {feature}
+                    </div>
+                ))}
+            </div>
+
+            {/* Footer: Status and Action Button */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                <div>
+                    {isCurrent ? (
+                        <span className="bg-emerald-50 text-emerald-700 text-xs font-bold px-4 py-2 rounded-lg">
+                            Active Plan
+                        </span>
+                    ) : (
+                        <span className="text-black text-xs font-medium">
+                            Available for purchase
+                        </span>
+                    )}
+                </div>
+                
+                <button
+                    onClick={() => !isDisabled && onSelectPlan(plan)}
+                    disabled={isDisabled}
+                    className={`
+                        flex items-center gap-2 px-6 py-2.5 rounded-md text-sm transition-all cursor-pointer
+                        ${isCurrent 
+                            ? 'bg-gray-50 text-gray-400 cursor-default' 
+                            : 'bg-[#004aad] text-white hover:bg-[#003a8c] hover:shadow-lg active:scale-95'}
+                    `}
+                >
+                    {isProcessing ? (
+                        <FaSync className="animate-spin" />
+                    ) : isCurrent ? (
+                        'Current'
+                    ) : (
+                        <>Subscribe Now <FaChevronRight size={10} /></>
+                    )}
+                </button>
+            </div>
         </div>
     );
 };
