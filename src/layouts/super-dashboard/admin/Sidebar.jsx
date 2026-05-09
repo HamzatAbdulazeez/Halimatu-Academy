@@ -6,9 +6,9 @@ import { notify } from "../../../utils/toast";
 import {
   FaHome, FaUsers, FaCog, FaBell,
   FaUserGraduate, FaCreditCard, FaCertificate,
-  FaBookOpen, FaLink, FaListUl, FaChevronDown, FaShieldAlt,
+  FaBookOpen, FaLink, FaListUl, FaChevronDown, FaShieldAlt, 
 } from "react-icons/fa";
-import { UserCheck, LogOut, MessageSquare, LogOut as LogOutAll } from "lucide-react";
+import { UserCheck, LogOut, MessageSquare, HandCoins,  LogOut as LogOutAll } from "lucide-react";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const { user, logout: contextLogout } = useAuth(); 
@@ -139,6 +139,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <SidebarItem to="/admin/subscriptions" icon={<FaCreditCard size={20} />} text="Subscriptions" onClick={handleLinkClick} />
           <SidebarItem to="/admin/certificates" icon={<FaCertificate size={20} />} text="Certificates" onClick={handleLinkClick} />
           <SidebarItem to="/admin/tutor-requests" icon={<UserCheck size={20} />} text="Tutor Requests" onClick={handleLinkClick} />
+          <SidebarItem to="/admin/payment-requests" icon={<HandCoins size={20} />} text="Payment Requests" onClick={handleLinkClick} />
           <SidebarItem to="/admin/contact-messages" icon={<MessageSquare size={20} />} text="Contact Messages" onClick={handleLinkClick} />
 
           {isAdmin && (

@@ -17,6 +17,7 @@ import RolePermissions from "../modules/Pages/adminDashboard/roles/RolePermissio
 import ManageAdminsPage from "../modules/Pages/adminDashboard/staff/ManageAdminsPage";
 import Unauthorized from "../modules/Pages/adminDashboard/Unauthorized";
 import AdminTutorRequestsPage from "../modules/Pages/adminDashboard/AdminTutorRequestsPage";
+import AdminPaymentRequestsPage from "../modules/Pages/adminDashboard/AdminPayment";
 import AdminContactMessagesPage from "../modules/Pages/adminDashboard/AdminContactMessagesPage";
 
 export const adminRoutes = [
@@ -35,6 +36,7 @@ export const adminRoutes = [
           { path: "certificates", element: <Certificate /> },
           { path: "notifications", element: <NotificationPage /> },
           { path: "tutor-requests", element: <AdminTutorRequestsPage /> },
+          { path: "payment-requests", element: <AdminPaymentRequestsPage /> },
           { path: "contact-messages", element: <AdminContactMessagesPage /> },
 
           // === STAFF & ROLES MANAGEMENT (Super Admin + Admin only) ===

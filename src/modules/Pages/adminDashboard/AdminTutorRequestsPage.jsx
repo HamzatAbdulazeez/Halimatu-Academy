@@ -64,33 +64,70 @@ const AdminTutorRequestsPage = () => {
         return matchesSearch && matchesFilter;
     });
 
-    const handleStatusUpdate = useCallback(async (requestId, newStatus, closeModal = false) => {
-        if (!requestId) {
-            notify.error("Invalid Request ID");
-            return;
-        }
-        
-        setUpdatingId(requestId);
-        try {
-            // ADD THIS LOG to see exactly what is being sent
-            console.log(`Updating request ${requestId} to status: ${newStatus}`);
-            
-            await updateTutorRequestStatus(requestId, newStatus);
-            
-            setRequests(prev =>
-                prev.map(req =>
-                    getId(req) === requestId ? { ...req, status: newStatus } : req
-                )
-            );
-            notify.success(`Request marked as ${newStatus}`);
-            if (closeModal) setShowDetailModal(false);
-        } catch (err) {
-            console.error("Update Error:", err.response || err);
-            notify.error(err.response?.data?.message || 'Failed to update status');
-        } finally {
-            setUpdatingId(null);
-        }
-    }, []);
+    const handleStatusUpdate = useCallback(
+        async (requestId, newStatus, closeModal = false) => {
+            if (!requestId) {
+                notify.error('Invalid Request ID');
+                return;
+            }
+    
+            setUpdatingId(requestId);
+    
+            try {
+                console.log('Updating Request:', {
+                    requestId,
+                    newStatus,
+                });
+    
+                // API CALL
+                const response = await updateTutorRequestStatus(
+                    requestId,
+                    { status: newStatus } // IMPORTANT FIX
+                );
+    
+                console.log('Update Response:', response);
+    
+                // UPDATE STATE IMMEDIATELY
+                setRequests((prev) =>
+                    prev.map((req) =>
+                        String(getId(req)) === String(requestId)
+                            ? {
+                                  ...req,
+                                  status: newStatus,
+                              }
+                            : req
+                    )
+                );
+    
+                // UPDATE MODAL STATE TOO
+                setSelectedRequest((prev) =>
+                    prev &&
+                    String(getId(prev)) === String(requestId)
+                        ? {
+                              ...prev,
+                              status: newStatus,
+                          }
+                        : prev
+                );
+    
+                notify.success(`Request marked as ${newStatus}`);
+    
+                if (closeModal) {
+                    setShowDetailModal(false);
+                }
+            } catch (err) {
+                console.error('Update Error:', err);
+    
+                notify.error(
+                    err?.response?.data?.message ||
+                    'Failed to update request status'
+                );
+            } finally {
+                setUpdatingId(null);
+            }
+        },
+        []
+    );
 
     const handleDelete = useCallback(async (requestId) => {
         if (!window.confirm('Delete this tutor request permanently?')) return;
@@ -238,7 +275,7 @@ const AdminTutorRequestsPage = () => {
                                                         <Eye size={18} />
                                                     </button>
 
-                                                    {req.status === 'pending' && (
+                                                    {req.status?.toLowerCase() === 'pending' && (
                                                         <button
                                                             onClick={() => handleStatusUpdate(reqId, 'contacted')}
                                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
@@ -248,7 +285,7 @@ const AdminTutorRequestsPage = () => {
                                                         </button>
                                                     )}
 
-                                                    {req.status !== 'completed' && (
+                                                    {req.status?.toLowerCase() !== 'completed' && (
                                                         <button
                                                             onClick={() => handleStatusUpdate(reqId, 'completed')}
                                                             className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
